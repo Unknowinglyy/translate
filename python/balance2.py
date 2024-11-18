@@ -55,28 +55,37 @@ total_steps_moved = {motor: 0 for motor in MOTOR_PINS.keys()}
 def move_motor(motor, steps, clockwise):
     """
     Moves a single motor a specified number of steps in a specified direction.
+    Updates the net total steps moved by the motor.
     """
     global total_steps_moved
 
-    # Calculate allowed steps based on the remaining step budget
-    remaining_steps = MAX_TOTAL_STEPS - total_steps_moved[motor]
-    allowed_steps = min(steps, remaining_steps)
+    # Calculate the proposed change in step count
+    change = steps if clockwise else -steps
+    new_total = total_steps_moved[motor] + change
 
-    if allowed_steps <= 0:
-        debug_log(f"{motor} has reached its maximum allowed steps. No movement.")
+    # Ensure the total steps remain within the allowable range
+    if abs(new_total) > MAX_TOTAL_STEPS:
+        allowed_steps = MAX_TOTAL_STEPS - abs(total_steps_moved[motor])
+        allowed_steps = max(allowed_steps, 0)  # Ensure no negative steps
+        debug_log(f"{motor} step limit reached. Adjusting steps to {allowed_steps}.")
+        steps = allowed_steps
+        change = steps if clockwise else -steps
+
+    if steps <= 0:
+        debug_log(f"{motor} cannot move further. No steps executed.")
         return
 
-    debug_log(f"Moving {motor}: steps={allowed_steps}, clockwise={clockwise}, remaining_steps={remaining_steps}")
+    debug_log(f"Moving {motor}: steps={steps}, clockwise={clockwise}, total_steps={total_steps_moved[motor]}")
     GPIO.output(MOTOR_PINS[motor]['dir'], GPIO.HIGH if clockwise else GPIO.LOW)
-
-    for _ in range(abs(allowed_steps)):
+    for _ in range(abs(steps)):
         GPIO.output(MOTOR_PINS[motor]['step'], GPIO.HIGH)
         time.sleep(0.01)
         GPIO.output(MOTOR_PINS[motor]['step'], GPIO.LOW)
         time.sleep(0.01)
 
     # Update the total steps moved for this motor
-    total_steps_moved[motor] += allowed_steps
+    total_steps_moved[motor] += change
+    debug_log(f"Updated {motor} total steps to {total_steps_moved[motor]}")
 
 def move_motors_concurrently(motor_steps):
     """
@@ -110,6 +119,7 @@ def move_to(hz, nx, ny):
 
     # Use threading to move motors concurrently
     move_motors_concurrently(motor_steps)
+
 def pid_control(setpoint_x, setpoint_y):
     """
     PID control to move the ball to the specified setpoint.
