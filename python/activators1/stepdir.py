@@ -1,6 +1,6 @@
 import logging
 import RPi.GPIO as GPIO
-from .. import DIRECTION_CW, DIRECTION_CCW, sleep_microseconds
+import DIRECTION_CW, DIRECTION_CCW, sleep_microseconds
 
 log = logging.getLogger(__name__)
 
