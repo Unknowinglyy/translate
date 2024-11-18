@@ -1,7 +1,7 @@
 from datetime import datetime
 import asyncio, logging, time
 import RPi.GPIO as GPIO
-from .activators1 import stepdir as stepdir_act
+from activators1 import stepdir as stepdir_act
 from . import DIRECTION_CW, DIRECTION_CCW, micros
 
 log = logging.getLogger(__name__)
