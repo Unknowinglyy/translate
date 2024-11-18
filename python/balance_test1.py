@@ -1,5 +1,6 @@
 import time
-from touchScreenBasicCoordOutput import read_touch_coordinates
+from RpiMotorLib import RpiMotorLib
+from touchScreenBasicCoordOutput import read_touch_coordinates, Point
 from kine import Machine
 
 # Initialize the machine with the given lengths
@@ -16,16 +17,16 @@ angOrig = 206.662752199  # Original angle that each leg starts at
 angToStep = 1  # Conversion factor from angle to step (adjust as needed)
 ks = 20  # Speed amplifying constant
 
-# Touchscreen variables
-Xoffset = 500  # X offset for the center position of the touchpad
-Yoffset = 500  # Y offset for the center position of the touchpad
-
 # PID variables
 error = [0, 0]
 errorPrev = [0, 0]
 integr = [0, 0]
 deriv = [0, 0]
 detected = 0
+
+# Touchscreen variables
+Xoffset = 500  # X offset for the center position of the touchpad
+Yoffset = 500  # Y offset for the center position of the touchpad
 
 # Function to move the stepper motors to the target positions
 def move_steppers(target_positions):
@@ -37,13 +38,14 @@ def move_steppers(target_positions):
 def PID(setpointX, setpointY):
     global detected, error, errorPrev, integr, deriv
 
-    for x, y in read_touch_coordinates():
-        if x is None or y is None:
+    while True:
+        point = read_touch_coordinates()
+        if point is None:
             break
 
         # Measure X and Y positions
-        p_x = x
-        p_y = y
+        p_x = point.x
+        p_y = point.y
 
         # If the ball is detected (the x position will not be 0)
         if p_x != 0:
