@@ -4,7 +4,7 @@ import time
 from simple_pid import PID
 from touchScreenBasicCoordOutput import read_touch_coordinates
 import threading
-from kine2 import compute_angle  
+from kine2 import Kinematics  # Import the Kinematics class
 
 # --------------------------------------------------------------------------------------------
 # GPIO setup for stepper motors
@@ -18,6 +18,10 @@ MOTOR_PINS = {
 CENTER_X, CENTER_Y = 2005, 2033.5
 # Ball detection thresholds
 BALL_DETECTION_THRESHOLD = 10
+
+# Kinematics parameters
+d, e, f, g = 10, 5, 15, 20  # Replace with actual machine parameters
+kinematics = Kinematics(d, e, f, g)
 
 # --------------------------------------------------------------------------------------------
 # GPIO Setup
@@ -68,11 +72,16 @@ def calculate_motor_steps(ball_x, ball_y, velocity_x, velocity_y):
     steps_y = int(pid_y(ball_y))
 
     # Use kinematics to compute angles and convert to motor steps
-    motor_angles = compute_angle(steps_x, steps_y)  # Returns angles for each motor
+    motor_angles = {
+        'motor1': kinematics.compute_angle('A', 0, steps_x, steps_y),  # Replace 0 with the height offset if needed
+        'motor2': kinematics.compute_angle('B', 0, steps_x, steps_y),
+        'motor3': kinematics.compute_angle('C', 0, steps_x, steps_y),
+    }
+
+    # Convert angles to steps (assuming 1 degree = 1 step for simplicity, adjust as needed)
     motor_steps = {
-        'motor1': (int(motor_angles['A']), motor_angles['A'] > 0),
-        'motor2': (int(motor_angles['B']), motor_angles['B'] > 0),
-        'motor3': (int(motor_angles['C']), motor_angles['C'] > 0),
+        motor: (int(angle), angle > 0)
+        for motor, angle in motor_angles.items()
     }
 
     return motor_steps
