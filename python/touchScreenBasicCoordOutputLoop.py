@@ -28,5 +28,9 @@ def read_touch_coordinates(device_path='/dev/input/event6'):
                 return Point(x, y)
 
 if __name__ == "__main__":
-    point = read_touch_coordinates()
-    print(f"X: {point.x}, Y: {point.y}")
+    while True:
+        try:
+            point = read_touch_coordinates()
+            print(f"X: {point.x}, Y: {point.y}")
+        except KeyboardInterrupt:
+            break
