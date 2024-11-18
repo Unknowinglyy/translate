@@ -3,6 +3,7 @@ import RPi.GPIO as GPIO
 import time
 from kine2 import Kinematics  # Import the Kinematics class
 from touchScreenBasicCoordOutput import read_touch_coordinates
+import threading
 
 # --------------------------------------------------------------------------------------------
 # GPIO setup for stepper motors
@@ -47,34 +48,39 @@ def debug_log(msg):
     """
     print(f"[{time.time():.2f}] {msg}")
 
-def move_motor(motor, steps, clockwise):
+
+def move_motors_concurrently(motor_steps):
     """
-    Moves a single motor a specified number of steps in a specified direction.
+    Moves the motors concurrently using threading.
     """
-    debug_log(f"Moving {motor}: steps={steps}, clockwise={clockwise}")
-    GPIO.output(MOTOR_PINS[motor]['dir'], GPIO.HIGH if clockwise else GPIO.LOW)
-    for _ in range(abs(steps)):
-        GPIO.output(MOTOR_PINS[motor]['step'], GPIO.HIGH)
-        time.sleep(0.001)
-        GPIO.output(MOTOR_PINS[motor]['step'], GPIO.LOW)
-        time.sleep(0.001)
+    threads = []
+    for motor, (steps, clockwise) in motor_steps.items():
+        if steps > 0:  # Only move motors with non-zero steps
+            t = threading.Thread(target=move_motor, args=(motor, steps, clockwise))
+            threads.append(t)
+            t.start()
+    for t in threads:
+        t.join()
 
 def move_to(hz, nx, ny):
     """
-    Moves the platform based on calculated motor positions.
+    Moves the platform based on calculated motor positions using threading.
     """
     global detected, pos
-    print(f"move_to: hz={hz}, nx={nx}, ny={ny}, detected={detected}")
+    debug_log(f"move_to called with hz={hz}, nx={nx}, ny={ny}, detected={detected}")
 
-    for i in range(3):
-        target_angle = kinematics.compute_angle(chr(65 + i), hz, nx, ny)
-        pos[i] = round((angOrig - target_angle) * angToStep)  # Calculate position in steps
-        print(f"Motor {chr(65 + i)}: Target angle={target_angle:.2f}, Steps={pos[i]}")
+    motor_steps = {}
 
     for i, motor in enumerate(MOTOR_PINS.keys()):
-        steps = abs(pos[i]) // 16
+        target_angle = kinematics.compute_angle(chr(65 + i), hz, nx, ny)
+        pos[i] = round((angOrig - target_angle) * angToStep)  # Calculate position in steps
+        steps = abs(pos[i]) // 16  # Adjust step scaling if necessary
         clockwise = pos[i] > 0
-        move_motor(motor, steps, clockwise)
+        motor_steps[motor] = (steps, clockwise)
+        debug_log(f"Motor {chr(65 + i)}: Target angle={target_angle:.2f}, Steps={steps}, Clockwise={clockwise}")
+
+    # Use threading to move motors concurrently
+    move_motors_concurrently(motor_steps)
 
 def pid_control(setpoint_x, setpoint_y):
     """
