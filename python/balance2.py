@@ -78,6 +78,8 @@ def calculate_motor_steps(ball_x, ball_y, velocity_x, velocity_y):
         'motor3': kinematics.compute_angle('C', 0, steps_x, steps_y),
     }
 
+    print(motor_angles)
+
     # Convert angles to steps (assuming 1 degree = 1 step for simplicity, adjust as needed)
     motor_steps = {
         motor: (int(angle), angle > 0)
