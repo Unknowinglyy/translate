@@ -20,7 +20,7 @@ CENTER_X, CENTER_Y = 2005, 2033.5
 BALL_DETECTION_THRESHOLD = 10
 
 # Kinematics parameters
-d, e, f, g = 10, 5, 15, 20  # Replace with actual machine parameters
+d, e, f, g = 2, 3.125, 1.75, 3.669291339  # Replace with actual machine parameters
 kinematics = Kinematics(d, e, f, g)
 
 # --------------------------------------------------------------------------------------------
