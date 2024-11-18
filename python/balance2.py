@@ -16,7 +16,8 @@ MOTOR_PINS = {
 # Parameters
 CENTER_X, CENTER_Y = 2025, 2045  # Touchscreen center offsets
 BALL_DETECTION_THRESHOLD = 20    # Ball detection range
-angOrig = 170          # Original angle
+MAX_STEPS = 50
+angOrig = 165          # Original angle
 angToStep = 3200 / 360           # Steps per degree
 ks = 20                          # Speed amplifying constant
 kp, ki, kd = 4E-4, 2E-6, 7E-3    # PID constants
@@ -85,10 +86,12 @@ def move_to(hz, nx, ny):
     for i, motor in enumerate(MOTOR_PINS.keys()):
         target_angle = kinematics.compute_angle(chr(65 + i), hz, nx, ny)
         pos[i] = round((angOrig - target_angle) * angToStep)  # Calculate position in steps
-        steps = abs(pos[i]) // 16  # Adjust step scaling if necessary
+
+        # Apply the upper limit on motor steps
+        limited_steps = min(abs(pos[i]) // 16, MAX_STEPS)
         clockwise = pos[i] > 0
-        motor_steps[motor] = (steps, clockwise)
-        debug_log(f"Motor {chr(65 + i)}: Target angle={target_angle:.2f}, Steps={steps}, Clockwise={clockwise}")
+        motor_steps[motor] = (limited_steps, clockwise)
+        debug_log(f"Motor {chr(65 + i)}: Target angle={target_angle:.2f}, Steps={limited_steps}, Clockwise={clockwise}")
 
     # Use threading to move motors concurrently
     move_motors_concurrently(motor_steps)
