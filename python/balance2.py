@@ -16,7 +16,8 @@ MOTOR_PINS = {
 # Parameters
 CENTER_X, CENTER_Y = 2025, 2045  # Touchscreen center offsets
 BALL_DETECTION_THRESHOLD = 20    # Ball detection range
-angOrig = 160          # Original angle
+MAX_TOTAL_STEPS = 200
+angOrig = 165          # Original angle
 angToStep = 3200 / 360           # Steps per degree
 ks = 20                          # Speed amplifying constant
 kp, ki, kd = 4E-4, 2E-6, 7E-3    # PID constants
@@ -48,11 +49,33 @@ def debug_log(msg):
     """
     print(f"[{time.time():.2f}] {msg}")
 
+# Dictionary to track the total steps moved by each motor
+total_steps_moved = {motor: 0 for motor in MOTOR_PINS.keys()}
 
 def move_motor(motor, steps, clockwise):
     """
     Moves a single motor a specified number of steps in a specified direction.
+    Updates the net total steps moved by the motor.
     """
+    global total_steps_moved
+
+    # Calculate the proposed change in step count
+    change = steps if clockwise else -steps
+    new_total = total_steps_moved[motor] + change
+
+    # Ensure the total steps remain within the allowable range
+    if abs(new_total) > MAX_TOTAL_STEPS:
+        allowed_steps = MAX_TOTAL_STEPS - abs(total_steps_moved[motor])
+        allowed_steps = max(allowed_steps, 0)  # Ensure no negative steps
+        debug_log(f"{motor} step limit reached. Adjusting steps to {allowed_steps}.")
+        steps = allowed_steps
+        change = steps if clockwise else -steps
+
+    if steps <= 0:
+        debug_log(f"{motor} cannot move further. No steps executed.")
+        return
+
+    debug_log(f"Moving {motor}: steps={steps}, clockwise={clockwise}, total_steps={total_steps_moved[motor]}")
     GPIO.output(MOTOR_PINS[motor]['dir'], GPIO.HIGH if clockwise else GPIO.LOW)
     for _ in range(abs(steps)):
         GPIO.output(MOTOR_PINS[motor]['step'], GPIO.HIGH)
@@ -60,7 +83,9 @@ def move_motor(motor, steps, clockwise):
         GPIO.output(MOTOR_PINS[motor]['step'], GPIO.LOW)
         time.sleep(0.001)
 
-
+    # Update the total steps moved for this motor
+    total_steps_moved[motor] += change
+    debug_log(f"Updated {motor} total steps to {total_steps_moved[motor]}")
 
 def move_motors_concurrently(motor_steps):
     """
@@ -69,7 +94,7 @@ def move_motors_concurrently(motor_steps):
     threads = []
     for motor, (steps, clockwise) in motor_steps.items():
         if steps > 0:  # Only move motors with non-zero steps
-            t = threading.Thread(target=move_motors_concurrently, args=(motor, steps, clockwise))
+            t = threading.Thread(target=move_motor, args=(motor, steps, clockwise))
             threads.append(t)
             t.start()
     for t in threads:
@@ -102,7 +127,7 @@ def pid_control(setpoint_x, setpoint_y):
     global detected, error, integr, deriv, out, speed
 
     point = read_touch_coordinates()  # Get touchscreen data
-    debug_log(f"Touchscreen read: {point}")
+    print(f"Touchscreen read: {point}")
     if point is not None and point.x != 0:
         detected = True
         for i in range(2):
