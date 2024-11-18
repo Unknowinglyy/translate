@@ -23,7 +23,7 @@ def compute_angle(steps_x, steps_y):
     # Calculate normal vector from steps (for simplicity, assume normalized values map to nx, ny)
     nx = steps_x / max(abs(steps_x), abs(steps_y), 1)  # Normalized direction X
     ny = steps_y / max(abs(steps_x), abs(steps_y), 1)  # Normalized direction Y
-    nz = math.sqrt(1 - nx**2 - ny**2)  # Assuming unit normal vector
+    nz = math.sqrt(max(0, 1 - nx**2 - ny**2))  # Assuming unit normal vector
 
     # Calculate angle for Leg A
     leg_angles['A'] = _compute_leg_angle('A', d, e, f, g, nx, ny, nz)
