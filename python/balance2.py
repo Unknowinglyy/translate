@@ -48,19 +48,17 @@ def debug_log(msg):
     """
     print(f"[{time.time():.2f}] {msg}")
 
-
 def move_motor(motor, steps, clockwise):
     """
     Moves a single motor a specified number of steps in a specified direction.
     """
+    debug_log(f"Moving {motor}: steps={steps}, clockwise={clockwise}")
     GPIO.output(MOTOR_PINS[motor]['dir'], GPIO.HIGH if clockwise else GPIO.LOW)
     for _ in range(abs(steps)):
         GPIO.output(MOTOR_PINS[motor]['step'], GPIO.HIGH)
         time.sleep(0.001)
         GPIO.output(MOTOR_PINS[motor]['step'], GPIO.LOW)
         time.sleep(0.001)
-
-
 
 def move_motors_concurrently(motor_steps):
     """
@@ -69,7 +67,7 @@ def move_motors_concurrently(motor_steps):
     threads = []
     for motor, (steps, clockwise) in motor_steps.items():
         if steps > 0:  # Only move motors with non-zero steps
-            t = threading.Thread(target=move_motors_concurrently, args=(motor, steps, clockwise))
+            t = threading.Thread(target=move_motor, args=(motor, steps, clockwise))
             threads.append(t)
             t.start()
     for t in threads:
