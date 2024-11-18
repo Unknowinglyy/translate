@@ -17,7 +17,7 @@ MOTOR_PINS = {
 # Center position of the touchscreen
 CENTER_X, CENTER_Y = 2025, 2045
 # Ball detection thresholds
-BALL_DETECTION_THRESHOLD = 10
+BALL_DETECTION_THRESHOLD = 3
 
 # Kinematics parameters
 d, e, f, g = 2, 3.125, 1.75, 3.669291339  # Replace with actual machine parameters
