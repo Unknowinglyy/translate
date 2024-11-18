@@ -18,7 +18,7 @@ MOTOR_PINS = {
 # Parameters
 CENTER_X, CENTER_Y = 2025, 2045  # Touchscreen center offsets
 BALL_DETECTION_THRESHOLD = 20    # Ball detection range
-MAX_TOTAL_STEPS = 250
+MAX_TOTAL_STEPS = 200
 angOrig = 165          # Original angle
 angToStep = 3200 / 360           # Steps per degree
 ks = 20                          # Speed amplifying constant
@@ -173,4 +173,10 @@ def balance_ball():
 # --------------------------------------------------------------------------------------------
 if __name__ == "__main__":
     debug_log("Initializing...")
+    # Centering motors before starting
+    print("Centering motors...")
+    for _ in range(150):  # Arbitrary 100 steps to center
+        move_motor('motor1', 1, True)
+        move_motor('motor2', 1, True)
+        move_motor('motor3', 1, True)
     balance_ball()
