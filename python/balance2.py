@@ -59,33 +59,38 @@ def move_motor(motor, steps, clockwise):
 def calculate_motor_steps(ball_x, ball_y, velocity_x, velocity_y):
     print(f"Ball position: x={ball_x}, y={ball_y}")
     print(f"Velocity: vx={velocity_x}, vy={velocity_y}")
-    
+
     if abs(ball_x - CENTER_X) < BALL_DETECTION_THRESHOLD and abs(ball_y - CENTER_Y) < BALL_DETECTION_THRESHOLD:
         print("Ball near center. No motor movement required.")
         return {motor: (0, True) for motor in MOTOR_PINS}
 
+    # Update PID outputs
     pid_x.set_auto_mode(True, last_output=velocity_x)
     pid_y.set_auto_mode(True, last_output=velocity_y)
-    
-    steps_x = int(pid_x(ball_x) // 4)
-    steps_y = int(pid_y(ball_y) // 4)
+
+    # Compute PID steps
+    steps_x = int(pid_x(ball_x))
+    steps_y = int(pid_y(ball_y))
     print(f"PID steps: x={steps_x}, y={steps_y}")
 
+    # Normalize inputs for kinematics
+    magnitude = math.sqrt(steps_x**2 + steps_y**2)
+    nx = steps_x / magnitude if magnitude > 0 else 0
+    ny = steps_y / magnitude if magnitude > 0 else 0
+    print(f"Normalized directions: nx={nx}, ny={ny}")
+
+    # Compute motor angles
     motor_angles = {
-        'motor1': kinematics.compute_angle('A', 0, steps_x, steps_y),
-        'motor2': kinematics.compute_angle('B', 0, steps_x, steps_y),
-        'motor3': kinematics.compute_angle('C', 0, steps_x, steps_y),
+        'motor1': kinematics.compute_angle('A', 0, nx, ny),
+        'motor2': kinematics.compute_angle('B', 0, nx, ny),
+        'motor3': kinematics.compute_angle('C', 0, nx, ny),
     }
     print(f"Motor angles: {motor_angles}")
 
+    # Convert angles to steps (assuming 1 degree = 1 step)
     motor_steps = {
-        motor: (int(angle), angle > 0)
+        motor: (max(1, int(abs(angle))), angle > 0)
         for motor, angle in motor_angles.items()
-    }
-
-    motor_steps = {
-        motor: (steps // 4, direction)  # Integer division ensures compatibility with stepper motor
-        for motor, (steps, direction) in motor_steps.items()
     }
 
     print(f"Motor steps: {motor_steps}")
