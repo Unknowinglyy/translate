@@ -1,7 +1,6 @@
 import math
 import RPi.GPIO as GPIO
 import time
-from simple_pid import PID
 from kine2 import Kinematics  # Import the Kinematics class
 from touchScreenBasicCoordOutput import read_touch_coordinates
 
@@ -42,10 +41,17 @@ for motor in MOTOR_PINS.values():
     GPIO.setup(motor['dir'], GPIO.OUT)
 
 # --------------------------------------------------------------------------------------------
+def debug_log(msg):
+    """
+    Helper function to print debugging messages with a timestamp.
+    """
+    print(f"[{time.time():.2f}] {msg}")
+
 def move_motor(motor, steps, clockwise):
     """
     Moves a single motor a specified number of steps in a specified direction.
     """
+    debug_log(f"Moving {motor}: steps={steps}, clockwise={clockwise}")
     GPIO.output(MOTOR_PINS[motor]['dir'], GPIO.HIGH if clockwise else GPIO.LOW)
     for _ in range(abs(steps)):
         GPIO.output(MOTOR_PINS[motor]['step'], GPIO.HIGH)
@@ -58,15 +64,19 @@ def move_to(hz, nx, ny):
     Moves the platform based on calculated motor positions.
     """
     global detected, pos, speed
+    debug_log(f"move_to called with hz={hz}, nx={nx}, ny={ny}, detected={detected}")
 
     if detected:
         for i in range(3):
             pos[i] = round((angOrig - kinematics.compute_angle(chr(65 + i), hz, nx, ny)) * angToStep)
+            debug_log(f"Motor {chr(65 + i)} target position: {pos[i]}")
         for i, motor in enumerate(MOTOR_PINS.keys()):
             move_motor(motor, pos[i], pos[i] > 0)
     else:
+        debug_log("No ball detected. Moving to default position.")
         for i in range(3):
             pos[i] = round((angOrig - kinematics.compute_angle(chr(65 + i), hz, 0, 0)) * angToStep)
+            debug_log(f"Motor {chr(65 + i)} default position: {pos[i]}")
         for i, motor in enumerate(MOTOR_PINS.keys()):
             move_motor(motor, pos[i], pos[i] > 0)
 
@@ -77,6 +87,7 @@ def pid_control(setpoint_x, setpoint_y):
     global detected, error, integr, deriv, out, speed
 
     point = read_touch_coordinates()  # Get touchscreen data
+    debug_log(f"Touchscreen read: {point}")
     if point is not None and point.x != 0:
         detected = True
         for i in range(2):
@@ -85,34 +96,39 @@ def pid_control(setpoint_x, setpoint_y):
             deriv[i] = error[i] - error[i - 1] if i > 0 else 0
             out[i] = kp * error[i] + ki * integr[i] + kd * deriv[i]
             out[i] = max(min(out[i], 0.25), -0.25)  # Constrain output
+            debug_log(f"PID output {['X', 'Y'][i]}: error={error[i]}, integr={integr[i]}, deriv={deriv[i]}, out={out[i]}")
 
         for i in range(3):
             speedPrev[i] = speed[i]
             speed[i] = abs(pos[i] - int(pos[i])) * ks
             speed[i] = max(min(speed[i], speedPrev[i] + 200), speedPrev[i] - 200)
             speed[i] = max(min(speed[i], 1000), 0)
+            debug_log(f"Motor {chr(65 + i)} speed: {speed[i]}")
     else:
         detected = False
+        debug_log("Ball not detected. Verifying...")
         time.sleep(0.01)
         point = read_touch_coordinates()
         if point is None or point.x == 0:
             detected = False
+            debug_log("Ball confirmed not detected.")
 
 def balance_ball():
     """
     Main loop to balance the ball using PID and platform movement.
     """
+    debug_log("Starting balance loop...")
     try:
         while True:
             pid_control(0, 0)
             move_to(4.25, -out[0], -out[1])
             time.sleep(0.02)
     except KeyboardInterrupt:
-        print("Exiting program...")
+        debug_log("Exiting program...")
     finally:
         GPIO.cleanup()
 
 # --------------------------------------------------------------------------------------------
 if __name__ == "__main__":
-    print("Initializing...")
+    debug_log("Initializing...")
     balance_ball()
