@@ -59,7 +59,7 @@ def PID(setpointX, setpointY):
 
             # Calculate target positions for the stepper motors
             for i, leg in enumerate(['A', 'B', 'C']):
-                pos[i] = round((angOrig - machine.theta(leg, 0, 0, 0)) * angToStep)
+                pos[i] = round((angOrig - machine.compute_angle(leg, 0, 0, 0)) * angToStep)
 
             # Set max speed
             stepperA.motor_go(False, "Full", pos[0], 0.01, False, 0.05)
