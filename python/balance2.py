@@ -35,8 +35,8 @@ pid_x = PID(3, 0.9, 0.05, setpoint=CENTER_X)
 pid_y = PID(3, 0.9, 0.05, setpoint=CENTER_Y)
 
 # Configure sample time (update frequency) and output limits
-pid_x.sample_time = 0.05  # 10 ms update rate
-pid_y.sample_time = 0.05
+pid_x.sample_time = 0.01  # 10 ms update rate
+pid_y.sample_time = 0.01
 pid_x.output_limits = (-5, 5)  # Limit to ±10 steps
 pid_y.output_limits = (-5, 5)
 
@@ -52,9 +52,9 @@ def move_motor(motor, steps, clockwise):
     GPIO.output(MOTOR_PINS[motor]['dir'], GPIO.HIGH if clockwise else GPIO.LOW)
     for _ in range(abs(steps)):
         GPIO.output(MOTOR_PINS[motor]['step'], GPIO.HIGH)
-        time.sleep(0.05)
+        time.sleep(0.01)
         GPIO.output(MOTOR_PINS[motor]['step'], GPIO.LOW)
-        time.sleep(0.05)
+        time.sleep(0.01)
 
 def calculate_motor_steps(ball_x, ball_y, velocity_x, velocity_y):
     print(f"Ball position: x={ball_x}, y={ball_y}")
