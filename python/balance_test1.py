@@ -7,9 +7,9 @@ from kine import Machine
 machine = Machine(2, 3.125, 1.75, 3.669291339)
 
 # Initialize the stepper motors
-stepperA = RpiMotorLib.A4988Nema(23, 24, 4, "A4988")
-stepperB = RpiMotorLib.A4988Nema(20, 21, 4, "A4988")
-stepperC = RpiMotorLib.A4988Nema(5, 6, 4, "A4988")
+stepperA = RpiMotorLib.A4988Nema(23, 24, (-1,-1,-1), "A4988")
+stepperB = RpiMotorLib.A4988Nema(20, 21, (-1,-1,-1), "A4988")
+stepperC = RpiMotorLib.A4988Nema(5, 6, (-1,-1,-1), "A4988")
 
 # Stepper motor variables
 pos = [0, 0, 0]  # Target positions for each stepper motor
