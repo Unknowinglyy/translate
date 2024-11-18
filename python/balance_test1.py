@@ -58,8 +58,8 @@ def PID(setpointX, setpointY):
                 deriv[i] = error[i] - errorPrev[i]  # Calculate the derivative of the error
 
             # Calculate target positions for the stepper motors
-            for i in range(3):
-                pos[i] = round((angOrig - machine.theta(i, 0, 0, 0)) * angToStep)
+            for i, leg in enumerate(['A', 'B', 'C']):
+                pos[i] = round((angOrig - machine.theta(leg, 0, 0, 0)) * angToStep)
 
             # Set max speed
             stepperA.motor_go(False, "Full", pos[0], 0.01, False, 0.05)
