@@ -2,9 +2,8 @@ import math
 import RPi.GPIO as GPIO
 import time
 from simple_pid import PID
-from touchScreenBasicCoordOutput import read_touch_coordinates
-import threading
 from kine2 import Kinematics  # Import the Kinematics class
+from touchScreenBasicCoordOutput import read_touch_coordinates
 
 # --------------------------------------------------------------------------------------------
 # GPIO setup for stepper motors
@@ -14,35 +13,33 @@ MOTOR_PINS = {
     'motor3': {'step': 5, 'dir': 6}
 }
 
-# Center position of the touchscreen
-CENTER_X, CENTER_Y = 2025, 2045
-# Ball detection thresholds
-BALL_DETECTION_THRESHOLD = 20
+# Parameters
+CENTER_X, CENTER_Y = 2025, 2045  # Touchscreen center offsets
+BALL_DETECTION_THRESHOLD = 20    # Ball detection range
+angOrig = 206.662752199          # Original angle
+angToStep = 3200 / 360           # Steps per degree
+ks = 20                          # Speed amplifying constant
+kp, ki, kd = 4E-4, 2E-6, 7E-3    # PID constants
 
 # Kinematics parameters
-d, e, f, g = 2, 3.125, 1.75, 3.669291339  # Replace with actual machine parameters
+d, e, f, g = 2, 3.125, 1.75, 3.669291339
 kinematics = Kinematics(d, e, f, g)
 
-# --------------------------------------------------------------------------------------------
-# GPIO Setup
+# Initialize stepper variables
+pos = [0, 0, 0]
+speed = [0, 0, 0]
+speedPrev = [0, 0, 0]
+error = [0, 0]
+integr = [0, 0]
+deriv = [0, 0]
+out = [0, 0]
+detected = False
+
+# GPIO setup
 GPIO.setmode(GPIO.BCM)
 for motor in MOTOR_PINS.values():
     GPIO.setup(motor['step'], GPIO.OUT)
     GPIO.setup(motor['dir'], GPIO.OUT)
-
-# PID controllers for X and Y directions
-pid_x = PID(3, 0.9, 0.05, setpoint=CENTER_X)
-pid_y = PID(3, 0.9, 0.05, setpoint=CENTER_Y)
-
-# Configure sample time (update frequency) and output limits
-pid_x.sample_time = 0.01  # 10 ms update rate
-pid_y.sample_time = 0.01
-pid_x.output_limits = (-5, 5)  # Limit to ±10 steps
-pid_y.output_limits = (-5, 5)
-
-# Velocity tracking variables
-prev_time = time.time()
-prev_x, prev_y = CENTER_X, CENTER_Y
 
 # --------------------------------------------------------------------------------------------
 def move_motor(motor, steps, clockwise):
@@ -52,96 +49,64 @@ def move_motor(motor, steps, clockwise):
     GPIO.output(MOTOR_PINS[motor]['dir'], GPIO.HIGH if clockwise else GPIO.LOW)
     for _ in range(abs(steps)):
         GPIO.output(MOTOR_PINS[motor]['step'], GPIO.HIGH)
-        time.sleep(0.01)
+        time.sleep(0.001)
         GPIO.output(MOTOR_PINS[motor]['step'], GPIO.LOW)
+        time.sleep(0.001)
+
+def move_to(hz, nx, ny):
+    """
+    Moves the platform based on calculated motor positions.
+    """
+    global detected, pos, speed
+
+    if detected:
+        for i in range(3):
+            pos[i] = round((angOrig - kinematics.compute_angle(chr(65 + i), hz, nx, ny)) * angToStep)
+        for i, motor in enumerate(MOTOR_PINS.keys()):
+            move_motor(motor, pos[i], pos[i] > 0)
+    else:
+        for i in range(3):
+            pos[i] = round((angOrig - kinematics.compute_angle(chr(65 + i), hz, 0, 0)) * angToStep)
+        for i, motor in enumerate(MOTOR_PINS.keys()):
+            move_motor(motor, pos[i], pos[i] > 0)
+
+def pid_control(setpoint_x, setpoint_y):
+    """
+    PID control to move the ball to the specified setpoint.
+    """
+    global detected, error, integr, deriv, out, speed
+
+    point = read_touch_coordinates()  # Get touchscreen data
+    if point is not None and point.x != 0:
+        detected = True
+        for i in range(2):
+            error[i] = (CENTER_X - point.x - setpoint_x) if i == 0 else (CENTER_Y - point.y - setpoint_y)
+            integr[i] += error[i]
+            deriv[i] = error[i] - error[i - 1] if i > 0 else 0
+            out[i] = kp * error[i] + ki * integr[i] + kd * deriv[i]
+            out[i] = max(min(out[i], 0.25), -0.25)  # Constrain output
+
+        for i in range(3):
+            speedPrev[i] = speed[i]
+            speed[i] = abs(pos[i] - int(pos[i])) * ks
+            speed[i] = max(min(speed[i], speedPrev[i] + 200), speedPrev[i] - 200)
+            speed[i] = max(min(speed[i], 1000), 0)
+    else:
+        detected = False
         time.sleep(0.01)
-
-def calculate_motor_steps(ball_x, ball_y, velocity_x, velocity_y):
-    print(f"Ball position: x={ball_x}, y={ball_y}")
-    print(f"Velocity: vx={velocity_x}, vy={velocity_y}")
-
-    if abs(ball_x - CENTER_X) < BALL_DETECTION_THRESHOLD and abs(ball_y - CENTER_Y) < BALL_DETECTION_THRESHOLD:
-        print("Ball near center. No motor movement required.")
-        return {motor: (0, True) for motor in MOTOR_PINS}
-
-    # Update PID outputs
-    pid_x.set_auto_mode(True, last_output=velocity_x)
-    pid_y.set_auto_mode(True, last_output=velocity_y)
-
-    # Compute PID steps
-    steps_x = int(pid_x(ball_x))
-    steps_y = int(pid_y(ball_y))
-    print(f"PID steps: x={steps_x}, y={steps_y}")
-
-    # Normalize inputs for kinematics
-    magnitude = math.sqrt(steps_x**2 + steps_y**2)
-    nx = steps_x / magnitude if magnitude > 0 else 0
-    ny = steps_y / magnitude if magnitude > 0 else 0
-    print(f"Normalized directions: nx={nx}, ny={ny}")
-
-    # Compute motor angles
-    motor_angles = {
-        'motor1': kinematics.compute_angle('A', 0, nx, ny),
-        'motor2': kinematics.compute_angle('B', 0, nx, ny),
-        'motor3': kinematics.compute_angle('C', 0, nx, ny),
-    }
-    print(f"Motor angles: {motor_angles}")
-
-    # Convert angles to steps (assuming 1 degree = 1 step)
-    motor_steps = {
-        motor: (max(1, int(abs(angle))), angle > 0)
-        for motor, angle in motor_angles.items()
-    }
-
-    print(f"Motor steps: {motor_steps}")
-
-    return motor_steps
-
-
-def move_motors_concurrently(motor_steps):
-    """
-    Moves the motors concurrently using threading.
-    """
-    threads = []
-    for motor, (steps, clockwise) in motor_steps.items():
-        if steps > 0:
-            t = threading.Thread(target=move_motor, args=(motor, steps, clockwise))
-            threads.append(t)
-            t.start()
-    for t in threads:
-        t.join()
+        point = read_touch_coordinates()
+        if point is None or point.x == 0:
+            detected = False
 
 def balance_ball():
     """
-    Main loop to balance the ball using PID, motor control, and velocity calculations.
+    Main loop to balance the ball using PID and platform movement.
     """
-    global prev_time, prev_x, prev_y
-
     try:
         while True:
-            point = read_touch_coordinates()
-            if point is None:
-                continue
-
-            ball_x, ball_y = point.x, point.y
-            current_time = time.time()
-
-            # Calculate velocity
-            dt = current_time - prev_time if current_time != prev_time else 0.01
-            velocity_x = (ball_x - prev_x) / dt
-            velocity_y = (ball_y - prev_y) / dt
-
-            # Update previous values
-            prev_x, prev_y = ball_x, ball_y
-            prev_time = current_time
-
-            # Calculate motor steps based on position and velocity
-            motor_steps = calculate_motor_steps(ball_x, ball_y, velocity_x, velocity_y)
-
-            # Move each motor according to the calculated steps
-            move_motors_concurrently(motor_steps)
-
-            time.sleep(0.01)  # Update cycle delay (10 ms)
+            pid_control(0, 0)
+            move_to(4.25, -out[0], -out[1])
+            time.sleep(0.02)
     except KeyboardInterrupt:
         print("Exiting program...")
     finally:
@@ -149,12 +114,5 @@ def balance_ball():
 
 # --------------------------------------------------------------------------------------------
 if __name__ == "__main__":
-    # Centering motors before starting
-    print("Centering motors...")
-    for _ in range(100):  # Arbitrary 100 steps to center
-        move_motor('motor1', 1, True)
-        move_motor('motor2', 1, True)
-        move_motor('motor3', 1, True)
-    print("Motors centered. Starting balance loop...")
-
+    print("Initializing...")
     balance_ball()
