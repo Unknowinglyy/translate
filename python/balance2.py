@@ -37,8 +37,8 @@ pid_y = PID(3, 0.9, 0.05, setpoint=CENTER_Y)
 # Configure sample time (update frequency) and output limits
 pid_x.sample_time = 0.01  # 10 ms update rate
 pid_y.sample_time = 0.01
-pid_x.output_limits = (-1, 1)  # Limit to ±10 steps
-pid_y.output_limits = (-1, 1)
+pid_x.output_limits = (-5, 5)  # Limit to ±10 steps
+pid_y.output_limits = (-5, 5)
 
 # Velocity tracking variables
 prev_time = time.time()
@@ -82,6 +82,12 @@ def calculate_motor_steps(ball_x, ball_y, velocity_x, velocity_y):
         motor: (int(angle), angle > 0)
         for motor, angle in motor_angles.items()
     }
+
+    motor_steps = {
+        motor: (steps // 4, direction)  # Integer division ensures compatibility with stepper motor
+        for motor, (steps, direction) in motor_steps.items()
+    }
+
     print(f"Motor steps: {motor_steps}")
 
     return motor_steps
@@ -125,11 +131,6 @@ def balance_ball():
             prev_time = current_time
 
             # Calculate motor steps based on position and velocity
-
-            ball_x = ball_x / 4
-            ball_y = ball_y / 4
-            velocity_x = velocity_x / 4
-            velocity_y = velocity_y / 4
             motor_steps = calculate_motor_steps(ball_x, ball_y, velocity_x, velocity_y)
 
             # Move each motor according to the calculated steps
