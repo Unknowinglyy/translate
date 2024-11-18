@@ -16,7 +16,7 @@ MOTOR_PINS = {
 # Parameters
 CENTER_X, CENTER_Y = 2025, 2045  # Touchscreen center offsets
 BALL_DETECTION_THRESHOLD = 20    # Ball detection range
-MAX_STEPS = 50
+MAX_TOTAL_STEPS = 130
 angOrig = 165          # Original angle
 angToStep = 3200 / 360           # Steps per degree
 ks = 20                          # Speed amplifying constant
@@ -49,17 +49,34 @@ def debug_log(msg):
     """
     print(f"[{time.time():.2f}] {msg}")
 
+# Dictionary to track the total steps moved by each motor
+total_steps_moved = {motor: 0 for motor in MOTOR_PINS.keys()}
+
 def move_motor(motor, steps, clockwise):
     """
     Moves a single motor a specified number of steps in a specified direction.
     """
-    debug_log(f"Moving {motor}: steps={steps}, clockwise={clockwise}")
+    global total_steps_moved
+
+    # Calculate allowed steps based on the remaining step budget
+    remaining_steps = MAX_TOTAL_STEPS - total_steps_moved[motor]
+    allowed_steps = min(steps, remaining_steps)
+
+    if allowed_steps <= 0:
+        debug_log(f"{motor} has reached its maximum allowed steps. No movement.")
+        return
+
+    debug_log(f"Moving {motor}: steps={allowed_steps}, clockwise={clockwise}, remaining_steps={remaining_steps}")
     GPIO.output(MOTOR_PINS[motor]['dir'], GPIO.HIGH if clockwise else GPIO.LOW)
-    for _ in range(abs(steps)):
+
+    for _ in range(abs(allowed_steps)):
         GPIO.output(MOTOR_PINS[motor]['step'], GPIO.HIGH)
         time.sleep(0.01)
         GPIO.output(MOTOR_PINS[motor]['step'], GPIO.LOW)
         time.sleep(0.01)
+
+    # Update the total steps moved for this motor
+    total_steps_moved[motor] += allowed_steps
 
 def move_motors_concurrently(motor_steps):
     """
@@ -86,16 +103,13 @@ def move_to(hz, nx, ny):
     for i, motor in enumerate(MOTOR_PINS.keys()):
         target_angle = kinematics.compute_angle(chr(65 + i), hz, nx, ny)
         pos[i] = round((angOrig - target_angle) * angToStep)  # Calculate position in steps
-
-        # Apply the upper limit on motor steps
-        limited_steps = min(abs(pos[i]) // 16, MAX_STEPS)
+        steps = abs(pos[i]) // 16  # Adjust step scaling if necessary
         clockwise = pos[i] > 0
-        motor_steps[motor] = (limited_steps, clockwise)
-        debug_log(f"Motor {chr(65 + i)}: Target angle={target_angle:.2f}, Steps={limited_steps}, Clockwise={clockwise}")
+        motor_steps[motor] = (steps, clockwise)
+        debug_log(f"Motor {chr(65 + i)}: Target angle={target_angle:.2f}, Steps={steps}, Clockwise={clockwise}")
 
     # Use threading to move motors concurrently
     move_motors_concurrently(motor_steps)
-
 def pid_control(setpoint_x, setpoint_y):
     """
     PID control to move the ball to the specified setpoint.
@@ -138,7 +152,7 @@ def balance_ball():
         while True:
             pid_control(0, 0)
             move_to(4.25, -out[0], -out[1])
-            time.sleep(0.05)
+            time.sleep(0.02)
     except KeyboardInterrupt:
         debug_log("Exiting program...")
     finally:
