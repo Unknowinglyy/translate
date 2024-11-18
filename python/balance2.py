@@ -17,7 +17,7 @@ MOTOR_PINS = {
 # Center position of the touchscreen
 CENTER_X, CENTER_Y = 2025, 2045
 # Ball detection thresholds
-BALL_DETECTION_THRESHOLD = 3
+BALL_DETECTION_THRESHOLD = 20
 
 # Kinematics parameters
 d, e, f, g = 2, 3.125, 1.75, 3.669291339  # Replace with actual machine parameters
@@ -35,8 +35,8 @@ pid_x = PID(3, 0.9, 0.05, setpoint=CENTER_X)
 pid_y = PID(3, 0.9, 0.05, setpoint=CENTER_Y)
 
 # Configure sample time (update frequency) and output limits
-pid_x.sample_time = 0.01  # 10 ms update rate
-pid_y.sample_time = 0.01
+pid_x.sample_time = 0.05  # 10 ms update rate
+pid_y.sample_time = 0.05
 pid_x.output_limits = (-5, 5)  # Limit to ±10 steps
 pid_y.output_limits = (-5, 5)
 
@@ -52,9 +52,9 @@ def move_motor(motor, steps, clockwise):
     GPIO.output(MOTOR_PINS[motor]['dir'], GPIO.HIGH if clockwise else GPIO.LOW)
     for _ in range(abs(steps)):
         GPIO.output(MOTOR_PINS[motor]['step'], GPIO.HIGH)
-        time.sleep(0.001)
+        time.sleep(0.05)
         GPIO.output(MOTOR_PINS[motor]['step'], GPIO.LOW)
-        time.sleep(0.001)
+        time.sleep(0.05)
 
 def calculate_motor_steps(ball_x, ball_y, velocity_x, velocity_y):
     print(f"Ball position: x={ball_x}, y={ball_y}")
