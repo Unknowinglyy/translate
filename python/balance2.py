@@ -57,36 +57,35 @@ def move_motor(motor, steps, clockwise):
         time.sleep(0.001)
 
 def calculate_motor_steps(ball_x, ball_y, velocity_x, velocity_y):
-    """
-    Calculates the motor movements required to tilt the plane based on ball position and velocity.
-    """
+    print(f"Ball position: x={ball_x}, y={ball_y}")
+    print(f"Velocity: vx={velocity_x}, vy={velocity_y}")
+    
     if abs(ball_x - CENTER_X) < BALL_DETECTION_THRESHOLD and abs(ball_y - CENTER_Y) < BALL_DETECTION_THRESHOLD:
-        return {motor: (0, True) for motor in MOTOR_PINS}  # No movement if ball is near center.
+        print("Ball near center. No motor movement required.")
+        return {motor: (0, True) for motor in MOTOR_PINS}
 
-    # Adjust PID controllers with velocity inputs (D-term inherently handles velocity response)
     pid_x.set_auto_mode(True, last_output=velocity_x)
     pid_y.set_auto_mode(True, last_output=velocity_y)
     
-    # Compute PID outputs
     steps_x = int(pid_x(ball_x))
     steps_y = int(pid_y(ball_y))
+    print(f"PID steps: x={steps_x}, y={steps_y}")
 
-    # Use kinematics to compute angles and convert to motor steps
     motor_angles = {
-        'motor1': kinematics.compute_angle('A', 0, steps_x, steps_y),  # Replace 0 with the height offset if needed
+        'motor1': kinematics.compute_angle('A', 0, steps_x, steps_y),
         'motor2': kinematics.compute_angle('B', 0, steps_x, steps_y),
         'motor3': kinematics.compute_angle('C', 0, steps_x, steps_y),
     }
+    print(f"Motor angles: {motor_angles}")
 
-    print(motor_angles)
-
-    # Convert angles to steps (assuming 1 degree = 1 step for simplicity, adjust as needed)
     motor_steps = {
         motor: (int(angle), angle > 0)
         for motor, angle in motor_angles.items()
     }
+    print(f"Motor steps: {motor_steps}")
 
     return motor_steps
+
 
 def move_motors_concurrently(motor_steps):
     """
