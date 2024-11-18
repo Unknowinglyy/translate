@@ -71,7 +71,7 @@ def move_to(hz, nx, ny):
             pos[i] = round((angOrig - kinematics.compute_angle(chr(65 + i), hz, nx, ny)) * angToStep)
             debug_log(f"Motor {chr(65 + i)} target position: {pos[i]}")
         for i, motor in enumerate(MOTOR_PINS.keys()):
-            move_motor(motor, pos[i], pos[i] > 0)
+            move_motor(motor, pos[i] // 4, pos[i] > 0)
     else:
         debug_log("No ball detected. Moving to default position.")
         for i in range(3):
