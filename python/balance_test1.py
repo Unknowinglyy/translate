@@ -7,9 +7,9 @@ from kine import Machine
 machine = Machine(2, 3.125, 1.75, 3.669291339)
 
 # Initialize the stepper motors
-stepperA = RpiMotorLib.A4988Nema(1, 1, 2, "A4988")
-stepperB = RpiMotorLib.A4988Nema(3, 3, 4, "A4988")
-stepperC = RpiMotorLib.A4988Nema(5, 5, 6, "A4988")
+stepperA = RpiMotorLib.A4988Nema(23, 24, 4, "A4988")
+stepperB = RpiMotorLib.A4988Nema(20, 21, 4, "A4988")
+stepperC = RpiMotorLib.A4988Nema(5, 6, 4, "A4988")
 
 # Stepper motor variables
 pos = [0, 0, 0]  # Target positions for each stepper motor
@@ -39,7 +39,7 @@ def PID(setpointX, setpointY):
     global detected, error, errorPrev, integr, deriv
 
     while True:
-        point = read_touch_coordinates()
+        point = read_touch_coordinate()
         if point is None:
             break
 
