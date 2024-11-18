@@ -63,22 +63,18 @@ def move_to(hz, nx, ny):
     """
     Moves the platform based on calculated motor positions.
     """
-    global detected, pos, speed
-    debug_log(f"move_to called with hz={hz}, nx={nx}, ny={ny}, detected={detected}")
+    global detected, pos
+    print(f"move_to: hz={hz}, nx={nx}, ny={ny}, detected={detected}")
 
-    if detected:
-        for i in range(3):
-            pos[i] = round((angOrig - kinematics.compute_angle(chr(65 + i), hz, nx, ny)) * angToStep)
-            debug_log(f"Motor {chr(65 + i)} target position: {pos[i]}")
-        for i, motor in enumerate(MOTOR_PINS.keys()):
-            move_motor(motor, pos[i] // 4, pos[i] > 0)
-    else:
-        debug_log("No ball detected. Moving to default position.")
-        for i in range(3):
-            pos[i] = round((angOrig - kinematics.compute_angle(chr(65 + i), hz, 0, 0)) * angToStep)
-            debug_log(f"Motor {chr(65 + i)} default position: {pos[i]}")
-        for i, motor in enumerate(MOTOR_PINS.keys()):
-            move_motor(motor, pos[i], pos[i] > 0)
+    for i in range(3):
+        target_angle = kinematics.compute_angle(chr(65 + i), hz, nx, ny)
+        pos[i] = round((angOrig - target_angle) * angToStep)  # Calculate position in steps
+        print(f"Motor {chr(65 + i)}: Target angle={target_angle:.2f}, Steps={pos[i]}")
+
+    for i, motor in enumerate(MOTOR_PINS.keys()):
+        steps = abs(pos[i])
+        clockwise = pos[i] > 0
+        move_motor(motor, steps, clockwise)
 
 def pid_control(setpoint_x, setpoint_y):
     """
