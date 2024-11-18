@@ -125,7 +125,7 @@ def balance_ball():
             prev_time = current_time
 
             # Calculate motor steps based on position and velocity
-            motor_steps = calculate_motor_steps(ball_x, ball_y, velocity_x, velocity_y)
+            motor_steps = calculate_motor_steps(ball_x, ball_y, velocity_x, velocity_y) //4 
 
             # Move each motor according to the calculated steps
             move_motors_concurrently(motor_steps)
