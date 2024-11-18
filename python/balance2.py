@@ -72,7 +72,7 @@ def move_to(hz, nx, ny):
         print(f"Motor {chr(65 + i)}: Target angle={target_angle:.2f}, Steps={pos[i]}")
 
     for i, motor in enumerate(MOTOR_PINS.keys()):
-        steps = abs(pos[i]) // 8
+        steps = abs(pos[i]) // 16
         clockwise = pos[i] > 0
         move_motor(motor, steps, clockwise)
 
