@@ -67,8 +67,8 @@ def calculate_motor_steps(ball_x, ball_y, velocity_x, velocity_y):
     pid_x.set_auto_mode(True, last_output=velocity_x)
     pid_y.set_auto_mode(True, last_output=velocity_y)
     
-    steps_x = int(pid_x(ball_x))
-    steps_y = int(pid_y(ball_y))
+    steps_x = int(pid_x(ball_x) // 4)
+    steps_y = int(pid_y(ball_y) // 4)
     print(f"PID steps: x={steps_x}, y={steps_y}")
 
     motor_angles = {
