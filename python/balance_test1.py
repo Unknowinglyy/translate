@@ -39,7 +39,7 @@ def PID(setpointX, setpointY):
     global detected, error, errorPrev, integr, deriv
 
     while True:
-        point = read_touch_coordinate()
+        point = read_touch_coordinates()
         if point is None:
             break
 
