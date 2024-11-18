@@ -1,10 +1,10 @@
 import time
 from RpiMotorLib import RpiMotorLib
 from touchScreenBasicCoordOutput import read_touch_coordinates, Point
-from kine import Machine
+from kine import Kinematics
 
 # Initialize the machine with the given lengths
-machine = Machine(2, 3.125, 1.75, 3.669291339)
+machine = Kinematics(2, 3.125, 1.75, 3.669291339)
 
 # Initialize the stepper motors
 stepperA = RpiMotorLib.A4988Nema(23, 24, (-1,-1,-1), "A4988")
