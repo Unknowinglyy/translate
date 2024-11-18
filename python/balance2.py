@@ -1,48 +1,38 @@
 import math
-import RPi.GPIO as GPIO
 import time
+import threading
+from accelstepper import AccelStepper  # Import AccelStepper
+from multistepper import MultiStepper  # Import MultiStepper
 from kine2 import Kinematics  # Import the Kinematics class
 from touchScreenBasicCoordOutput import read_touch_coordinates
-import threading
 
 # --------------------------------------------------------------------------------------------
-# GPIO setup for stepper motors
-MOTOR_PINS = {
-    'motor1': {'step': 23, 'dir': 24},
-    'motor2': {'step': 20, 'dir': 21},
-    'motor3': {'step': 5, 'dir': 6}
-}
-
 # Parameters
 CENTER_X, CENTER_Y = 2025, 2045  # Touchscreen center offsets
 BALL_DETECTION_THRESHOLD = 20    # Ball detection range
 MAX_TOTAL_STEPS = 250
-angOrig = 165          # Original angle
+angOrig = 165                    # Original angle
 angToStep = 3200 / 360           # Steps per degree
 ks = 20                          # Speed amplifying constant
-kp, ki, kd = 4E-8, 2E-6, 7E-6    # PID constants
+kp, ki, kd = 4E-8, 2E-6, 7E-3    # PID constants
 
 # Kinematics parameters
 d, e, f, g = 2, 3.125, 1.75, 3.669291339
 kinematics = Kinematics(d, e, f, g)
 
-# Initialize stepper variables
-pos = [0, 0, 0]
-speed = [0, 0, 0]
-speedPrev = [0, 0, 0]
-error = [0, 0]
-integr = [0, 0]
-deriv = [0, 0]
-out = [0, 0]
-detected = False
+# Stepper motor setup using AccelStepper
+stepperA = AccelStepper(None, 23, 24)  # (profile=None for now, STEP, DIR)
+stepperB = AccelStepper(None, 20, 21)  # Adjust pins for your setup
+stepperC = AccelStepper(None, 5, 6)
 
-# GPIO setup
-GPIO.setmode(GPIO.BCM)
-for motor in MOTOR_PINS.values():
-    GPIO.setup(motor['step'], GPIO.OUT)
-    GPIO.setup(motor['dir'], GPIO.OUT)
+# MultiStepper for coordinated movement
+multi_stepper = MultiStepper()
+multi_stepper.add_stepper(stepperA)
+multi_stepper.add_stepper(stepperB)
+multi_stepper.add_stepper(stepperC)
 
 # --------------------------------------------------------------------------------------------
+# Debug Logging
 def debug_log(msg):
     """
     Helper function to print debugging messages with a timestamp.
@@ -50,75 +40,35 @@ def debug_log(msg):
     print(f"[{time.time():.2f}] {msg}")
 
 # Dictionary to track the total steps moved by each motor
-total_steps_moved = {motor: 0 for motor in MOTOR_PINS.keys()}
-
-def move_motor(motor, steps, clockwise):
-    """
-    Moves a single motor a specified number of steps in a specified direction.
-    Updates the net total steps moved by the motor.
-    """
-    global total_steps_moved
-
-    # Calculate the proposed change in step count
-    change = steps if clockwise else -steps
-    new_total = total_steps_moved[motor] + change
-
-    # Ensure the total steps remain within the allowable range
-    if abs(new_total) > MAX_TOTAL_STEPS:
-        allowed_steps = MAX_TOTAL_STEPS - abs(total_steps_moved[motor])
-        allowed_steps = max(allowed_steps, 0)  # Ensure no negative steps
-        debug_log(f"{motor} step limit reached. Adjusting steps to {allowed_steps}.")
-        steps = allowed_steps
-        change = steps if clockwise else -steps
-
-    if steps <= 0:
-        debug_log(f"{motor} cannot move further. No steps executed.")
-        return
-
-    debug_log(f"Moving {motor}: steps={steps}, clockwise={clockwise}, total_steps={total_steps_moved[motor]}")
-    GPIO.output(MOTOR_PINS[motor]['dir'], GPIO.HIGH if clockwise else GPIO.LOW)
-    for _ in range(abs(steps)):
-        GPIO.output(MOTOR_PINS[motor]['step'], GPIO.HIGH)
-        time.sleep(0.003)
-        GPIO.output(MOTOR_PINS[motor]['step'], GPIO.LOW)
-        time.sleep(0.003)
-
-    # Update the total steps moved for this motor
-    total_steps_moved[motor] += change
-    debug_log(f"Updated {motor} total steps to {total_steps_moved[motor]}")
-
-def move_motors_concurrently(motor_steps):
-    """
-    Moves the motors concurrently using threading.
-    """
-    threads = []
-    for motor, (steps, clockwise) in motor_steps.items():
-        if steps > 0:  # Only move motors with non-zero steps
-            t = threading.Thread(target=move_motor, args=(motor, steps, clockwise))
-            threads.append(t)
-            t.start()
-    for t in threads:
-        t.join()
+total_steps_moved = {'stepperA': 0, 'stepperB': 0, 'stepperC': 0}
 
 def move_to(hz, nx, ny):
     """
-    Moves the platform based on calculated motor positions using threading.
+    Moves the platform based on calculated motor positions using MultiStepper.
     """
-    global detected, pos
-    debug_log(f"move_to called with hz={hz}, nx={nx}, ny={ny}, detected={detected}")
-
-    motor_steps = {}
-
-    for i, motor in enumerate(MOTOR_PINS.keys()):
+    debug_log(f"move_to called with hz={hz}, nx={nx}, ny={ny}")
+    
+    absolute_positions = []
+    for i, stepper in enumerate([stepperA, stepperB, stepperC]):
         target_angle = kinematics.compute_angle(chr(65 + i), hz, nx, ny)
-        pos[i] = round((angOrig - target_angle) * angToStep)  # Calculate position in steps
-        steps = abs(pos[i]) // 28  # Adjust step scaling if necessary
-        clockwise = pos[i] > 0
-        motor_steps[motor] = (steps, clockwise)
-        debug_log(f"Motor {chr(65 + i)}: Target angle={target_angle:.2f}, Steps={steps}, Clockwise={clockwise}")
+        steps = round((angOrig - target_angle) * angToStep)  # Calculate position in steps
+        
+        # Ensure steps do not exceed the maximum total steps
+        motor_key = f'stepper{chr(65 + i)}'
+        new_total = total_steps_moved[motor_key] + steps
+        if abs(new_total) > MAX_TOTAL_STEPS:
+            allowed_steps = MAX_TOTAL_STEPS - abs(total_steps_moved[motor_key])
+            debug_log(f"{motor_key} step limit reached. Adjusting steps to {allowed_steps}.")
+            steps = allowed_steps
 
-    # Use threading to move motors concurrently
-    move_motors_concurrently(motor_steps)
+        total_steps_moved[motor_key] += steps
+        debug_log(f"{motor_key}: Target angle={target_angle:.2f}, Steps={steps}, Total Steps={total_steps_moved[motor_key]}")
+
+        absolute_positions.append(steps)
+
+    # Use MultiStepper to synchronize movement
+    multi_stepper.move_to(absolute_positions)
+    multi_stepper.run_speed_to_position()
 
 def pid_control(setpoint_x, setpoint_y):
     """
@@ -127,7 +77,7 @@ def pid_control(setpoint_x, setpoint_y):
     global detected, error, integr, deriv, out, speed
 
     point = read_touch_coordinates()  # Get touchscreen data
-    print(f"Touchscreen read: {point.x} {point.y}")
+    debug_log(f"Touchscreen read: x={point.x}, y={point.y}")
     if point is not None and point.x != 0:
         detected = True
         for i in range(2):
@@ -137,21 +87,9 @@ def pid_control(setpoint_x, setpoint_y):
             out[i] = kp * error[i] + ki * integr[i] + kd * deriv[i]
             out[i] = max(min(out[i], 0.25), -0.25)  # Constrain output
             debug_log(f"PID output {['X', 'Y'][i]}: error={error[i]}, integr={integr[i]}, deriv={deriv[i]}, out={out[i]}")
-
-        for i in range(3):
-            speedPrev[i] = speed[i]
-            speed[i] = abs(pos[i] - int(pos[i])) * ks
-            speed[i] = max(min(speed[i], speedPrev[i] + 200), speedPrev[i] - 200)
-            speed[i] = max(min(speed[i], 1000), 0)
-            debug_log(f"Motor {chr(65 + i)} speed: {speed[i]}")
     else:
         detected = False
-        debug_log("Ball not detected. Verifying...")
-        time.sleep(0.01)
-        point = read_touch_coordinates()
-        if point is None or point.x == 0:
-            detected = False
-            debug_log("Ball confirmed not detected.")
+        debug_log("Ball not detected.")
 
 def balance_ball():
     """
@@ -162,12 +100,12 @@ def balance_ball():
         while True:
             pid_control(0, 0)
             move_to(4.25, -out[0], -out[1])
-            time.sleep(0.02)
+            time.sleep(0.02)  # 50 Hz control loop
     except KeyboardInterrupt:
         debug_log("Exiting program...")
     finally:
-        GPIO.cleanup()
-
+        debug_log("Cleaning up...")
+        
 # --------------------------------------------------------------------------------------------
 if __name__ == "__main__":
     debug_log("Initializing...")
