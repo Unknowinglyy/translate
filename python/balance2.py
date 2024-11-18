@@ -16,7 +16,7 @@ MOTOR_PINS = {
 # Parameters
 CENTER_X, CENTER_Y = 2025, 2045  # Touchscreen center offsets
 BALL_DETECTION_THRESHOLD = 20    # Ball detection range
-MAX_TOTAL_STEPS = 200
+MAX_TOTAL_STEPS = 250
 angOrig = 165          # Original angle
 angToStep = 3200 / 360           # Steps per degree
 ks = 20                          # Speed amplifying constant
@@ -79,9 +79,9 @@ def move_motor(motor, steps, clockwise):
     GPIO.output(MOTOR_PINS[motor]['dir'], GPIO.HIGH if clockwise else GPIO.LOW)
     for _ in range(abs(steps)):
         GPIO.output(MOTOR_PINS[motor]['step'], GPIO.HIGH)
-        time.sleep(0.001)
+        time.sleep(0.005)
         GPIO.output(MOTOR_PINS[motor]['step'], GPIO.LOW)
-        time.sleep(0.001)
+        time.sleep(0.005)
 
     # Update the total steps moved for this motor
     total_steps_moved[motor] += change
@@ -127,7 +127,7 @@ def pid_control(setpoint_x, setpoint_y):
     global detected, error, integr, deriv, out, speed
 
     point = read_touch_coordinates()  # Get touchscreen data
-    print(f"Touchscreen read: {point}")
+    print(f"Touchscreen read: {point.x} {point.y}")
     if point is not None and point.x != 0:
         detected = True
         for i in range(2):
