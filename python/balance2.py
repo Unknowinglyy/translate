@@ -1,7 +1,7 @@
 import math
 import time
 import threading
-from accelstepper import AccelStepper  # Import AccelStepper
+from accelstepper1 import AccelStepper  # Import AccelStepper
 from multistepper import MultiStepper  # Import MultiStepper
 from kine2 import Kinematics  # Import the Kinematics class
 from touchScreenBasicCoordOutput import read_touch_coordinates
