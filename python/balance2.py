@@ -37,8 +37,8 @@ pid_y = PID(1.2, 0.1, 0.05, setpoint=CENTER_Y)
 # Configure sample time (update frequency) and output limits
 pid_x.sample_time = 0.01  # 10 ms update rate
 pid_y.sample_time = 0.01
-pid_x.output_limits = (-10, 10)  # Limit to ±10 steps
-pid_y.output_limits = (-10, 10)
+pid_x.output_limits = (-3, 3)  # Limit to ±10 steps
+pid_y.output_limits = (-3, 3)
 
 # Velocity tracking variables
 prev_time = time.time()
