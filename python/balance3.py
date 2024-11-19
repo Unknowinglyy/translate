@@ -113,6 +113,7 @@ def PID(setpointX, setpointY):
 
     if(p.x != 0):
         detected = True
+
         for i in range(2):
             errorPrev[i] = error[i]
 
@@ -122,9 +123,28 @@ def PID(setpointX, setpointY):
             deriv[i] = 0 if math.isnan(deriv[i]) or math.isinf(deriv[i]) else deriv[i]
             out[i] = kp * error[i] + ki * integr[i] + kd * deriv[i]
             out[i] = constrain(out[i], -0.25, 0.25)
-    for i in range(3):
-        speedPrev[i] = speed[i]
 
-        speed[i] = (stepper1.position() if i == Kinematics.A else 0) + (stepper2.position() if i == Kinematics.B else 0) + (stepper3.position() if i == Kinematics.C else 0)
+        for i in range(3):
+            speedPrev[i] = speed[i]
+
+            speed[i] = (stepper1.position() if i == Kinematics.A else 0) + (stepper2.position() if i == Kinematics.B else 0) + (stepper3.position() if i == Kinematics.C else 0)
+        
+            speed[i] = abs(speed[i] - pos[i]) * ks
+
+            speed[i] = constrain(speed[i], speedPrev[i] - 200, speedPrev[i] + 200)
+
+            speed[i] = constrain(speed[i], 0, 1000)
+        print("X OUT: " + str(out[0]) + " Y OUT: " + str(out[1]) + " Speed A: " + speed[Kinematics.A])
+    else:
+        #delay by 10 ms to double check that there is no ball
+        time.sleep(0.01)
+        point = read_touch_coordinates()
+        if(p.x == 0):
+            detected = False
+            print("No ball detected")
+
+    # continues moving platform and waits until 20 milliseconds have elapsed
+    timeI = time.time() * 1000  # Convert to milliseconds
+    while (time.time() * 1000 - timeI) < 20:
+        moveTo(4.25, -out[0], -out[1])  # moves the platform
     
-        speed[i] = 
