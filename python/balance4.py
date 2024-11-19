@@ -1,9 +1,9 @@
-# no accel/multistepper
+# no accel/multistepper yet
 
 import math
 import RPi.GPIO as GPIO
 import time
-from kine2 import Kinematics  # Import the Kinematics class
+from kine2 import Kinematics 
 from touchScreenBasicCoordOutput import read_touch_coordinates
 import threading
 
@@ -15,11 +15,10 @@ MOTOR_PINS = {
     'motor3': {'step': 5, 'dir': 6}
 }
 
-# Parameters
 CENTER_X, CENTER_Y = 2025, 2045  # Touchscreen center offsets
 BALL_DETECTION_THRESHOLD = 10    # Ball detection range
 MAX_TOTAL_STEPS = 300
-angOrig = 165          # Original angle
+angOrig = 165                    # Original angle
 angToStep = 3200 / 360           # Steps per degree
 ks = 20                          # Speed amplifying constant
 kp, ki, kd = 4E-8, 2E-6, 7E-6    # PID constants
@@ -28,7 +27,7 @@ kp, ki, kd = 4E-8, 2E-6, 7E-6    # PID constants
 d, e, f, g = 2, 3.125, 1.75, 3.669291339
 kinematics = Kinematics(d, e, f, g)
 
-# Initialize stepper variables
+# stepper variables
 pos = [0, 0, 0]
 speed = [0, 0, 0]
 speedPrev = [0, 0, 0]
@@ -38,7 +37,6 @@ deriv = [0, 0]
 out = [0, 0]
 detected = False
 
-# GPIO setup
 GPIO.setmode(GPIO.BCM)
 for motor in MOTOR_PINS.values():
     GPIO.setup(motor['step'], GPIO.OUT)
@@ -51,7 +49,6 @@ def debug_log(msg):
     """
     print(f"[{time.time():.2f}] {msg}")
 
-# Dictionary to track the total steps moved by each motor
 total_steps_moved = {motor: 0 for motor in MOTOR_PINS.keys()}
 
 def move_motor(motor, steps, clockwise):
@@ -61,14 +58,12 @@ def move_motor(motor, steps, clockwise):
     """
     global total_steps_moved
 
-    # Calculate the proposed change in step count
     change = steps if clockwise else -steps
     new_total = total_steps_moved[motor] + change
 
-    # Ensure the total steps remain within the allowable range
     if abs(new_total) > MAX_TOTAL_STEPS:
         allowed_steps = MAX_TOTAL_STEPS - abs(total_steps_moved[motor])
-        allowed_steps = max(allowed_steps, 0)  # Ensure no negative steps
+        allowed_steps = max(allowed_steps, 0)  
         debug_log(f"{motor} step limit reached. Adjusting steps to {allowed_steps}.")
         steps = allowed_steps
         change = steps if clockwise else -steps
@@ -85,7 +80,6 @@ def move_motor(motor, steps, clockwise):
         GPIO.output(MOTOR_PINS[motor]['step'], GPIO.LOW)
         time.sleep(0.001)
 
-    # Update the total steps moved for this motor
     total_steps_moved[motor] += change
     debug_log(f"Updated {motor} total steps to {total_steps_moved[motor]}")
 
@@ -95,7 +89,7 @@ def move_motors_concurrently(motor_steps):
     """
     threads = []
     for motor, (steps, clockwise) in motor_steps.items():
-        if steps > 0:  # Only move motors with non-zero steps
+        if steps > 0:  
             t = threading.Thread(target=move_motor, args=(motor, steps, clockwise))
             threads.append(t)
             t.start()
@@ -113,13 +107,12 @@ def move_to(hz, nx, ny):
 
     for i, motor in enumerate(MOTOR_PINS.keys()):
         target_angle = kinematics.compute_angle(chr(65 + i), hz, nx, ny)
-        pos[i] = round((angOrig - target_angle) * angToStep)  # Calculate position in steps
-        steps = abs(pos[i])  # Adjust step scaling if necessary
+        pos[i] = round((angOrig - target_angle) * angToStep)  
+        steps = abs(pos[i]) 
         clockwise = pos[i] > 0
         motor_steps[motor] = (steps, clockwise)
         debug_log(f"Motor {chr(65 + i)}: Target angle={target_angle:.2f}, Steps={steps}, Clockwise={clockwise}")
 
-    # Use threading to move motors concurrently
     move_motors_concurrently(motor_steps)
 
 def pid_control(setpoint_x, setpoint_y):
@@ -128,7 +121,7 @@ def pid_control(setpoint_x, setpoint_y):
     """
     global detected, error, integr, deriv, out, speed
 
-    point = read_touch_coordinates()  # Get touchscreen data
+    point = read_touch_coordinates() 
     print(f"Touchscreen read: {point.x} {point.y}")
     if point is not None and point.x != 0:
         detected = True
@@ -137,7 +130,7 @@ def pid_control(setpoint_x, setpoint_y):
             integr[i] += error[i]
             deriv[i] = error[i] - error[i - 1] if i > 0 else 0
             out[i] = kp * error[i] + ki * integr[i] + kd * deriv[i]
-            out[i] = max(min(out[i], 0.25), -0.25)  # Constrain output
+            out[i] = max(min(out[i], 0.25), -0.25) 
             debug_log(f"PID output {['X', 'Y'][i]}: error={error[i]}, integr={integr[i]}, deriv={deriv[i]}, out={out[i]}")
 
         for i in range(3):
@@ -173,10 +166,10 @@ def balance_ball():
 # --------------------------------------------------------------------------------------------
 if __name__ == "__main__":
     debug_log("Initializing...")
-    # # Centering motors before starting
-    # print("Centering motors...")
-    # for _ in range(150):  # Arbitrary 100 steps to center
-    #     move_motor('motor1', 1, True)
-    #     move_motor('motor2', 1, True)
-    #     move_motor('motor3', 1, True)
+    # Centering motors before starting
+    print("Centering motors...")
+    for _ in range(150):  
+        move_motor('motor1', 1, True)
+        move_motor('motor2', 1, True)
+        move_motor('motor3', 1, True)
     balance_ball()
