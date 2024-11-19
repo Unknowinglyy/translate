@@ -1,7 +1,3 @@
-//***3RPS Parallel Manipulator Ball Balancer Code BY Aaed Musa**
-//--------------------------------------------------------------
-
-//libraries
 #include <AccelStepper.h>
 #include <InverseKinematics.h>
 #include <MultiStepper.h>
