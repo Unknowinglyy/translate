@@ -114,7 +114,7 @@ def move_to(hz, nx, ny):
     for i, motor in enumerate(MOTOR_PINS.keys()):
         target_angle = kinematics.compute_angle(chr(65 + i), hz, nx, ny)
         pos[i] = round((angOrig - target_angle) * angToStep)  # Calculate position in steps
-        steps = abs(pos[i]) // 8  # Adjust step scaling if necessary
+        steps = abs(pos[i])  # Adjust step scaling if necessary
         clockwise = pos[i] > 0
         motor_steps[motor] = (steps, clockwise)
         debug_log(f"Motor {chr(65 + i)}: Target angle={target_angle:.2f}, Steps={steps}, Clockwise={clockwise}")
@@ -164,7 +164,7 @@ def balance_ball():
         while True:
             pid_control(0, 0)
             move_to(4.25, -out[0], -out[1])
-            time.sleep(0.01)
+            time.sleep(0.001)
     except KeyboardInterrupt:
         debug_log("Exiting program...")
     finally:
