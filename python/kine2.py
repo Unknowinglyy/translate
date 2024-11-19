@@ -1,5 +1,9 @@
 import math
 
+A = 0
+B = 1
+C = 2
+
 class Kinematics:
     def __init__(self, d, e, f, g):
         """

@@ -1,64 +1,130 @@
 import time
-import evdev
-import logging
+import math
 from accelstepper import AccelStepper
-from kinematics import Kinematics
-from spi import SPI
-from stepdir import StepperDriver
-from touchscreenbasiccoordoutput import read_touch_coordinates, Point
+from multistepper import MultiStepper
+from touchScreenBasicCoordOutput import read_touch_coordinates
+from kine2 import Kinematics
+from accel import __init__
 
-# Initialize logging
-logging.basicConfig(level=logging.DEBUG)
-log = logging.getLogger(__name__)
-
-# Constants
 DIRECTION_CCW = 0   # Clockwise
 DIRECTION_CW  = 1   # Counter-Clockwise
 
-# Helper functions
-def sleep_microseconds(us_to_sleep):
-    time.sleep(us_to_sleep / float(1000000))
-
 def constrain(value, minn, maxn):
-    return max(min(maxn, value), minn)
+  return max(min(maxn, value), minn)
 
-def micros():
-    """
-    Mimics the Arduino micros() function.
-    """
-    return int(time.time() * 1000000)
+kinematics = Kinematics(2, 3.125, 1.75, 3.669291339)
 
-# Main class for ball balancing
-class BallBalancing:
-    def __init__(self):
-        self.spi = SPI()
-        self.kinematics = Kinematics(d=10, e=20, f=30, g=40)
-        self.stepper_driver = StepperDriver(motor_steps=200, dir_pin=17, step_pin=27, enable_pin=22)
-        self.accel_stepper = AccelStepper(profile=None, dir_pin=17, step_pin=27, enable_pin=22)
-        self.touchscreen_device_path = '/dev/input/event6'
+stepper1 = AccelStepper(1,1,2)
+stepper2 = AccelStepper(1,3,4)
+stepper3 = AccelStepper(1,5,6)
 
-    def read_touch_coordinates(self):
-        return read_touch_coordinates(self.touchscreen_device_path)
+steppers = MultiStepper()
 
-    def balance_ball(self):
-        while True:
-            point = self.read_touch_coordinates()
-            log.debug(f"Touch coordinates: X: {point.x}, Y: {point.y}")
 
-            # Compute angles for the legs
-            angle_a = self.kinematics.compute_angle('A', hz=0, nx=point.x, ny=point.y)
-            angle_b = self.kinematics.compute_angle('B', hz=0, nx=point.x, ny=point.y)
-            angle_c = self.kinematics.compute_angle('C', hz=0, nx=point.x, ny=point.y)
+#stores the target positions for each stepper motor
+pos = [0, 0, 0]
 
-            log.debug(f"Angles: A: {angle_a}, B: {angle_b}, C: {angle_c}")
+#enable pin for drivers
+ENA = 0
 
-            # Move the stepper motors based on the computed angles
-            self.stepper_driver.move_to(angle_a)
-            self.stepper_driver.move_to(angle_b)
-            self.stepper_driver.move_to(angle_c)
+#original angle that each leg starts at
+angOrig = 206.662752199
 
-            sleep_microseconds(10000)  # Sleep for 10 milliseconds
+#speed of the stepper motor and the speed amplifying constant
+speed = [0, 0, 0]
+speedPrev = [0, 0, 0]
+ks = 20
 
-if __name__ == "__main__":
-    ball_balancing = BallBalancing()
-    ball_balancing.balance_ball()
+#touch screen variables
+
+#x offset for the center position of the touchscreen
+xoffset = 500
+#y offset for the center position of the touchscreen
+yoffset = 500
+
+#PID variables
+
+#proportional gain
+kp = 4E-4
+#integral gain
+ki = 2E-6
+#derivative gain
+kd = 7E-3
+
+#PID constants
+#PID terms for X and Y directions
+error = [0, 0]
+errorPrev = [0, 0]
+integr = [0, 0]
+deriv = [0, 0]
+
+out = [0, 0]
+#variable to capture inital times
+timeI = 0
+
+#other variables
+angToStep = 3200 / 360
+
+detected = False
+
+def setup():
+    steppers.add_stepper(stepper1)
+    steppers.add_stepper(stepper2)
+    steppers.add_stepper(stepper3)
+
+    steppers.move_to(4.25,0,0)
+    steppers.run_speed_to_position()
+
+def loop():
+    PID(0,0)
+
+def moveTo(hz, nx, ny):
+    if(detected):
+        for i in range(3):
+            pos[i] = round((angOrig - kinematics.compute_angle(i, hz, nx, ny)) * angToStep)
+        stepper1.set_target_speed(speed[Kinematics.A])
+        stepper2.set_target_speed(speed[Kinematics.B])
+        stepper3.set_target_speed(speed[Kinematics.C])
+
+        stepper1.set_acceleration(speed[Kinematics.A] * 30)
+        stepper2.set_acceleration(speed[Kinematics.B] * 30)
+        stepper3.set_acceleration(speed[Kinematics.C] * 30)
+
+        steppers.move_to(pos[Kinematics.A])
+        steppers.move_to(pos[Kinematics.B])
+        steppers.move_to(pos[Kinematics.C])
+
+        stepper1.run()
+        stepper2.run()
+        stepper3.run()
+    else:
+        for i in range(3):
+            pos[i] = round((angOrig - kinematics.compute_angle(i, hz, 0,0)) * angToStep)
+
+        stepper1.set_target_speed(800)
+        stepper2.set_target_speed(800)
+        stepper3.set_target_speed(800)
+
+        steppers.move_to(pos)
+        steppers.run()
+
+def PID(setpointX, setpointY):
+    point = read_touch_coordinates()
+
+    if(p.x != 0):
+        detected = True
+        for i in range(2):
+            errorPrev[i] = error[i]
+
+            error[i] = (i == 0) * (xoffset - p.x - setpointX) + (i == 1) * (yoffset - p.y - setpointY)
+            integr[i] += error[i] + errorPrev[i]
+            deriv[i] = error[i] - errorPrev[i]
+            deriv[i] = 0 if math.isnan(deriv[i]) or math.isinf(deriv[i]) else deriv[i]
+            out[i] = kp * error[i] + ki * integr[i] + kd * deriv[i]
+            out[i] = constrain(out[i], -0.25, 0.25)
+    for i in range(3):
+        speedPrev[i] = speed[i]
+
+        speed[i] = (stepper1.position() if i == Kinematics.A else 0) + (stepper2.position() if i == Kinematics.B else 0) + (stepper3.position() if i == Kinematics.C else 0)
+    
+        speed[i] = 
