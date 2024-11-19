@@ -173,10 +173,10 @@ def balance_ball():
 # --------------------------------------------------------------------------------------------
 if __name__ == "__main__":
     debug_log("Initializing...")
-    # Centering motors before starting
-    print("Centering motors...")
-    for _ in range(150):  # Arbitrary 100 steps to center
-        move_motor('motor1', 1, True)
-        move_motor('motor2', 1, True)
-        move_motor('motor3', 1, True)
+    # # Centering motors before starting
+    # print("Centering motors...")
+    # for _ in range(150):  # Arbitrary 100 steps to center
+    #     move_motor('motor1', 1, True)
+    #     move_motor('motor2', 1, True)
+    #     move_motor('motor3', 1, True)
     balance_ball()
