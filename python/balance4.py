@@ -78,9 +78,9 @@ def move_motor(motor, steps, clockwise):
     GPIO.output(MOTOR_PINS[motor]['dir'], GPIO.HIGH if clockwise else GPIO.LOW)
     for _ in range(abs(steps)):
         GPIO.output(MOTOR_PINS[motor]['step'], GPIO.HIGH)
-        time.sleep(0.01)
+        time.sleep(0.001)
         GPIO.output(MOTOR_PINS[motor]['step'], GPIO.LOW)
-        time.sleep(0.01)
+        time.sleep(0.001)
 
     # Update the total steps moved for this motor
     total_steps_moved[motor] += change
@@ -170,10 +170,10 @@ def balance_ball():
 # --------------------------------------------------------------------------------------------
 if __name__ == "__main__":
     debug_log("Initializing...")
-    # Centering motors before starting
-    print("Centering motors...")
-    for _ in range(150):  
-        move_motor('motor1', 1, True)
-        move_motor('motor2', 1, True)
-        move_motor('motor3', 1, True)
+    # # Centering motors before starting
+    # print("Centering motors...")
+    # for _ in range(150):  
+    #     move_motor('motor1', 1, True)
+    #     move_motor('motor2', 1, True)
+    #     move_motor('motor3', 1, True)
     balance_ball()
