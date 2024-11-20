@@ -71,7 +71,7 @@ def setup():
     steppers.add_stepper(stepper2)
     steppers.add_stepper(stepper3)
 
-    steppers.move_to(4.25,0,0)
+    steppers.move_to([4.25,0,0])
     steppers.run_speed_to_position()
 
 def loop():
