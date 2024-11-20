@@ -80,9 +80,6 @@ async def setup():
     steppers.move_to([4.25,0,0])
     await steppers.run_speed_to_position()
 
-def loop():
-    PID(0,0)
-
 def moveTo(hz, nx, ny):
     if(detected):
         for i in range(3):
@@ -156,6 +153,6 @@ def PID(setpointX, setpointY):
 async def main():
     await setup()
     while True:
-        loop()
+        PID(0,0)
 
 asyncio.run(main())
