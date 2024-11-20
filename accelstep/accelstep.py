@@ -1,3 +1,4 @@
+import RPi.GPIO as GPIO
 import math
 import time
 
@@ -25,40 +26,40 @@ class AccelStepper:
 
     #do we need to translate this?
     '''AccelStepper::AccelStepper(void (*forward)(), void (*backward)())
-{
-    _interface = 0;
-    _currentPos = 0;
-    _targetPos = 0;
-    _speed = 0.0;
-    _maxSpeed = 0.0;
-    _acceleration = 0.0;
-    _sqrt_twoa = 1.0;
-    _stepInterval = 0;
-    _minPulseWidth = 1;
-    _enablePin = 0xff;
-    _lastStepTime = 0;
-    _pin[0] = 0;
-    _pin[1] = 0;
-    _pin[2] = 0;
-    _pin[3] = 0;
-    _forward = forward;
-    _backward = backward;
+    {
+        _interface = 0;
+        _currentPos = 0;
+        _targetPos = 0;
+        _speed = 0.0;
+        _maxSpeed = 0.0;
+        _acceleration = 0.0;
+        _sqrt_twoa = 1.0;
+        _stepInterval = 0;
+        _minPulseWidth = 1;
+        _enablePin = 0xff;
+        _lastStepTime = 0;
+        _pin[0] = 0;
+        _pin[1] = 0;
+        _pin[2] = 0;
+        _pin[3] = 0;
+        _forward = forward;
+        _backward = backward;
 
-    // NEW
-    _n = 0;
-    _c0 = 0.0;
-    _cn = 0.0;
-    _cmin = 1.0;
-    _direction = DIRECTION_CCW;
+        // NEW
+        _n = 0;
+        _c0 = 0.0;
+        _cn = 0.0;
+        _cmin = 1.0;
+        _direction = DIRECTION_CCW;
 
-    int i;
-    for (i = 0; i < 4; i++)
-	_pinInverted[i] = 0;
-    // Some reasonable default
-    setAcceleration(1);
-    setMaxSpeed(1);
-}
-'''
+        int i;
+        for (i = 0; i < 4; i++)
+        _pinInverted[i] = 0;
+        // Some reasonable default
+        setAcceleration(1);
+        setMaxSpeed(1);
+    }
+    '''
 
     def __init__(self, interface, pin1, pin2, pin3=None, pin4=None, enable_pin=False, enable=False):
         self._interface = interface
@@ -254,32 +255,16 @@ class AccelStepper:
         self._lastStepTime = micros()
         return self._currentPos
 
-
-    '''// You might want to override this to implement eg serial output
-// bit 0 of the mask corresponds to _pin[0]
-// bit 1 of the mask corresponds to _pin[1]
-// ....
-void AccelStepper::setOutputPins(uint8_t mask)
-{
-    uint8_t numpins = 2;
-    if (_interface == FULL4WIRE || _interface == HALF4WIRE)
-	numpins = 4;
-    else if (_interface == FULL3WIRE || _interface == HALF3WIRE)
-	numpins = 3;
-    uint8_t i;
-    for (i = 0; i < numpins; i++)
-	digitalWrite(_pin[i], (mask & (1 << i)) ? (HIGH ^ _pinInverted[i]) : (LOW ^ _pinInverted[i]));
-}'''
-
     def set_output_pins(self, mask):
         numpins = 2
         if self._interface == self.FULL4WIRE or self._interface == self.HALF4WIRE:
             numpins = 4
         elif self._interface == self.FULL3WIRE or self._interface == self.HALF3WIRE:
             numpins = 3
+
         for i in range(numpins):
-            # digitalWrite(_pin[i], (mask & (1 << i)) ? (HIGH ^ _pinInverted[i]) : (LOW ^ _pinInverted[i]))
-            pass
+            if self._pin[i] is not None:
+                GPIO.output(self._pin[i], GPIO.HIGH if mask & (1 << i) else GPIO.LOW)
     
     def step0(self, step):
         if(self._speed > 0):
@@ -388,22 +373,13 @@ void AccelStepper::setOutputPins(uint8_t mask)
     def set_min_pulse_width(self, minWidth):
         self._minPulseWidth = minWidth
 
-
-'''void AccelStepper::setEnablePin(uint8_t enablePin)
-{
-    _enablePin = enablePin;
-
-    // This happens after construction, so init pin now.
-    if (_enablePin != 0xff)
-    {
-        pinMode(_enablePin, OUTPUT);
-        digitalWrite(_enablePin, HIGH ^ _enableInverted);
-    }
-}
-'''
-    #TODO: fix this!!!
     def set_enable_pin(self, enable_pin):
         self._enablePin = enable_pin
+
+        if self._enablePin != 0xff:
+            GPIO.setup(self._enablePin, GPIO.OUT)
+            GPIO.output(self._enablePin, GPIO.HIGH if self._enableInverted else GPIO.LOW)
+
 
     def set_pins_inverted(self, directionInvert, stepInvert, enableInvert):
         self._pinInverted[0] = directionInvert
@@ -418,7 +394,7 @@ void AccelStepper::setOutputPins(uint8_t mask)
         self._enableInverted = enableInvert
 
     def run_to_position(self):
-        while(run()):
+        while(self.run()):
             time.sleep(0.0020) # TODO CHECK THIS
 
     def run_speed_to_position(self):
@@ -428,11 +404,11 @@ void AccelStepper::setOutputPins(uint8_t mask)
             self._direction = self.DIRECTION_CW
         else:
             self._direction = self.DIRECTION_CCW 
-        return run_speed()
+        return self.run_speed()
 
     def run_to_new_position(self, position):
-        move_to(position)
-        run_to_position()
+        self.move_to(position)
+        self.run_to_position()
 
     def stop(self):
         if (self._speed != 0.0):
@@ -444,4 +420,4 @@ void AccelStepper::setOutputPins(uint8_t mask)
                 self.move(-stepsToStop)
 
     def is_running(self):
-        return not (self._speed == 0.0 and  self._targetPos == self._currentPos)
+        return (self._speed == 0.0 and self._targetPos == self._currentPos)
