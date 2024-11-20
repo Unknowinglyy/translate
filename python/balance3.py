@@ -82,6 +82,7 @@ async def setup():
     steppers.add_stepper(stepper2)
     steppers.add_stepper(stepper3)
 
+    print("starting to move to starting position")
     steppers.move_to([4.25,0,0])
     await steppers.run_speed_to_position()
     print("Done with setup")
