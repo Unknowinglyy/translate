@@ -79,9 +79,9 @@ def move_motor(motor, steps, clockwise):
     GPIO.output(MOTOR_PINS[motor]['dir'], GPIO.HIGH if clockwise else GPIO.LOW)
     for _ in range(abs(steps)):
         GPIO.output(MOTOR_PINS[motor]['step'], GPIO.HIGH)
-        time.sleep(0.001)
+        time.sleep(0.01)
         GPIO.output(MOTOR_PINS[motor]['step'], GPIO.LOW)
-        time.sleep(0.001)
+        time.sleep(0.01)
 
     # Update the total steps moved for this motor
     total_steps_moved[motor] += change
@@ -112,7 +112,7 @@ def move_to(hz, nx, ny):
     for i, motor in enumerate(MOTOR_PINS.keys()):
         target_angle = kinematics.compute_angle(chr(65 + i), hz, nx, ny)
         pos[i] = round((angOrig - target_angle) * angToStep)  # Calculate position in steps
-        steps = abs(pos[i]) // 16  # Adjust step scaling if necessary
+        steps = abs(pos[i])  # Adjust step scaling if necessary
         clockwise = pos[i] > 0
         motor_steps[motor] = (steps, clockwise)
         debug_log(f"Motor {chr(65 + i)}: Target angle={target_angle:.2f}, Steps={steps}, Clockwise={clockwise}")
