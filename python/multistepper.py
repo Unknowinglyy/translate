@@ -35,14 +35,14 @@ class MultiStepper:
                 self._steppers[i].move_to(absolute[i])
                 self._steppers[i].set_target_speed(this_speed)
 
-    def run(self) -> bool:
+    async def run(self) -> bool:
         running = False
         for stepper in self._steppers:
             if stepper.distance_to_go != 0:
-                stepper.run_at_speed()
+                await stepper.run_at_speed()
                 running = True
         return running
 
-    def run_speed_to_position(self):
-        while self.run():
+    async def run_speed_to_position(self):
+        while await self.run():
             pass
