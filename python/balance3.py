@@ -21,6 +21,10 @@ stepper1 = AccelStepper(accel.AccelProfile(), step_pin=23, dir_pin=24)
 stepper2 = AccelStepper(accel.AccelProfile(), step_pin=20, dir_pin=21)
 stepper3 = AccelStepper(accel.AccelProfile(), step_pin=5, dir_pin=6)
 
+stepper1.start()
+stepper2.start()
+stepper3.start()
+
 #does this work?
 # stepper1.set_pulse_width(2)
 # stepper2.set_pulse_width(2)
