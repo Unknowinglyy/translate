@@ -75,6 +75,8 @@ angToStep = 3200 / 360
 
 detected = False
 
+print("Done with variables")
+
 async def setup():
     steppers.add_stepper(stepper1)
     steppers.add_stepper(stepper2)
@@ -158,6 +160,7 @@ def PID(setpointX, setpointY):
 
 async def main():
     await setup()
+    print("done waiting for setup")
     while True:
         PID(0,0)
 
