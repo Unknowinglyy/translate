@@ -78,6 +78,14 @@ class AccelStepper:
             _direction = self.DIRECTION_CW if speed > 0.0 else self.DIRECTION_CCW
             _speed = speed
 
+
+    def disable_outputs(self):
+        if(not self._interface):
+            return
+        set_output_pins(0)
+        if(self._enablePin != 0xff):
+            digitalWrite(self._enablePin, not self._enableInverted)
+
     def enable_outputs(self):
         if (not self._interface):
             return
