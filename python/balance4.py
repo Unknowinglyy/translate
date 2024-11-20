@@ -20,7 +20,7 @@ MAX_TOTAL_STEPS = 250
 angOrig = 170          # Original angle
 angToStep = 3200 / 360           # Steps per degree
 ks = 80                          # Speed amplifying constant
-kp, ki, kd = 4E-9, 2E-6, 7E-3    # PID constants
+kp, ki, kd = 4E-9, 2E-8, 7E-6    # PID constants
 
 # Kinematics parameters
 d, e, f, g = 2, 3.125, 1.75, 3.669291339
