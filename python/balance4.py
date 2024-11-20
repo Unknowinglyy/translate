@@ -19,7 +19,7 @@ BALL_DETECTION_THRESHOLD = 20    # Ball detection range
 MAX_TOTAL_STEPS = 250
 angOrig = 165          # Original angle
 angToStep = 3200 / 360           # Steps per degree
-ks = 20                          # Speed amplifying constant
+ks = 10                          # Speed amplifying constant
 kp, ki, kd = 4E-8, 2E-6, 7E-3    # PID constants
 
 # Kinematics parameters
