@@ -14,7 +14,7 @@
 #include "TouchScreen.h"
 
 // increase or decrease the touchscreen oversampling. This is a little different
-// than you make think: 1 is no oversampling, whatever data we get is
+// than you may think: 1 is no oversampling, whatever data we get is
 // immediately returned 2 is double-sampling and we only return valid data if
 // both points are the same 3+ uses insert sort to get the median value. We
 // found 2 is precise yet not too slow so we suggest sticking with it!
