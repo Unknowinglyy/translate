@@ -15,16 +15,19 @@ def constrain(value, minn, maxn):
 
 kinematics = Kinematics(2, 3.125, 1.75, 3.669291339)
 
+print("Done with kinematics")
+
 stepper1 = AccelStepper(accel.AccelProfile(), step_pin=23, dir_pin=24)
 stepper2 = AccelStepper(accel.AccelProfile(), step_pin=20, dir_pin=21)
 stepper3 = AccelStepper(accel.AccelProfile(), step_pin=5, dir_pin=6)
 
 #does this work?
-stepper1.set_pulse_width(2)
-stepper2.set_pulse_width(2)
-stepper3.set_pulse_width(2)
+# stepper1.set_pulse_width(2)
+# stepper2.set_pulse_width(2)
+# stepper3.set_pulse_width(2)
 
 steppers = MultiStepper()
+print("Done with steppers")
 
 #stores the target positions for each stepper motor
 pos = [0, 0, 0]
@@ -79,8 +82,10 @@ async def setup():
 
     steppers.move_to([4.25,0,0])
     await steppers.run_speed_to_position()
+    print("Done with setup")
 
 def moveTo(hz, nx, ny):
+    print("Moving to: " + str(hz) + " " + str(nx) + " " + str(ny))
     if(detected):
         for i in range(3):
             pos[i] = round((angOrig - kinematics.compute_angle(i, hz, nx, ny)) * angToStep)
@@ -111,8 +116,9 @@ def moveTo(hz, nx, ny):
         steppers.run()
 
 def PID(setpointX, setpointY):
+    print("starting PID")
     point = read_touch_coordinates()
-
+    print("read touch coordinates: " + str(point.x) + " " + str(point.y))
     if(point.x != 0):
         detected = True
 
