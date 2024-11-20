@@ -1,6 +1,6 @@
 import time
 import math
-from accelstepper import AccelStepper
+from accel.accelstepper import AccelStepper
 from multistepper import MultiStepper
 from touchScreenBasicCoordOutput import read_touch_coordinates
 from kine2 import Kinematics
