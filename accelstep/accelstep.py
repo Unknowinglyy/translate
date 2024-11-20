@@ -77,3 +77,16 @@ class AccelStepper:
             _stepInterval = abs(1000000.0 / speed)
             _direction = self.DIRECTION_CW if speed > 0.0 else self.DIRECTION_CCW
             _speed = speed
+    
+    def stop(self):
+        if (self._speed != 0.0):
+            stepsToStop = ((self._speed * self._speed) / (2.0 * self._acceleration)) + 1 
+
+            if (self._speed > 0):
+                self.move(stepsToStop)
+            else:
+                self.move(-stepsToStop)
+
+
+    def isRunning(self):
+        return not (self._speed == 0.0 and  self._targetPos == self._currentPos)
