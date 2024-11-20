@@ -16,8 +16,8 @@ MOTOR_PINS = {
 # Parameters
 CENTER_X, CENTER_Y = 2025, 2045  # Touchscreen center offsets
 BALL_DETECTION_THRESHOLD = 20    # Ball detection range
-MAX_TOTAL_STEPS = 250
-angOrig = 200          # Original angle
+MAX_TOTAL_STEPS = 1000
+angOrig = 206          # Original angle
 angToStep = 3200 / 360           # Steps per degree
 ks = 30                          # Speed amplifying constant
 kp, ki, kd = 4E-8, 2E-6, 7E-6    # PID constants
