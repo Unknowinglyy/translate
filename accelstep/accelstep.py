@@ -11,6 +11,15 @@ def micros():
   return int(time.time() * 1000000)
 
 class AccelStepper:
+
+    FUNCTION = 0
+    DRIVER = 1
+    FULL2WIRE = 2
+    FULL3WIRE = 3
+    FULL4WIRE = 4
+    HALF3WIRE = 6
+    HALF4WIRE = 8
+    
     DIRECTION_CCW = 0
     DIRECTION_CW = 1
 
@@ -38,7 +47,10 @@ class AccelStepper:
         if enable:
             self.enable_outputs()
         self.set_acceleration(1)
-        self.sex_max_speed(1)
+        self.set_max_speed(1)
+
+        self._forward = None
+        self._backward = None
 
     def move_to(self, absolute: list):
         if(self._targetPos != absolute):
@@ -51,12 +63,15 @@ class AccelStepper:
     def run_speed(self):
         if(not self._stepInterval):
             return False
+        
         time = micros()
+
         if(time - self._lastStepTime >= self._stepInterval):
             if(self._direction == self.DIRECTION_CW):
                 self._currentPos += 1
             else:
                 self._currentPos -= 1
+            
             self.step(self._currentPos)
             self._lastStepTime = time
             return True
@@ -78,91 +93,6 @@ class AccelStepper:
         self._stepInterval = 0
         self._speed = 0.0
 
-    '''
-    // Subclasses can override
-unsigned long AccelStepper::computeNewSpeed()
-{
-    long distanceTo = distanceToGo(); // +ve is clockwise from curent location
-
-    long stepsToStop = (long)((_speed * _speed) / (2.0 * _acceleration)); // Equation 16
-
-    if (distanceTo == 0 && stepsToStop <= 1)
-    {
-	// We are at the target and its time to stop
-	_stepInterval = 0;
-	_speed = 0.0;
-	_n = 0;
-	return _stepInterval;
-    }
-
-    if (distanceTo > 0)
-    {
-	// We are anticlockwise from the target
-	// Need to go clockwise from here, maybe decelerate now
-	if (_n > 0)
-	{
-	    // Currently accelerating, need to decel now? Or maybe going the wrong way?
-	    if ((stepsToStop >= distanceTo) || _direction == DIRECTION_CCW)
-		_n = -stepsToStop; // Start deceleration
-	}
-	else if (_n < 0)
-	{
-	    // Currently decelerating, need to accel again?
-	    if ((stepsToStop < distanceTo) && _direction == DIRECTION_CW)
-		_n = -_n; // Start accceleration
-	}
-    }
-    else if (distanceTo < 0)
-    {
-	// We are clockwise from the target
-	// Need to go anticlockwise from here, maybe decelerate
-	if (_n > 0)
-	{
-	    // Currently accelerating, need to decel now? Or maybe going the wrong way?
-	    if ((stepsToStop >= -distanceTo) || _direction == DIRECTION_CW)
-		_n = -stepsToStop; // Start deceleration
-	}
-	else if (_n < 0)
-	{
-	    // Currently decelerating, need to accel again?
-	    if ((stepsToStop < -distanceTo) && _direction == DIRECTION_CCW)
-		_n = -_n; // Start accceleration
-	}
-    }
-
-    // Need to accelerate or decelerate
-    if (_n == 0)
-    {
-	// First step from stopped
-	_cn = _c0;
-	_direction = (distanceTo > 0) ? DIRECTION_CW : DIRECTION_CCW;
-    }
-    else
-    {
-	// Subsequent step. Works for accel (n is +_ve) and decel (n is -ve).
-	_cn = _cn - ((2.0 * _cn) / ((4.0 * _n) + 1)); // Equation 13
-	_cn = max(_cn, _cmin); 
-    }
-    _n++;
-    _stepInterval = _cn;
-    _speed = 1000000.0 / _cn;
-    if (_direction == DIRECTION_CCW)
-	_speed = -_speed;
-
-#if 0
-    Serial.println(_speed);
-    Serial.println(_acceleration);
-    Serial.println(_cn);
-    Serial.println(_c0);
-    Serial.println(_n);
-    Serial.println(_stepInterval);
-    Serial.println(distanceTo);
-    Serial.println(stepsToStop);
-    Serial.println("-----");
-#endif
-    return _stepInterval;
-}'''
-
     def compute_new_speed(self):
         distance_to = self.distance_to_go()
         steps_to_stop = (self._speed * self._speed) / (2.0 * self._acceleration)
@@ -178,7 +108,7 @@ unsigned long AccelStepper::computeNewSpeed()
                 if(steps_to_stop >= distance_to or self._direction == self.DIRECTION_CCW):
                     self._n = -steps_to_stop
             elif(self._n < 0):
-                if(steps_to_stop < distance_to or self._direction == self.DIRECTION_CW):
+                if(steps_to_stop < distance_to and self._direction == self.DIRECTION_CW):
                     self._n = -self._n
 
         elif(distance_to < 0):
@@ -256,6 +186,129 @@ unsigned long AccelStepper::computeNewSpeed()
 
     def speed(self):
         return self._speed
+    
+    def step(self, step):
+        if(self._interface == self.FUNCTION):
+            self.step0(step)
+        elif(self._interface == self.DRIVER):
+            self.step1(step)
+        elif(self._interface == self.FULL2WIRE):
+            self.step2(step)
+        elif(self._interface == self.FULL3WIRE):
+            self.step3(step)
+        elif(self._interface == self.FULL4WIRE):
+            self.step4(step)
+        elif(self._interface == self.HALF3WIRE):
+            self.step6(step)
+        elif(self._interface == self.HALF4WIRE):
+            self.step8(step)
+
+    '''// You might want to override this to implement eg serial output
+// bit 0 of the mask corresponds to _pin[0]
+// bit 1 of the mask corresponds to _pin[1]
+// ....
+void AccelStepper::setOutputPins(uint8_t mask)
+{
+    uint8_t numpins = 2;
+    if (_interface == FULL4WIRE || _interface == HALF4WIRE)
+	numpins = 4;
+    else if (_interface == FULL3WIRE || _interface == HALF3WIRE)
+	numpins = 3;
+    uint8_t i;
+    for (i = 0; i < numpins; i++)
+	digitalWrite(_pin[i], (mask & (1 << i)) ? (HIGH ^ _pinInverted[i]) : (LOW ^ _pinInverted[i]));
+}'''
+
+    def set_output_pins(self, mask):
+        numpins = 2
+        if self._interface == self.FULL4WIRE or self._interface == self.HALF4WIRE:
+            numpins = 4
+        elif self._interface == self.FULL3WIRE or self._interface == self.HALF3WIRE:
+            numpins = 3
+        for i in range(numpins):
+            # digitalWrite(_pin[i], (mask & (1 << i)) ? (HIGH ^ _pinInverted[i]) : (LOW ^ _pinInverted[i]))
+            pass
+    def step0(self, step):
+        if(self._speed > 0):
+            if self._forward:
+                self._forward()
+        else:
+            if self._backward:
+                self._backward()
+
+
+    def step1(self, step):
+        self.set_output_pins(0b10 if self._direction else 0b00)
+        self.set_output_pins(0b11 if self._direction else 0b01)
+
+        time.sleep(self._minPulseWidth / 1000000.0)
+        self.set_output_pins(0b10 if self._direction else 0b00)
+
+    def step2(self, step):
+        step = step & 0x3
+        if step == 0:
+            self.set_output_pins(0b10)
+        elif step == 1:
+            self.set_output_pins(0b11)
+        elif step == 2:
+            self.set_output_pins(0b01)
+        elif step == 3:
+            self.set_output_pins(0b00)
+
+    def step3(self, step):
+        step = step % 0x3
+        if step == 0:
+            self.set_output_pins(0b100)
+        elif step == 1:
+            self.set_output_pins(0b001)
+        elif step == 2:
+            self.set_output_pins(0b010)
+
+    def step4(self, step):
+        step = step & 0x3
+        if step == 0:
+            self.set_output_pins(0b0101)
+        elif step == 1:
+            self.set_output_pins(0b0110)
+        elif step == 2:
+            self.set_output_pins(0b1010)
+        elif step == 3:
+            self.set_output_pins(0b1001)
+
+    def step6(self, step):
+        step = step % 6
+        if step == 0:
+            self.set_output_pins(0b100)
+        elif step == 1:
+            self.set_output_pins(0b101)
+        elif step == 2:
+            self.set_output_pins(0b001)
+        elif step == 3:
+            self.set_output_pins(0b011)
+        elif step == 4:
+            self.set_output_pins(0b010)
+        elif step == 5:
+            self.set_output_pins(0b110)
+
+    def step8(self, step):
+        step = step & 0x7
+        if step == 0:
+            self.set_output_pins(0b0001)
+        elif step == 1:
+            self.set_output_pins(0b0101)
+        elif step == 2:
+            self.set_output_pins(0b0100)
+        elif step == 3:
+            self.set_output_pins(0b0110)
+        elif step == 4:
+            self.set_output_pins(0b0010)
+        elif step == 5:
+            self.set_output_pins(0b1010)
+        elif step == 6:
+            self.set_output_pins(0b1000)
+        elif step == 7:
+            self.set_output_pins(0b1001)
+
 
     def disable_outputs(self):
         if(not self._interface):
