@@ -1,5 +1,5 @@
 import math
-
+import time
 def constrain(value, minn, maxn):
     return max(min(maxn, value), minn)
 
@@ -80,7 +80,7 @@ class AccelStepper:
     
     def run_to_position(self):
         while(run()):
-            YIELD
+            time.sleep(0.0020) # CHECK THIS
 
     def run_speed_to_position(self):
         if (self._targetPos == self._currentPos):
