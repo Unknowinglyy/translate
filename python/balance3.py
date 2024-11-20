@@ -26,9 +26,9 @@ stepper2.start()
 stepper3.start()
 
 #does this work?
-# stepper1.set_pulse_width(2)
-# stepper2.set_pulse_width(2)
-# stepper3.set_pulse_width(2)
+stepper1.set_pulse_width(2)
+stepper2.set_pulse_width(2)
+stepper3.set_pulse_width(2)
 
 steppers = MultiStepper()
 print("Done with steppers")
