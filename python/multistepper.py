@@ -21,8 +21,8 @@ class MultiStepper:
         longest_time = 0.0
 
         for i in range(self._num_steppers):
-            this_distance = absolute[i] - self._steppers[i].position
-            this_time = abs(this_distance) / self._steppers[i].max_speed
+            this_distance = absolute[i] - self._steppers[i].current_position()
+            this_time = abs(this_distance) / self._steppers[i].max_speed()
 
             if this_time > longest_time:
                 longest_time = this_time
@@ -30,19 +30,20 @@ class MultiStepper:
         if(longest_time > 0.0):
             # Now set the speed of each stepper so they will all arrive at the same time
             for i in range(self._num_steppers):
-                this_distance = absolute[i] - self._steppers[i].position
+                this_distance = absolute[i] - self._steppers[i].current_position()
                 this_speed = this_distance / longest_time
                 self._steppers[i].move_to(absolute[i])
-                self._steppers[i].set_target_speed(this_speed)
+                self._steppers[i].set_speed(this_speed)
 
-    async def run(self) -> bool:
+    def run(self) -> bool:
         running = False
         for stepper in self._steppers:
-            if stepper.distance_to_go != 0:
-                await stepper.run_at_speed()
+            if stepper.distance_to_go() != 0:
+                stepper.run_speed()
                 running = True
         return running
 
-    async def run_speed_to_position(self):
-        while await self.run():
+    def run_speed_to_position(self):
+        while self.run():
+            #do nothing
             pass
