@@ -37,7 +37,10 @@ class AccelProfile(RampProfile):
     if self._target_speed == speed:
       return
     self._target_speed = speed
-    self._ramp_delay_min_us = 1000000.0 / speed
+    if speed != 0:
+      self._ramp_delay_min_us = 1000000.0 / speed
+    else:
+      self._ramp_delay_min_us = 0.0
     # Recompute _ramp_step_number from current speed and adjust speed if accelerating or cruising
     if (self._ramp_step_number > 0):
       if self._acceleration != 0:
