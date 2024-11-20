@@ -71,13 +71,13 @@ angToStep = 3200 / 360
 
 detected = False
 
-def setup():
+async def setup():
     steppers.add_stepper(stepper1)
     steppers.add_stepper(stepper2)
     steppers.add_stepper(stepper3)
 
     steppers.move_to([4.25,0,0])
-    steppers.run_speed_to_position()
+    await steppers.run_speed_to_position()
 
 def loop():
     PID(0,0)
