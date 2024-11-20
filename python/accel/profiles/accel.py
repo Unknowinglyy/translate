@@ -111,7 +111,10 @@ class AccelProfile(RampProfile):
 
     self._ramp_step_number += 1
     self._step_interval_us = self._ramp_delay_n_us
-    self._current_speed = 1000000.0 / self._ramp_delay_n_us
+    if self._ramp_delay_n_us > 0:
+      self._current_speed = 1000000.0 / self._ramp_delay_n_us
+    else:
+      self._current_speed = 0.0
     if self._direction == DIRECTION_CCW:
       self._current_speed = -self._current_speed
 
