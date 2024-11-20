@@ -182,7 +182,7 @@ unsigned long AccelStepper::computeNewSpeed()
 // You must call this at least once per step, preferably in your main loop
 // If the motor is in the desired position, the cost is very small
 // returns true if the motor is still running to the target position.
-boolean AccelStepper::run()
+bool AccelStepper::run()
 {
     if (runSpeed())
 	computeNewSpeed();
