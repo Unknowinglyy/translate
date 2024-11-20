@@ -79,9 +79,9 @@ def move_motor(motor, steps, clockwise):
     GPIO.output(MOTOR_PINS[motor]['dir'], GPIO.HIGH if clockwise else GPIO.LOW)
     for _ in range(abs(steps)):
         GPIO.output(MOTOR_PINS[motor]['step'], GPIO.HIGH)
-        time.sleep(0.01)
+        time.sleep(0.001)
         GPIO.output(MOTOR_PINS[motor]['step'], GPIO.LOW)
-        time.sleep(0.01)
+        time.sleep(0.001)
 
     # Update the total steps moved for this motor
     total_steps_moved[motor] += change
@@ -162,7 +162,7 @@ def balance_ball():
         while True:
             pid_control(0, 0)
             move_to(4.25, -out[0], -out[1])
-            time.sleep(0.001)
+            time.sleep(0.01)
     except KeyboardInterrupt:
         debug_log("Exiting program...")
     finally:
