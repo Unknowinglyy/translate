@@ -25,6 +25,14 @@ stepper1.start()
 stepper2.start()
 stepper3.start()
 
+stepper1.set_target_speed(100)
+stepper2.set_target_speed(100)
+stepper3.set_target_speed(100)
+
+stepper1.set_acceleration(100)
+stepper2.set_acceleration(100)
+stepper3.set_acceleration(100)
+
 #does this work?
 stepper1.set_pulse_width(2)
 stepper2.set_pulse_width(2)
