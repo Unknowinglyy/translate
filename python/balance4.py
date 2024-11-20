@@ -17,7 +17,7 @@ MOTOR_PINS = {
 
 CENTER_X, CENTER_Y = 2025, 2045  # Touchscreen center offsets
 BALL_DETECTION_THRESHOLD = 10    # Ball detection range
-MAX_TOTAL_STEPS = 400
+MAX_CLOCKWISE_STEPS = 400
 angOrig = 165                    # Original angle
 angToStep = 3200 / 360           # Steps per degree
 ks = 20                          # Speed amplifying constant
@@ -49,32 +49,39 @@ def debug_log(msg):
     """
     print(f"[{time.time():.2f}] {msg}")
 
-total_steps_moved = {motor: 0 for motor in MOTOR_PINS.keys()}
+# Step limits for each motor
+motor_positions = {motor: 0 for motor in MOTOR_PINS.keys()}  # Tracks current position of each motor
 
 def move_motor(motor, steps, clockwise):
     """
     Moves a single motor a specified number of steps in a specified direction.
-    Updates the net total steps moved by the motor.
+    Restricts movement to within 0 (starting position) and 400 (maximum clockwise steps).
     """
-    global total_steps_moved
+    global motor_positions
 
-    # Calculate the proposed change in step count
+    # Calculate the proposed new position
     change = steps if clockwise else -steps
-    new_total = total_steps_moved[motor] + change
+    new_position = motor_positions[motor] + change
 
-    # Ensure the total steps remain within the allowable range
-    if abs(new_total) > MAX_TOTAL_STEPS:
-        allowed_steps = MAX_TOTAL_STEPS - abs(total_steps_moved[motor])
-        allowed_steps = max(allowed_steps, 0)  # Ensure no negative steps
-        debug_log(f"{motor} step limit reached. Adjusting steps to {allowed_steps}.")
-        steps = allowed_steps
-        change = steps if clockwise else -steps
+    # Enforce movement constraints
+    if new_position > MAX_CLOCKWISE_STEPS:
+        # Adjust steps to stay within the upper limit
+        allowed_steps = MAX_CLOCKWISE_STEPS - motor_positions[motor]
+        steps = max(allowed_steps, 0)
+        change = steps
+        debug_log(f"{motor} clockwise limit reached. Adjusting steps to {allowed_steps}.")
+    elif new_position < 0:
+        # Prevent moving below the starting position
+        allowed_steps = abs(motor_positions[motor])
+        steps = max(allowed_steps, 0)
+        change = -allowed_steps
+        debug_log(f"{motor} counterclockwise limit reached. Adjusting steps to {allowed_steps}.")
 
     if steps <= 0:
         debug_log(f"{motor} cannot move further. No steps executed.")
         return
 
-    debug_log(f"Moving {motor}: steps={steps}, clockwise={clockwise}, total_steps={total_steps_moved[motor]}")
+    debug_log(f"Moving {motor}: steps={steps}, clockwise={clockwise}, current_position={motor_positions[motor]}")
     GPIO.output(MOTOR_PINS[motor]['dir'], GPIO.HIGH if clockwise else GPIO.LOW)
     for _ in range(abs(steps)):
         GPIO.output(MOTOR_PINS[motor]['step'], GPIO.HIGH)
@@ -82,9 +89,9 @@ def move_motor(motor, steps, clockwise):
         GPIO.output(MOTOR_PINS[motor]['step'], GPIO.LOW)
         time.sleep(0.001)
 
-    # Update the total steps moved for this motor
-    total_steps_moved[motor] += change
-    debug_log(f"Updated {motor} total steps to {total_steps_moved[motor]}")
+    # Update the motor position
+    motor_positions[motor] += change
+    debug_log(f"Updated {motor} position to {motor_positions[motor]}")
 
 def move_motors_concurrently(motor_steps):
     """
