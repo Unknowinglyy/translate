@@ -84,6 +84,7 @@ async def setup():
 
     print("starting to move to starting position")
     steppers.move_to([4.25,0,0])
+    print("Waiting...")
     await steppers.run_speed_to_position()
     print("Done with setup")
 
@@ -160,6 +161,7 @@ def PID(setpointX, setpointY):
         moveTo(4.25, -out[0], -out[1])  # moves the platform
 
 async def main():
+    print("Entered main")
     await setup()
     print("done waiting for setup")
     while True:
