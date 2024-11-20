@@ -8,9 +8,9 @@ import threading
 # --------------------------------------------------------------------------------------------
 # GPIO setup for stepper motors
 MOTOR_PINS = {
-    'motor1': {'step': 23, 'dir': 24},
+    'motor1': {'step': 5, 'dir': 6},
     'motor2': {'step': 20, 'dir': 21},
-    'motor3': {'step': 5, 'dir': 6}
+    'motor3': {'step': 23, 'dir': 24}
 }
 
 # Parameters
@@ -79,9 +79,9 @@ def move_motor(motor, steps, clockwise):
     GPIO.output(MOTOR_PINS[motor]['dir'], GPIO.HIGH if clockwise else GPIO.LOW)
     for _ in range(abs(steps)):
         GPIO.output(MOTOR_PINS[motor]['step'], GPIO.HIGH)
-        time.sleep(0.003)
+        time.sleep(0.001)
         GPIO.output(MOTOR_PINS[motor]['step'], GPIO.LOW)
-        time.sleep(0.003)
+        time.sleep(0.001)
 
     # Update the total steps moved for this motor
     total_steps_moved[motor] += change
