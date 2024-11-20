@@ -77,7 +77,39 @@ class AccelStepper:
             _stepInterval = abs(1000000.0 / speed)
             _direction = self.DIRECTION_CW if speed > 0.0 else self.DIRECTION_CCW
             _speed = speed
+
+    def enable_outputs(self):
+        if (not self._interface):
+            return
+        pinMode(self._pin[0], OUTPUT)
+        pinMode(self._pin[1], OUTPUT)
+        if(self._interface == FULL4WIRE || self._interface == HALF4WIRE):
+            pinMode(self._pin[2], OUTPUT)
+            pinMode(self._pin[3], OUTPUT)
+        else if (self._interface == FULL3WIRE || self._interface == HALF3WIRE):
+            pinMode(self._pin[2], OUTPUT)
+        if (self._enablePin != 0xff):
+            pinMode(self._enablePin, OUTPUT)
+            digitalWrite(self._enablePin, self._enableInverted)
+
+    def set_min_pulse_width(self, minWidth):
+        self._minPulseWidth = minWidth
+
+    def set_enable_pin(self, enable_pin):
+        self._enablePin = enable_pin
+
+    def set_pins_inverted(self, directionInvert, stepInvert, enableInvert):
+        self._pinInverted[0] = directionInvert
+        self._pinInverted[1] = stepInvert
+        self._enableInverted = enableInvert
     
+    def set_pins_inverted(self, pin1Invert, pin2Invert, pin3Invert, pin4Invert, enableInvert):
+        self._pinInverted[0] = pin1Invert
+        self._pinInverted[1] = pin2Invert
+        self._pinInverted[2] = pin3Invert
+        self._pinInverted[3] = pin4Invert
+        self._enableInverted = enableInvert
+
     def run_to_position(self):
         while(run()):
             time.sleep(0.0020) # CHECK THIS
