@@ -14,12 +14,11 @@ def constrain(value, minn, maxn):
 
 kinematics = Kinematics(2, 3.125, 1.75, 3.669291339)
 
-stepper1 = AccelStepper(1,1,2)
-stepper2 = AccelStepper(1,3,4)
-stepper3 = AccelStepper(1,5,6)
+stepper1 = AccelStepper(1, step_pin=23, dir_pin=24)
+stepper2 = AccelStepper(1, step_pin=20, dir_pin=21)
+stepper3 = AccelStepper(1, step_pin=5, dir_pin=6)
 
 steppers = MultiStepper()
-
 
 #stores the target positions for each stepper motor
 pos = [0, 0, 0]
