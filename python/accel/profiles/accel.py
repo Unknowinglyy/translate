@@ -40,7 +40,11 @@ class AccelProfile(RampProfile):
     self._ramp_delay_min_us = 1000000.0 / speed
     # Recompute _ramp_step_number from current speed and adjust speed if accelerating or cruising
     if (self._ramp_step_number > 0):
-      self._ramp_step_number = ((self._current_speed * self._current_speed) / (2.0 * self._acceleration)) # Equation 16
+      if self._acceleration != 0:
+        self._ramp_step_number = ((self._current_speed * self._current_speed) / (2.0 * self._acceleration)) # Equation 16
+      else:
+        self._ramp_step_number = 0
+      
       self.compute_new_speed()
 
   def set_acceleration(self, acceleration):
@@ -111,7 +115,7 @@ class AccelProfile(RampProfile):
 
     self._ramp_step_number += 1
     self._step_interval_us = self._ramp_delay_n_us
-    if self._ramp_delay_n_us > 0:
+    if self._ramp_delay_n_us != 0:
       self._current_speed = 1000000.0 / self._ramp_delay_n_us
     else:
       self._current_speed = 0.0
