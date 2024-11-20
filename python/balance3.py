@@ -4,7 +4,7 @@ from accel.accelstepper import AccelStepper
 from multistepper import MultiStepper
 from touchScreenBasicCoordOutput import read_touch_coordinates
 from kine2 import Kinematics
-from accel import __init__
+from accel.profiles import accel
 
 DIRECTION_CCW = 0   # Clockwise
 DIRECTION_CW  = 1   # Counter-Clockwise
@@ -14,9 +14,14 @@ def constrain(value, minn, maxn):
 
 kinematics = Kinematics(2, 3.125, 1.75, 3.669291339)
 
-stepper1 = AccelStepper(1, step_pin=23, dir_pin=24)
-stepper2 = AccelStepper(1, step_pin=20, dir_pin=21)
-stepper3 = AccelStepper(1, step_pin=5, dir_pin=6)
+stepper1 = AccelStepper(accel.AccelProfile(), step_pin=23, dir_pin=24)
+stepper2 = AccelStepper(accel.AccelProfile(), step_pin=20, dir_pin=21)
+stepper3 = AccelStepper(accel.AccelProfile(), step_pin=5, dir_pin=6)
+
+#does this work?
+stepper1.set_pulse_width(2)
+stepper2.set_pulse_width(2)
+stepper3.set_pulse_width(2)
 
 steppers = MultiStepper()
 
