@@ -78,7 +78,11 @@ class AccelStepper:
             _direction = self.DIRECTION_CW if speed > 0.0 else self.DIRECTION_CCW
             _speed = speed
     
-    def runSpeedToPosition(self):
+    def run_to_position(self):
+        while(run()):
+            YIELD
+
+    def run_speed_to_position(self):
         if (self._targetPos == self._currentPos):
             return False;
         if (self._targetPos > self._currentPos):
@@ -87,7 +91,7 @@ class AccelStepper:
             self._direction = self.DIRECTION_CCW 
         return run_speed()
 
-    def runToNewPosition(self, position):
+    def run_to_new_position(self, position):
         move_to(position)
         run_to_position()
 
@@ -101,5 +105,5 @@ class AccelStepper:
                 self.move(-stepsToStop)
 
 
-    def isRunning(self):
+    def is_running(self):
         return not (self._speed == 0.0 and  self._targetPos == self._currentPos)
