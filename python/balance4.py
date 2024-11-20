@@ -79,9 +79,9 @@ def move_motor(motor, steps, clockwise):
     GPIO.output(MOTOR_PINS[motor]['dir'], GPIO.HIGH if clockwise else GPIO.LOW)
     for _ in range(abs(steps)):
         GPIO.output(MOTOR_PINS[motor]['step'], GPIO.HIGH)
-        time.sleep(0.0002)
+        time.sleep(0.001)
         GPIO.output(MOTOR_PINS[motor]['step'], GPIO.LOW)
-        time.sleep(0.0002)
+        time.sleep(0.001)
 
     # Update the total steps moved for this motor
     total_steps_moved[motor] += change
