@@ -1,10 +1,13 @@
 import math
 
+def constrain(value, minn, maxn):
+    return max(min(maxn, value), minn)
+
 class AccelStepper:
     DIRECTION_CCW = 0
     DIRECTION_CW = 1
 
-    def __init__(self, interface, pin1, pin2, pin3=None, pin4=None, enable_pin=False):
+    def __init__(self, interface, pin1, pin2, pin3=None, pin4=None, enable_pin=False, enable=False):
         self._interface = interface
         self._currentPos = 0
         self._targetPos = 0
@@ -49,24 +52,6 @@ class AccelStepper:
 
     def maxSpeed(self):
         return self._maxSpeed
-    
-    '''void AccelStepper::setAcceleration(float acceleration)
-{
-    if (acceleration == 0.0)
-	return;
-    if (acceleration < 0.0)
-      acceleration = -acceleration;
-    if (_acceleration != acceleration)
-    {
-	// Recompute _n per Equation 17
-	_n = _n * (_acceleration / acceleration);
-	// New c0 per Equation 7, with correction per Equation 15
-	_c0 = 0.676 * sqrt(2.0 / acceleration) * 1000000.0; // Equation 15
-	_acceleration = acceleration;
-	computeNewSpeed();
-    }
-}
-'''
 
     def set_acceleration(self, acceleration):
         if(acceleration == 0.0):
@@ -78,6 +63,17 @@ class AccelStepper:
             self._c0 = 0.676 * math.sqrt(2.0 / acceleration) * 1000000.0
             self._acceleration = acceleration
             self.compute_new_speed()
-    
 
+    def acceleration(self):
+        return self._acceleration
     
+    def set_speed(self, speed):
+        if(self._speed == speed):
+            return
+        speed = constrain(speed,  -self._maxSpeed, self._maxSpeed)
+        if(speed == 0.0):
+            _stepInterval = 0
+        else:
+            _stepInterval = abs(1000000.0 / speed)
+            _direction = self.DIRECTION_CW if speed > 0.0 else self.DIRECTION_CCW
+            _speed = speed
