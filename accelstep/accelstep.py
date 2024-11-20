@@ -90,11 +90,6 @@ class AccelStepper:
         self._forward = None
         self._backward = None
 
-    def run(self):
-        if(self.run_speed()):
-            self.compute_new_speed()
-        return self._speed != 0.0 or self.distance_to_go() != 0
-
     def move_to(self, absolute: list):
         if(self._targetPos != absolute):
             self._targetPos = absolute
@@ -181,10 +176,6 @@ class AccelStepper:
         if(self.run_speed()):
             self.compute_new_speed()
         return self._speed != 0.0 or self.distance_to_go() != 0
-
-    def enable_outputs(self):
-        #TODO implement this
-        pass
  
     def set_max_speed(self, speed):
         if(speed < 0.0):
@@ -347,28 +338,27 @@ class AccelStepper:
         elif step == 7:
             self.set_output_pins(0b1001)
 
-    #TODO: FIX THIS
     def disable_outputs(self):
         if(not self._interface):
             return
         self.set_output_pins(0)
         if(self._enablePin != 0xff):
-            digitalWrite(self._enablePin, not self._enableInverted)
+            GPIO.setup(self._enablePin, GPIO.OUT)
+            GPIO.output(self._enablePin, GPIO.LOW if not self._enableInverted else GPIO.HIGH)
 
-    #TODO: FIX THIS
     def enable_outputs(self):
         if (not self._interface):
             return
-        pinMode(self._pin[0], OUTPUT)
-        pinMode(self._pin[1], OUTPUT)
-        if(self._interface == FULL4WIRE || self._interface == HALF4WIRE):
-            pinMode(self._pin[2], OUTPUT)
-            pinMode(self._pin[3], OUTPUT)
-        else if (self._interface == FULL3WIRE || self._interface == HALF3WIRE):
-            pinMode(self._pin[2], OUTPUT)
+        GPIO.setup(self._pin[0], GPIO.OUT)
+        GPIO.setup(self._pin[1], GPIO.OUT)
+        if self._interface in [self.FULL4WIRE, self.HALF4WIRE]:
+            GPIO.setup(self._pin[2], GPIO.OUT)
+            GPIO.setup(self._pin[3], GPIO.OUT)
+        elif self._interface in [self.FULL3WIRE, self.HALF3WIRE]:
+            GPIO.setup(self._pin[2], GPIO.OUT)
         if (self._enablePin != 0xff):
-            pinMode(self._enablePin, OUTPUT)
-            digitalWrite(self._enablePin, self._enableInverted)
+            GPIO.setup(self._enablePin, GPIO.OUT)
+            GPIO.output(self._enablePin, GPIO.HIGH if not self._enableInverted else GPIO.LOW)
 
     def set_min_pulse_width(self, minWidth):
         self._minPulseWidth = minWidth
@@ -395,7 +385,7 @@ class AccelStepper:
 
     def run_to_position(self):
         while(self.run()):
-            time.sleep(0.0020) # TODO CHECK THIS
+            time.sleep(0.0020)
 
     def run_speed_to_position(self):
         if (self._targetPos == self._currentPos):
