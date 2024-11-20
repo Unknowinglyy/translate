@@ -79,5 +79,15 @@ class AccelStepper:
             self._acceleration = acceleration
             self.compute_new_speed()
     
+def stop(self):
+    if (self._speed != 0.0):
+	    stepsToStop = ((self._speed * self._speed) / (2.0 * self._acceleration)) + 1; // Equation 16 (+integer rounding):
 
-    
+        if (self._speed > 0):
+            move(stepsToStop)
+        else:
+            move(-stepsToStop)
+
+
+def isRunning():
+    return !(_speed == 0.0 && _targetPos == _currentPos)
