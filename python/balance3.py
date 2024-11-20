@@ -5,6 +5,7 @@ from multistepper import MultiStepper
 from touchScreenBasicCoordOutput import read_touch_coordinates
 from kine2 import Kinematics
 from accel.profiles import accel
+import asyncio
 
 DIRECTION_CCW = 0   # Clockwise
 DIRECTION_CW  = 1   # Counter-Clockwise
@@ -152,8 +153,9 @@ def PID(setpointX, setpointY):
     while (time.time() * 1000 - timeI) < 20:
         moveTo(4.25, -out[0], -out[1])  # moves the platform
 
-if __name__ == "__main__":
-    setup()
+async def main():
+    await setup()
     while True:
         loop()
-        time.sleep(0.01)    
+
+asyncio.run(main())

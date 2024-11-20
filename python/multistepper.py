@@ -43,6 +43,6 @@ class MultiStepper:
                 running = True
         return running
 
-    async def run_speed_to_position(self):
-        while await self.run():
+    def run_speed_to_position(self):
+        while self.run():
             pass
