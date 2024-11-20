@@ -23,6 +23,43 @@ class AccelStepper:
     DIRECTION_CCW = 0
     DIRECTION_CW = 1
 
+    #do we need to translate this?
+    '''AccelStepper::AccelStepper(void (*forward)(), void (*backward)())
+{
+    _interface = 0;
+    _currentPos = 0;
+    _targetPos = 0;
+    _speed = 0.0;
+    _maxSpeed = 0.0;
+    _acceleration = 0.0;
+    _sqrt_twoa = 1.0;
+    _stepInterval = 0;
+    _minPulseWidth = 1;
+    _enablePin = 0xff;
+    _lastStepTime = 0;
+    _pin[0] = 0;
+    _pin[1] = 0;
+    _pin[2] = 0;
+    _pin[3] = 0;
+    _forward = forward;
+    _backward = backward;
+
+    // NEW
+    _n = 0;
+    _c0 = 0.0;
+    _cn = 0.0;
+    _cmin = 1.0;
+    _direction = DIRECTION_CCW;
+
+    int i;
+    for (i = 0; i < 4; i++)
+	_pinInverted[i] = 0;
+    // Some reasonable default
+    setAcceleration(1);
+    setMaxSpeed(1);
+}
+'''
+
     def __init__(self, interface, pin1, pin2, pin3=None, pin4=None, enable_pin=False, enable=False):
         self._interface = interface
         self._currentPos = 0
@@ -51,6 +88,11 @@ class AccelStepper:
 
         self._forward = None
         self._backward = None
+
+    def run(self):
+        if(self.run_speed()):
+            self.compute_new_speed()
+        return self._speed != 0.0 or self.distance_to_go() != 0
 
     def move_to(self, absolute: list):
         if(self._targetPos != absolute):
@@ -142,9 +184,6 @@ class AccelStepper:
     def enable_outputs(self):
         #TODO implement this
         pass
-
-    def set_acceleration(self, acceleration):
-        self._acceleration = acceleration
  
     def set_max_speed(self, speed):
         if(speed < 0.0):
@@ -156,7 +195,7 @@ class AccelStepper:
                 self._n = (self._speed * self._speed) / (2.0 * self._acceleration)
                 self.compute_new_speed()
 
-    def maxSpeed(self):
+    def max_speed(self):
         return self._maxSpeed
 
     def set_acceleration(self, acceleration):
@@ -203,6 +242,19 @@ class AccelStepper:
         elif(self._interface == self.HALF4WIRE):
             self.step8(step)
 
+    def stepForward(self):
+        self._currentPos += 1
+        self.step(self._currentPos)
+        self._lastStepTime = micros()
+        return self._currentPos
+    
+    def stepBackward(self):
+        self._currentPos -= 1
+        self.step(self._currentPos)
+        self._lastStepTime = micros()
+        return self._currentPos
+
+
     '''// You might want to override this to implement eg serial output
 // bit 0 of the mask corresponds to _pin[0]
 // bit 1 of the mask corresponds to _pin[1]
@@ -228,6 +280,7 @@ void AccelStepper::setOutputPins(uint8_t mask)
         for i in range(numpins):
             # digitalWrite(_pin[i], (mask & (1 << i)) ? (HIGH ^ _pinInverted[i]) : (LOW ^ _pinInverted[i]))
             pass
+    
     def step0(self, step):
         if(self._speed > 0):
             if self._forward:
@@ -309,14 +362,15 @@ void AccelStepper::setOutputPins(uint8_t mask)
         elif step == 7:
             self.set_output_pins(0b1001)
 
-
+    #TODO: FIX THIS
     def disable_outputs(self):
         if(not self._interface):
             return
-        set_output_pins(0)
+        self.set_output_pins(0)
         if(self._enablePin != 0xff):
             digitalWrite(self._enablePin, not self._enableInverted)
 
+    #TODO: FIX THIS
     def enable_outputs(self):
         if (not self._interface):
             return
@@ -334,6 +388,20 @@ void AccelStepper::setOutputPins(uint8_t mask)
     def set_min_pulse_width(self, minWidth):
         self._minPulseWidth = minWidth
 
+
+'''void AccelStepper::setEnablePin(uint8_t enablePin)
+{
+    _enablePin = enablePin;
+
+    // This happens after construction, so init pin now.
+    if (_enablePin != 0xff)
+    {
+        pinMode(_enablePin, OUTPUT);
+        digitalWrite(_enablePin, HIGH ^ _enableInverted);
+    }
+}
+'''
+    #TODO: fix this!!!
     def set_enable_pin(self, enable_pin):
         self._enablePin = enable_pin
 
@@ -351,11 +419,11 @@ void AccelStepper::setOutputPins(uint8_t mask)
 
     def run_to_position(self):
         while(run()):
-            time.sleep(0.0020) # CHECK THIS
+            time.sleep(0.0020) # TODO CHECK THIS
 
     def run_speed_to_position(self):
         if (self._targetPos == self._currentPos):
-            return False;
+            return False
         if (self._targetPos > self._currentPos):
             self._direction = self.DIRECTION_CW
         else:
