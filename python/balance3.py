@@ -111,7 +111,7 @@ def moveTo(hz, nx, ny):
 def PID(setpointX, setpointY):
     point = read_touch_coordinates()
 
-    if(p.x != 0):
+    if(point.x != 0):
         detected = True
 
         for i in range(2):
@@ -139,7 +139,7 @@ def PID(setpointX, setpointY):
         #delay by 10 ms to double check that there is no ball
         time.sleep(0.01)
         point = read_touch_coordinates()
-        if(p.x == 0):
+        if(point.x == 0):``
             detected = False
             print("No ball detected")
 
@@ -147,4 +147,9 @@ def PID(setpointX, setpointY):
     timeI = time.time() * 1000  # Convert to milliseconds
     while (time.time() * 1000 - timeI) < 20:
         moveTo(4.25, -out[0], -out[1])  # moves the platform
-    
+
+if __name__ == "__main__":
+    setup()
+    while True:
+        loop()
+        time.sleep(0.01)    
