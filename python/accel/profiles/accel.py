@@ -60,7 +60,10 @@ class AccelProfile(RampProfile):
 
   def compute_new_speed(self):
     distanceTo = self.distance_to_go     # +ve is clockwise from curent location
-    stepsToStop = int(((self._current_speed * self._current_speed) / (2.0 * self._acceleration))) # Equation 16
+    if self._acceleration != 0:
+      stepsToStop = int(((self._current_speed * self._current_speed) / (2.0 * self._acceleration))) # Equation 16
+    else:
+      stepsToStop = 0
 
     if distanceTo == 0 and stepsToStop <= 1:
       # We are at the target and its time to stop
