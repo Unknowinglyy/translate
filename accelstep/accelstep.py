@@ -77,6 +77,62 @@ class AccelStepper:
             _stepInterval = abs(1000000.0 / speed)
             _direction = self.DIRECTION_CW if speed > 0.0 else self.DIRECTION_CCW
             _speed = speed
+
+    def speed(self):
+        return self._speed
+    
+    #TODO step, stepForward, stepBackward, setOutputPins, step0-8 not implemented
+
+    def disable_outputs(self):
+        if not(self._interface):
+            return
+        self.set_output_pins(0)
+        if(self._enablePin != 0xff):
+            pin_mode(self._enablePin, OUTPUT)
+            digital_write(self._enablePin, LOW ^ self._enableInverted)
+    
+
+    def enable_outputs(self):
+        if(self._interface == None):
+            return
+        pin_mode(self._pin[0], OUTPUT)
+        pin_mode(self._pin[1], OUTPUT)
+        if(self._interface == FULL4WIRE or self._interface == HALF4WIRE):
+            pin_mode(self._pin[2], OUTPUT)
+            pin_mode(self._pin[3], OUTPUT)
+        elif(self._interface == FULL3WIRE or self._interface == HALF3WIRE):
+            pin_mode(self._pin[2], OUTPUT)
+        if(self._enablePin != 0xff):
+            pin_mode(self._enablePin, OUTPUT)
+            digital_write(self._enablePin, HIGH ^ self._enableInverted)
+
+    def set__min_pulse_width(self, min_width):
+        self._minPulseWidth = min_width
+
+    def set_enable_pin(self, enable_pin):
+        self._enablePin = enable_pin
+        if(self._enablePin != 0xff):
+            pin_mode(self._enablePin, OUTPUT)
+            digital_write(self._enablePin, HIGH ^ self._enableInverted)
+
+
+    def set_pins_inverted(self, direction_invert, step_invert, enable_invert):
+        self._pinInverted[0] = step_invert
+        self._pinInverted[1] = direction_invert
+        self._enableInverted = enable_invert
+
+    def set_pins_inverted(self, pin1Invert, pin2Invert, pin3Invert, pin4Invert, enableInvert):
+        self._pinInverted[0] = pin1Invert
+        self._pinInverted[1] = pin2Invert
+        self._pinInverted[2] = pin3Invert
+        self._pinInverted[3] = pin4Invert
+        self._enableInverted = enableInvert
+    
+
+    def run_to_position(self):
+        while self.run():
+            pass
+    
     
     def runSpeedToPosition(self):
         if (self._targetPos == self._currentPos):
