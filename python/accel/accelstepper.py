@@ -15,10 +15,15 @@ class AccelStepper:
     # Time in microseconds that last step occured
     self._last_step_time_us = 0
     self._activator = stepdir_act.StepDirActivator(dir_pin, step_pin, enable_pin, pin_mode)
+    self._max_speed = 1000
 
   @property
   def position(self):
     return self._profile._current_steps
+  
+  @property
+  def max_speed(self):
+    return self._max_speed
 
   @property
   def direction(self):
@@ -35,6 +40,9 @@ class AccelStepper:
   @property
   def distance_to_go(self):
     return self._profile.distance_to_go
+  
+  def set_max_speed(self, speed):
+    self._max_speed = speed
 
   def set_pulse_width(self, pulse_width_us):
     """
