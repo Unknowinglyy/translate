@@ -162,7 +162,7 @@ def balance_ball():
         while True:
             pid_control(0, 0)
             move_to(4.25, -out[0], -out[1])
-            time.sleep(0.02)
+            time.sleep(0.001)
     except KeyboardInterrupt:
         debug_log("Exiting program...")
     finally:
