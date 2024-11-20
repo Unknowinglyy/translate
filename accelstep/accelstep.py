@@ -78,6 +78,8 @@ class AccelStepper:
             _direction = self.DIRECTION_CW if speed > 0.0 else self.DIRECTION_CCW
             _speed = speed
 
+    def speed(self):
+        return self._speed
 
     def disable_outputs(self):
         if(not self._interface):
