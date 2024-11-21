@@ -1,108 +1,88 @@
 import time
-import math
 from accelstepper import AccelStepper
 from multistepper import MultiStepper
-from touchScreenBasicCoordOutput import read_touch_coordinates
-from kine2 import Kinematics
+import RPi.GPIO as GPIO
 
-# GPIO Pins for the steppers
-STEP_PINS = [23, 20, 5]
-DIR_PINS = [24, 21, 6]
+# Define GPIO pins for the 3 stepper motors
+STEP_PIN1 = 23
+DIR_PIN1 = 24
+
+STEP_PIN2 = 34
+DIR_PIN2 = 35
+
+STEP_PIN3 = 5
+DIR_PIN3 = 6
+
 ENA_PIN = 17
 
-# Initialize kinematics and steppers
-kinematics = Kinematics(2, 3.125, 1.75, 3.669291339)
-
-# Proportional-Integral-Derivative (PID) parameters
-kp = 4E-4  # Proportional gain
-ki = 2E-6  # Integral gain
-kd = 7E-3  # Derivative gain
-
-# Touchscreen center offsets
-xoffset = 500
-yoffset = 500
-
-# Initial setup
-angOrig = 206.662752199  # Original angle of the platform
-angToStep = 3200 / 360   # Steps per degree
-pos = [0, 0, 0]          # Target positions
-error = [0, 0]
-errorPrev = [0, 0]
-integr = [0, 0]
-speed = [0, 0, 0]
-speedPrev = [0, 0, 0]
-ks = 20  # Speed amplification factor
-
-# Initialize GPIO for enable pin
-import RPi.GPIO as GPIO
+# Initialize GPIO
 GPIO.setmode(GPIO.BCM)
+
 GPIO.setup(ENA_PIN, GPIO.OUT)
-GPIO.output(ENA_PIN, GPIO.LOW)  # Enable drivers
+GPIO.output(ENA_PIN, GPIO.LOW)
 
-# Initialize steppers
-steppers = MultiStepper()
-stepper_list = []
-for step_pin, dir_pin in zip(STEP_PINS, DIR_PINS):
-    stepper = AccelStepper(AccelStepper.DRIVER, step_pin, dir_pin)
-    stepper.set_max_speed(1000)
-    stepper.set_acceleration(500)
-    stepper.set_current_position(0)
-    steppers.add_stepper(stepper)
-    stepper_list.append(stepper)
+# Define stepper motors
+motor1 = AccelStepper(AccelStepper.DRIVER, STEP_PIN1, DIR_PIN1)
+motor2 = AccelStepper(AccelStepper.DRIVER, STEP_PIN2, DIR_PIN2)
+motor3 = AccelStepper(AccelStepper.DRIVER, STEP_PIN3, DIR_PIN3)
 
-def constrain(value, minn, maxn):
-    return max(min(maxn, value), minn)
+# Initialize MultiStepper and add motors
+multi_stepper = MultiStepper()
+multi_stepper.add_stepper(motor1)
+multi_stepper.add_stepper(motor2)
+multi_stepper.add_stepper(motor3)
 
-def compute_motor_positions(hz, nx, ny):
-    """Compute motor positions based on kinematics."""
-    for i in range(3):
-        angle = kinematics.compute_angle(i, hz, nx, ny)
-        pos[i] = round((angOrig - angle) * angToStep)
+# Set motor properties (max speed, acceleration, etc.)
+motor1.set_max_speed(1000)
+motor1.set_acceleration(500)
 
-def PID_control(setpointX, setpointY):
-    """Calculate PID output for balancing."""
-    global error, errorPrev, integr, speed, speedPrev
+motor2.set_max_speed(1000)
+motor2.set_acceleration(500)
 
-    point = read_touch_coordinates()
-    print(f"Touchscreen coordinates: x={point.x}, y={point.y}")
+motor3.set_max_speed(1000)
+motor3.set_acceleration(500)
 
-    if point.x != 0:
-        detected = True
-        for i in range(2):  # Loop for X and Y axes
-            errorPrev[i] = error[i]
-            error[i] = (xoffset - point.x - setpointX if i == 0 else yoffset - point.y - setpointY)
-            integr[i] += error[i] + errorPrev[i]
-            deriv = error[i] - errorPrev[i]
-            out = kp * error[i] + ki * integr[i] + kd * deriv
-            out = constrain(out, -0.25, 0.25)
+motor1.set_current_position(0)
+motor2.set_current_position(0)
+motor3.set_current_position(0)
 
-        compute_motor_positions(4.25, -out[0], -out[1])
+def move_motors_to_angle(angle1, angle2, angle3):
+    # Convert angles to steps based on your system's specifications
+    steps1 = angle1 * 3200 / 360  # Example: 3200 steps for 360 degrees
+    steps2 = angle2 * 3200 / 360
+    steps3 = angle3 * 3200 / 360
 
-        # Calculate and apply motor speeds
-        for i, stepper in enumerate(stepper_list):
-            speedPrev[i] = speed[i]
-            speed[i] = abs(stepper.current_position() - pos[i]) * ks
-            speed[i] = constrain(speed[i], speedPrev[i] - 200, speedPrev[i] + 200)
-            speed[i] = constrain(speed[i], 0, 1000)
+    # Move motors to the target positions
+    print(f"Moving motors to angles: {angle1}°, {angle2}°, {angle3}°")
+    multi_stepper.move_to([steps1, steps2, steps3])
 
-        steppers.move_to(pos)
-        while steppers.run():
-            time.sleep(0.0001)
-
-    else:
-        print("No ball detected, resetting.")
-        time.sleep(0.01)
+    # Wait until all motors reach their positions
+    while multi_stepper.run():
+        time.sleep(0.001)  # Small delay for smooth operation
 
 def main():
-    """Main loop to balance the ball."""
-    print("Starting ball balancing...")
-    while True:
-        PID_control(0, 0)
+    try:
+        # Move motors to tilt platform to some angle
+        move_motors_to_angle(0, 0, 45)  # Example: Tilt all motors to 45 degrees
+
+        time.sleep(1)  # Wait for 1 second
+
+        # Return motors to initial positions (0 degrees)
+        print("Returning motors to initial position")
+        move_motors_to_angle(0, 0, 0)
+
+        time.sleep(1)  # Wait for 1 second
+
+        # Move motors to a different angle
+        move_motors_to_angle(30, 60, 90)  # Example: Tilt motors to different angles
+
+        time.sleep(1)  # Wait for 1 second
+
+    except KeyboardInterrupt:
+        print("Keyboard interrupt")
+    finally:
+        print("Cleaning up GPIO")
+        GPIO.cleanup()
 
 if __name__ == "__main__":
-    try:
-        main()
-    except KeyboardInterrupt:
-        print("Stopping program.")
-    finally:
-        GPIO.cleanup()
+    main()
