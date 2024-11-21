@@ -39,6 +39,8 @@ print("added all the steppers")
 try:
     while True:
         stepper1.step1(1)
+        stepper2.step(1)
+        stepper3.step(1)
         time.sleep(0.01)
 
 except KeyboardInterrupt:
