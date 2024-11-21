@@ -211,11 +211,11 @@ class AccelStepper:
             return
         speed = constrain(speed,  -self._maxSpeed, self._maxSpeed)
         if(speed == 0.0):
-            _stepInterval = 0
+            self._stepInterval = 0
         else:
-            _stepInterval = abs(1000000.0 / speed)
-            _direction = self.DIRECTION_CW if speed > 0.0 else self.DIRECTION_CCW
-            _speed = speed
+            self._stepInterval = abs(1000000.0 / speed)
+            self._direction = self.DIRECTION_CW if speed > 0.0 else self.DIRECTION_CCW
+            self._speed = speed
 
     def speed(self):
         return self._speed
