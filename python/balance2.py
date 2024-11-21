@@ -11,10 +11,10 @@ DIR_PIN = 24
 ENA = 17
 
 # Constants and Parameters
-CENTER_X, CENTER_Y = 2025, 2045  # Touchscreen center offsets
+CENTER_X, CENTER_Y = 100, 100  # Touchscreen center offsets
 BALL_DETECTION_THRESHOLD = 20    # Ball detection range
 angOrig = 206                    # Original angle
-angToStep = 3200 / 360           # Steps per degree
+angToStep = 1600 / 360           # Steps per degree
 ks = 20                          # Speed amplifying constant
 kp, ki, kd = 4E-4, 2E-6, 7E-3    # PID constants
 
@@ -42,7 +42,7 @@ stepper3 = AccelStepper(AccelStepper.DRIVER, 23, 24)
 
 # Configure stepper motor speeds and accelerations
 for stepper in [stepper1, stepper2, stepper3]:
-    stepper.set_max_speed(1000)  # Adjust as needed
+    stepper.set_max_speed(100000)  # Adjust as needed
     stepper.set_acceleration(100)  # Adjust as needed
 
 # Create a MultiStepper instance
@@ -69,12 +69,13 @@ def move_to(hz, nx, ny):
     # Move all motors concurrently to the calculated positions
     multi_stepper.move_to(target_positions)
     while multi_stepper.run():
-        time.sleep(0.01)  # Allow motors to run concurrently
+        time.sleep(0.005)  # Allow motors to run concurrently
 
 def pid_control(setpoint_x, setpoint_y):
     global detected, error, integr, deriv, out, pos
 
     point = read_touch_coordinates()  # Get touchscreen data
+    debug_log(f"Touchscreen point: {point.x} {point.y}")
     if point is not None and point.x != 0:
         detected = True
         for i in range(2):  # For X and Y axes
@@ -82,11 +83,11 @@ def pid_control(setpoint_x, setpoint_y):
             integr[i] += error[i]
             deriv[i] = error[i] - deriv[i]  # Calculate derivative
             out[i] = kp * error[i] + ki * integr[i] + kd * deriv[i]
-            out[i] = max(min(out[i], 0.2), -0.2)  # Constrain output
+            out[i] = max(min(out[i], 0.25), -0.25)  # Constrain output
             debug_log(f"PID output {['X', 'Y'][i]}: error={error[i]}, integr={integr[i]}, deriv={deriv[i]}, out={out[i]}")
 
         # Update motor positions
-        move_to(4.3, -out[0], -out[1])
+        move_to(4.25, -out[0], -out[1])
     else:
         detected = False
         debug_log("Ball not detected.")
