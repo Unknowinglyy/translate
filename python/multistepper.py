@@ -43,8 +43,8 @@ class MultiStepper:
                 self._steppers[i].run_speed()
                 running = True
             #might not be needed
-            else:
-                self._steppers[i].set_current_position(self._steppers[i].current_position())
+            # else:
+            #     self._steppers[i].set_current_position(self._steppers[i].current_position())
         return running
 
     def run_speed_to_position(self):
