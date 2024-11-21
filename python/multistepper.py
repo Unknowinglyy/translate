@@ -29,7 +29,7 @@ class MultiStepper:
             if this_time > longest_time:
                 longest_time = this_time
         
-        if(longest_time > 0.1):
+        if(longest_time > 0.2):
             # Now set the speed of each stepper so they will all arrive at the same time
             for i in range(self._num_steppers):
                 this_distance = absolute[i] - self._steppers[i].current_position()
