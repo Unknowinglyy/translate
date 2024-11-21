@@ -41,7 +41,8 @@ try:
     steppers.move_to(pos)
     print("moved to target positions")
 
-    steppers.run_speed_to_position()
+    while steppers.run():
+        time.sleep(0.0001)
     print("ran to target positions")
 
 except KeyboardInterrupt:
