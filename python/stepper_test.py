@@ -22,9 +22,9 @@ GPIO.output(ENA, GPIO.LOW)
 #small delay to allow system to settle
 time.sleep(1)
 
-stepper1.set_max_speed(200)
-stepper2.set_max_speed(200)
-stepper3.set_max_speed(200)
+stepper1.set_max_speed(1000)
+stepper2.set_max_speed(1000)
+stepper3.set_max_speed(1000)
 
 steppers.add_stepper(stepper1)
 steppers.add_stepper(stepper2)
@@ -35,7 +35,7 @@ try:
     steppers.move_to(pos)
 
     steppers.run_speed_to_position()
-    
+
 except KeyboardInterrupt:
     print("Keyboard interrupt")
 
