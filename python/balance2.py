@@ -1,15 +1,18 @@
-import math
 import time
 from accelstepper import AccelStepper
 from multistepper import MultiStepper
+import RPi.GPIO as GPIO
 from kine2 import Kinematics  # Import the Kinematics class
 from touchScreenBasicCoordOutput import read_touch_coordinates
 
-# --------------------------------------------------------------------------------------------
+# Define GPIO pins for the stepper motor
+STEP_PIN = 23
+DIR_PIN = 24
+ENA = 17
+
 # Constants and Parameters
 CENTER_X, CENTER_Y = 2025, 2045  # Touchscreen center offsets
 BALL_DETECTION_THRESHOLD = 20    # Ball detection range
-MAX_TOTAL_STEPS = 250
 angOrig = 150                    # Original angle
 angToStep = 6400 / 360           # Steps per degree
 ks = 20                          # Speed amplifying constant
@@ -23,9 +26,14 @@ out = [0, 0]  # PID output for X and Y axes
 pos = [0, 0, 0]  # Position of each motor
 detected = False  # Ball detection flag
 
-# Kinematics parameters
 d, e, f, g = 2, 3.125, 1.75, 3.669291339
 kinematics = Kinematics(d, e, f, g)
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(ENA, GPIO.OUT)
+GPIO.output(ENA, GPIO.LOW)
+GPIO.setup(STEP_PIN, GPIO.OUT)
+GPIO.setup(DIR_PIN, GPIO.OUT)
 
 # Initialize stepper motors
 stepper1 = AccelStepper(AccelStepper.DRIVER, 5, 6)
@@ -43,18 +51,11 @@ multi_stepper.add_stepper(stepper1)
 multi_stepper.add_stepper(stepper2)
 multi_stepper.add_stepper(stepper3)
 
-# --------------------------------------------------------------------------------------------
 # Helper Functions
 def debug_log(msg):
-    """
-    Helper function to print debugging messages with a timestamp.
-    """
     print(f"[{time.time():.2f}] {msg}")
 
 def move_to(hz, nx, ny):
-    """
-    Moves the platform based on calculated motor positions using MultiStepper.
-    """
     global pos
     debug_log(f"move_to called with hz={hz}, nx={nx}, ny={ny}")
 
@@ -71,9 +72,6 @@ def move_to(hz, nx, ny):
         time.sleep(0.01)  # Allow motors to run concurrently
 
 def pid_control(setpoint_x, setpoint_y):
-    """
-    PID control to move the ball to the specified setpoint.
-    """
     global detected, error, integr, deriv, out, pos
 
     point = read_touch_coordinates()  # Get touchscreen data
@@ -93,13 +91,8 @@ def pid_control(setpoint_x, setpoint_y):
         detected = False
         debug_log("Ball not detected.")
 
-
-# --------------------------------------------------------------------------------------------
 # Main Loop
 def balance_ball():
-    """
-    Main loop to balance the ball using PID and platform movement.
-    """
     debug_log("Starting balance loop...")
     try:
         while True:
@@ -108,10 +101,8 @@ def balance_ball():
     except KeyboardInterrupt:
         debug_log("Exiting program...")
     finally:
-        # Clean up GPIO or any other resources
-        pass
+        GPIO.cleanup()  # Clean up GPIO or any other resources
 
-# --------------------------------------------------------------------------------------------
 if __name__ == "__main__":
     debug_log("Initializing...")
     balance_ball()
