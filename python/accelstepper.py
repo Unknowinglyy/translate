@@ -63,7 +63,7 @@ class AccelStepper:
     }
     '''
 
-    def __init__(self, interface, pin1, pin2, pin3=None, pin4=None, enable_pin=False, enable=False):
+    def __init__(self, interface, pin1, pin2, pin3=None, pin4=None, enable_pin=False, enable=True):
         self._interface = interface
         self._currentPos = 0
         self._targetPos = 0
@@ -258,7 +258,6 @@ class AccelStepper:
         for i in range(numpins):
             #step and direction pins
             if self._pin[i] is not None:
-                GPIO.setup(self._pin[i], GPIO.OUT)
                 #print("setting up pin: ", self._pin[i])
                 GPIO.output(self._pin[i], GPIO.HIGH if mask & (1 << i) else GPIO.LOW)
                 #print("outputting: ", GPIO.HIGH if mask & (1 << i) else GPIO.LOW)
