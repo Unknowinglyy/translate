@@ -69,7 +69,7 @@ def move_to(hz, nx, ny):
     # Move all motors concurrently to the calculated positions
     multi_stepper.move_to(target_positions)
     while multi_stepper.run():
-        time.sleep(0.001)  # Allow motors to run concurrently
+        time.sleep(0.05)  # Allow motors to run concurrently
 
 def pid_control(setpoint_x, setpoint_y):
     global detected, error, integr, deriv, out, pos
