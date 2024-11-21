@@ -26,9 +26,9 @@ stepper1.set_speed(2000)
 stepper2.set_speed(2000)
 stepper3.set_speed(2000)
 
-stepper1.set_max_speed(2000)
-stepper2.set_max_speed(2000)
-stepper3.set_max_speed(2000)
+stepper1.set_max_speed(5000)
+stepper2.set_max_speed(5000)
+stepper3.set_max_speed(5000)
 print("set all the speeds")
 
 steppers.add_stepper(stepper1)
