@@ -20,7 +20,7 @@ MAX_TOTAL_STEPS = 250
 angOrig = 170          # Original angle
 angToStep = 3200 / 360           # Steps per degree
 ks = 50                          # Speed amplifying constant
-kp, ki, kd = 5, 5E-10, 5E-9      # PID constants
+kp, ki, kd = 1, 5E-10, 5E-9      # PID constants
 
 # Kinematics parameters
 d, e, f, g = 2, 3.125, 1.75, 3.669291339
@@ -79,9 +79,9 @@ def move_motor(motor, steps, clockwise):
     GPIO.output(MOTOR_PINS[motor]['dir'], GPIO.HIGH if clockwise else GPIO.LOW)
     for _ in range(abs(steps)):
         GPIO.output(MOTOR_PINS[motor]['step'], GPIO.HIGH)
-        time.sleep(0.0008)
+        time.sleep(0.0005)
         GPIO.output(MOTOR_PINS[motor]['step'], GPIO.LOW)
-        time.sleep(0.0008)
+        time.sleep(0.0005)
 
     # Update the total steps moved for this motor
     total_steps_moved[motor] += change
