@@ -63,7 +63,7 @@ def move_motors_to_angle(angle1, angle2, angle3):
 def main():
     try:
         # Move motors to tilt platform to some angle
-        move_motors_to_angle(45, 45, 45)  # Example: Tilt all motors to 45 degrees
+        move_motors_to_angle(0, 0, 45)  # Example: Tilt all motors to 45 degrees
 
         time.sleep(1)  # Wait for 1 second
 
