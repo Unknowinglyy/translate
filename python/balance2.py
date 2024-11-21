@@ -15,7 +15,7 @@ CENTER_X, CENTER_Y = 2025, 2045  # Touchscreen center offsets
 BALL_DETECTION_THRESHOLD = 20    # Ball detection range
 angOrig = 206                    # Original angle
 angToStep = 3200 / 360           # Steps per degree
-ks = 20                          # Speed amplifying constant
+ks = 50                          # Speed amplifying constant
 kp, ki, kd = 4E-4, 2E-6, 7E-3    # PID constants
 
 # Global variables for PID control
@@ -82,11 +82,11 @@ def pid_control(setpoint_x, setpoint_y):
             integr[i] += error[i]
             deriv[i] = error[i] - deriv[i]  # Calculate derivative
             out[i] = kp * error[i] + ki * integr[i] + kd * deriv[i]
-            out[i] = max(min(out[i], 0.2), -0.2)  # Constrain output
+            out[i] = max(min(out[i], 0.25), -0.25)  # Constrain output
             debug_log(f"PID output {['X', 'Y'][i]}: error={error[i]}, integr={integr[i]}, deriv={deriv[i]}, out={out[i]}")
 
         # Update motor positions
-        move_to(4.3, -out[0], -out[1])
+        move_to(4.25, -out[0], -out[1])
     else:
         detected = False
         debug_log("Ball not detected.")
