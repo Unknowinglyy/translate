@@ -63,7 +63,7 @@ class AccelStepper:
     }
     '''
 
-    def __init__(self, interface, pin1, pin2, pin3=None, pin4=None, enable_pin=False, enable=False):
+    def __init__(self, interface, pin1, pin2, pin3=None, pin4=None, enable_pin=False, enable=True):
         self._interface = interface
         self._currentPos = 0
         self._targetPos = 0
@@ -258,7 +258,6 @@ class AccelStepper:
         for i in range(numpins):
             #step and direction pins
             if self._pin[i] is not None:
-                GPIO.setup(self._pin[i], GPIO.OUT)
                 #print("setting up pin: ", self._pin[i])
                 GPIO.output(self._pin[i], GPIO.HIGH if mask & (1 << i) else GPIO.LOW)
                 #print("outputting: ", GPIO.HIGH if mask & (1 << i) else GPIO.LOW)
@@ -275,14 +274,14 @@ class AccelStepper:
     def step1(self, step):
         #pin[0] is step, pin[1] is direction
         #set direction first else you will get rogue pulses
-        self.set_output_pins(0b01 if self._direction else 0b00)
+        self.set_output_pins(0b10 if self._direction else 0b00)
         #step high
-        self.set_output_pins(0b11 if self._direction else 0b10)
+        self.set_output_pins(0b11 if self._direction else 0b01)
         #there is a 200ns setup time
         #delay the minimum allowed pulse width
         time.sleep(self._minPulseWidth / 1_000_000)
         #step low
-        self.set_output_pins(0b01 if self._direction else 0b00)
+        self.set_output_pins(0b10 if self._direction else 0b00)
 
     def step2(self, step):
         step = step & 0x3
