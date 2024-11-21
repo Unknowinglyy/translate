@@ -75,6 +75,7 @@ def pid_control(setpoint_x, setpoint_y):
     global detected, error, integr, deriv, out, pos
 
     point = read_touch_coordinates()  # Get touchscreen data
+    debug_log(f"Touchscreen point: {point}")
     if point is not None and point.x != 0:
         detected = True
         for i in range(2):  # For X and Y axes
