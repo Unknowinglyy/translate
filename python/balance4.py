@@ -135,7 +135,7 @@ def pid_control(setpoint_x, setpoint_y):
             integr[i] += error[i]
             deriv[i] = error[i] - error[i - 1] if i > 0 else 0
             out[i] = kp * error[i] + ki * integr[i] + kd * deriv[i]
-            out[i] = max(min(out[i], 0.1), -0.1)  # Constrain output
+            out[i] = max(min(out[i], 0.2), -0.2)  # Constrain output
             debug_log(f"PID output {['X', 'Y'][i]}: error={error[i]}, integr={integr[i]}, deriv={deriv[i]}, out={out[i]}")
 
         for i in range(3):
