@@ -30,9 +30,14 @@ steppers.add_stepper(stepper1)
 steppers.add_stepper(stepper2)
 steppers.add_stepper(stepper3)
 
-#move to target positions
-steppers.move_to(pos)
+try:
+    #move to target positions
+    steppers.move_to(pos)
 
-steppers.run_speed_to_position()
+    steppers.run_speed_to_position()
+    
+except KeyboardInterrupt:
+    print("Keyboard interrupt")
 
-GPIO.cleanup()
+finally:
+    GPIO.cleanup()
