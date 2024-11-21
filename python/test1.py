@@ -1,10 +1,15 @@
 import time
 from accelstepper import AccelStepper
 from multistepper import MultiStepper
+import RPi.GPIO as GPIO 
 
 # Define GPIO pins for the stepper motor
 STEP_PIN = 23
 DIR_PIN = 24
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(STEP_PIN, GPIO.OUT)
+GPIO.setup(DIR_PIN, GPIO.OUT)
 
 def main():
     # Initialize the stepper motor
