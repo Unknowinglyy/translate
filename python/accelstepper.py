@@ -248,9 +248,9 @@ class AccelStepper:
 
     def set_output_pins(self, mask):
         numpins = 2
-        if self._interface == self.FULL4WIRE or self._interface == self.HALF4WIRE:
+        if self._interface in [self.FULL4WIRE, self.HALF4WIRE]:
             numpins = 4
-        elif self._interface == self.FULL3WIRE or self._interface == self.HALF3WIRE:
+        elif self._interface in [self.FULL3WIRE, self.HALF3WIRE]:
             numpins = 3
 
         for i in range(numpins):
