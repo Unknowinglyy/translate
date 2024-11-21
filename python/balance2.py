@@ -15,6 +15,14 @@ angToStep = 6400 / 360           # Steps per degree
 ks = 20                          # Speed amplifying constant
 kp, ki, kd = 2E-2, 5E-4, 5E-7    # PID constants
 
+# Global variables for PID control
+error = [0, 0]  # Error for X and Y axes
+integr = [0, 0]  # Integral term for X and Y axes
+deriv = [0, 0]  # Derivative term for X and Y axes
+out = [0, 0]  # PID output for X and Y axes
+pos = [0, 0, 0]  # Position of each motor
+detected = False  # Ball detection flag
+
 # Kinematics parameters
 d, e, f, g = 2, 3.125, 1.75, 3.669291339
 kinematics = Kinematics(d, e, f, g)
@@ -74,7 +82,7 @@ def pid_control(setpoint_x, setpoint_y):
         for i in range(2):  # For X and Y axes
             error[i] = (CENTER_X - point.x - setpoint_x) if i == 0 else (CENTER_Y - point.y - setpoint_y)
             integr[i] += error[i]
-            deriv[i] = error[i] - error[i - 1] if i > 0 else 0
+            deriv[i] = error[i] - deriv[i]  # Calculate derivative
             out[i] = kp * error[i] + ki * integr[i] + kd * deriv[i]
             out[i] = max(min(out[i], 0.2), -0.2)  # Constrain output
             debug_log(f"PID output {['X', 'Y'][i]}: error={error[i]}, integr={integr[i]}, deriv={deriv[i]}, out={out[i]}")
@@ -84,6 +92,7 @@ def pid_control(setpoint_x, setpoint_y):
     else:
         detected = False
         debug_log("Ball not detected.")
+
 
 # --------------------------------------------------------------------------------------------
 # Main Loop
