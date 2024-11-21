@@ -422,3 +422,6 @@ class AccelStepper:
 
     def is_running(self):
         return (self._speed == 0.0 and self._targetPos == self._currentPos)
+    
+    def set_direction(self, direction):
+        self._direction = direction
