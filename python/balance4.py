@@ -18,11 +18,11 @@ MOTOR_PINS = {
 ENA = 17
 CENTER_X, CENTER_Y = 2025, 2045  # Touchscreen center offsets
 BALL_DETECTION_THRESHOLD = 20    # Ball detection range
-MAX_TOTAL_STEPS = 450
-angOrig = 170          # Original angle
+MAX_TOTAL_STEPS = 250
+angOrig = 150          # Original angle
 angToStep = 12800 / 360           # Steps per degree
 ks = 20                          # Speed amplifying constant
-kp, ki, kd = 2E-2, 5E-4, 5E-7      # PID constants
+kp, ki, kd = 4E-4, 2E-6, 7E-3      # PID constants
 
 # Kinematics parameters
 d, e, f, g = 2, 3.125, 1.75, 3.669291339
@@ -141,7 +141,7 @@ def pid_control(setpoint_x, setpoint_y):
             integr[i] += error[i]
             deriv[i] = error[i] - error[i - 1] if i > 0 else 0
             out[i] = kp * error[i] + ki * integr[i] + kd * deriv[i]
-            out[i] = max(min(out[i], 0.2), -0.2)  # Constrain output
+            out[i] = max(min(out[i], 0.25), -0.25)  # Constrain output
             debug_log(f"PID output {['X', 'Y'][i]}: error={error[i]}, integr={integr[i]}, deriv={deriv[i]}, out={out[i]}")
 
         for i in range(3):
