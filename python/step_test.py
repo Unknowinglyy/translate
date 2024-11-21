@@ -38,7 +38,7 @@ print("added all the steppers")
 
 try:
     while True:
-        stepper1.step1()
+        stepper1.step1(1)
 
 except KeyboardInterrupt:
     print("Keyboard interrupt")
