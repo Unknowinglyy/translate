@@ -82,7 +82,7 @@ class AccelStepper:
         self._c0 = 0.0
         self._cn = 0.0
         self._cmin = 1.0
-        self._direction = self.DIRECTION_CCW
+        self._direction = self.DIRECTION_CW
         self._pinInverted = [0] * 4
         if enable:
             self.enable_outputs()
