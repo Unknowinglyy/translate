@@ -20,7 +20,7 @@ MAX_TOTAL_STEPS = 250
 angOrig = 170          # Original angle
 angToStep = 3200 / 360           # Steps per degree
 ks = 50                          # Speed amplifying constant
-kp, ki, kd = 3, 5E-10, 5E-9      # PID constants
+kp, ki, kd = 5, 5E-10, 5E-9      # PID constants
 
 # Kinematics parameters
 d, e, f, g = 2, 3.125, 1.75, 3.669291339
@@ -161,7 +161,7 @@ def balance_ball():
     try:
         while True:
             pid_control(0, 0)
-            move_to(4.25, -out[0], -out[1])
+            move_to(4.3, -out[0], -out[1])
             time.sleep(0.01)
     except KeyboardInterrupt:
         debug_log("Exiting program...")
