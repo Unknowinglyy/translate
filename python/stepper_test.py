@@ -34,6 +34,7 @@ steppers.add_stepper(stepper1)
 steppers.add_stepper(stepper2)
 steppers.add_stepper(stepper3)
 
+
 try:
     #move to target positions
     steppers.move_to(pos)

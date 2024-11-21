@@ -37,9 +37,9 @@ class MultiStepper:
 
     def run(self) -> bool:
         running = False
-        for stepper in self._steppers:
-            if stepper.distance_to_go() != 0:
-                stepper.run_speed()
+        for i in range(self._num_steppers):
+            if self._steppers[i].distance_to_go() != 0:
+                self._steppers[i].run_speed()
                 running = True
         return running
 
