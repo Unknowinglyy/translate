@@ -45,8 +45,8 @@ def main():
 
     # Return to start position
     print("Returning to initial position")
-    multi_stepper.move_to([0])  # Return to initial position
-    multi_stepper._steppers[0].set_direction(0)
+    multi_stepper.move_to([-400])  # Return to initial position
+    # multi_stepper._steppers[0].set_direction(0)
     print(f"Distance_to_go(): {multi_stepper._steppers[0].distance_to_go()}")
     print(f"Current Direction: {multi_stepper._steppers[0]._direction}")
     while multi_stepper.run():  # Keep running until all motors reach their positions
