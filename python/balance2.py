@@ -61,7 +61,7 @@ def move_to(hz, nx, ny):
 
     target_positions = []
     for i, stepper in enumerate([stepper1, stepper2, stepper3]):
-        target_angle = kinematics.compute_angle(chr(65 + i), hz, nx, ny)
+        target_angle = kinematics.compute_angle(i, hz, nx, ny)
         pos[i] = round((angOrig - target_angle) * angToStep)  # Calculate position in steps
         target_positions.append(pos[i])
         debug_log(f"Motor {chr(65 + i)}: Target angle={target_angle:.2f}, Steps={pos[i]}")

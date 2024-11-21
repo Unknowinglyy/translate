@@ -119,7 +119,7 @@ def move_to(hz, nx, ny):
     motor_steps = {}
 
     for i, motor in enumerate(MOTOR_PINS.keys()):
-        target_angle = kinematics.compute_angle(chr(65 + i), hz, nx, ny)
+        target_angle = kinematics.compute_angle(i, hz, nx, ny)
         pos[i] = round((angOrig - target_angle) * angToStep)  # Calculate position in steps
         steps = abs(pos[i])  # Adjust step scaling if necessary
         clockwise = pos[i] > 0
