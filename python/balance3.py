@@ -174,8 +174,9 @@ if __name__ == "__main__":
     try:
         setup()
         while True:
-            PID(2025,2045)
-            
+            PID(0,0)
+            time.sleep(0.01)
+
     except KeyboardInterrupt:
         print("Keyboard interrupt")
     finally:
