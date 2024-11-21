@@ -14,6 +14,8 @@ MOTOR_PINS = {
 }
 
 # Parameters
+#enable pin for drivers
+ENA = 17
 CENTER_X, CENTER_Y = 2025, 2045  # Touchscreen center offsets
 BALL_DETECTION_THRESHOLD = 20    # Ball detection range
 MAX_TOTAL_STEPS = 250
@@ -41,6 +43,10 @@ GPIO.setmode(GPIO.BCM)
 for motor in MOTOR_PINS.values():
     GPIO.setup(motor['step'], GPIO.OUT)
     GPIO.setup(motor['dir'], GPIO.OUT)
+
+#enabling the motors
+GPIO.setup(ENA, GPIO.OUT)
+GPIO.output(ENA, GPIO.LOW)
 
 # --------------------------------------------------------------------------------------------
 def debug_log(msg):
