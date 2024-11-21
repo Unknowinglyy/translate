@@ -156,7 +156,7 @@ def PID(setpointX, setpointY):
 
             speed[i] = constrain(speed[i], 0, 1000)
 
-        print("X OUT: " + str(out[0]) + " Y OUT: " + str(out[1]) + " Speed A: " + speed[Kinematics.A])
+        print("X OUT: " + str(out[0]) + " Y OUT: " + str(out[1]) + " Speed A: " + str(speed[Kinematics.A]))
     else:
         #delay by 10 ms to double check that there is no ball
         time.sleep(0.01)
