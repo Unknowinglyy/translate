@@ -50,6 +50,7 @@ def main():
     # while multi_stepper.run():  # Keep running until all motors reach their positions
     #     time.sleep(.001)  # Small delay for smooth operation
     
+    time.sleep(5)
 
 if __name__ == "__main__":
     try:
