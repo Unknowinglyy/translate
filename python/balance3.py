@@ -1,14 +1,13 @@
 import time
 import math
-from accel.accelstepper import AccelStepper
+import RPi.GPIO as GPIO
+from accelstepper import AccelStepper
 from multistepper import MultiStepper
 from touchScreenBasicCoordOutput import read_touch_coordinates
 from kine2 import Kinematics
-from accel.profiles import accel
-import asyncio
 
-DIRECTION_CCW = 0   # Clockwise
-DIRECTION_CW  = 1   # Counter-Clockwise
+def millis():
+    return int(time.time() * 1000)
 
 def constrain(value, minn, maxn):
   return max(min(maxn, value), minn)
@@ -17,26 +16,9 @@ kinematics = Kinematics(2, 3.125, 1.75, 3.669291339)
 
 print("Done with kinematics")
 
-stepper1 = AccelStepper(accel.AccelProfile(), step_pin=23, dir_pin=24)
-stepper2 = AccelStepper(accel.AccelProfile(), step_pin=20, dir_pin=21)
-stepper3 = AccelStepper(accel.AccelProfile(), step_pin=5, dir_pin=6)
-
-stepper1.start()
-stepper2.start()
-stepper3.start()
-
-stepper1.set_target_speed(500)
-stepper2.set_target_speed(500)
-stepper3.set_target_speed(500)
-
-stepper1.set_acceleration(1000)
-stepper2.set_acceleration(1000)
-stepper3.set_acceleration(1000)
-
-#does this work?
-stepper1.set_pulse_width(2)
-stepper2.set_pulse_width(2)
-stepper3.set_pulse_width(2)
+stepper1 = AccelStepper(AccelStepper.DRIVER, 23, 24)
+stepper2 = AccelStepper(AccelStepper.DRIVER, 20, 21)
+stepper3 = AccelStepper(AccelStepper.DRIVER, 5, 6)
 
 steppers = MultiStepper()
 print("Done with steppers")
@@ -45,7 +27,7 @@ print("Done with steppers")
 pos = [0, 0, 0]
 
 #enable pin for drivers
-ENA = 0
+ENA = 17
 
 #original angle that each leg starts at
 angOrig = 206.662752199
@@ -89,25 +71,35 @@ detected = False
 
 print("Done with variables")
 
-async def setup():
+def setup():
     steppers.add_stepper(stepper1)
     steppers.add_stepper(stepper2)
     steppers.add_stepper(stepper3)
 
-    print("starting to move to starting position")
-    steppers.move_to([1,0,0])
-    print("Waiting...")
-    await steppers.run_speed_to_position()
-    print("Done with setup")
+    
+    GPIO.setup(ENA, GPIO.OUT)
+    #turn motors off
+    GPIO.output(ENA, GPIO.HIGH)
 
-def moveTo(hz, nx, ny):
+    #sleeping for a second to allow the system to settle
+    time.sleep(1)
+
+    #turn them on
+    GPIO.output(ENA, GPIO.LOW)
+
+    move_to(4.25,0,0)
+
+    steppers.run_speed_to_position()   
+
+def move_to(hz, nx, ny):
     print("Moving to: " + str(hz) + " " + str(nx) + " " + str(ny))
     if(detected):
         for i in range(3):
             pos[i] = round((angOrig - kinematics.compute_angle(i, hz, nx, ny)) * angToStep)
-        stepper1.set_target_speed(speed[Kinematics.A])
-        stepper2.set_target_speed(speed[Kinematics.B])
-        stepper3.set_target_speed(speed[Kinematics.C])
+        
+        stepper1.set_max_speed(speed[Kinematics.A])
+        stepper2.set_max_speed(speed[Kinematics.B])
+        stepper3.set_max_speed(speed[Kinematics.C])
 
         stepper1.set_acceleration(speed[Kinematics.A] * 30)
         stepper2.set_acceleration(speed[Kinematics.B] * 30)
@@ -124,9 +116,9 @@ def moveTo(hz, nx, ny):
         for i in range(3):
             pos[i] = round((angOrig - kinematics.compute_angle(i, hz, 0,0)) * angToStep)
 
-        stepper1.set_target_speed(800)
-        stepper2.set_target_speed(800)
-        stepper3.set_target_speed(800)
+        stepper1.set_max_speed(800)
+        stepper2.set_max_speed(800)
+        stepper3.set_max_speed(800)
 
         steppers.move_to(pos)
         steppers.run()
@@ -141,23 +133,29 @@ def PID(setpointX, setpointY):
         for i in range(2):
             errorPrev[i] = error[i]
 
-            error[i] = (i == 0) * (xoffset - p.x - setpointX) + (i == 1) * (yoffset - p.y - setpointY)
+            error[i] = (i == 0) * (xoffset - point.x - setpointX) + (i == 1) * (yoffset - point.y - setpointY)
+
             integr[i] += error[i] + errorPrev[i]
+
             deriv[i] = error[i] - errorPrev[i]
+
             deriv[i] = 0 if math.isnan(deriv[i]) or math.isinf(deriv[i]) else deriv[i]
+
             out[i] = kp * error[i] + ki * integr[i] + kd * deriv[i]
+
             out[i] = constrain(out[i], -0.25, 0.25)
 
         for i in range(3):
             speedPrev[i] = speed[i]
 
-            speed[i] = (stepper1.position() if i == Kinematics.A else 0) + (stepper2.position() if i == Kinematics.B else 0) + (stepper3.position() if i == Kinematics.C else 0)
+            speed[i] = (i == Kinematics.A) * stepper1.current_position() + (i == Kinematics.B) * stepper2.current_position() + (i == Kinematics.C) * stepper3.current_position()
         
             speed[i] = abs(speed[i] - pos[i]) * ks
 
             speed[i] = constrain(speed[i], speedPrev[i] - 200, speedPrev[i] + 200)
 
             speed[i] = constrain(speed[i], 0, 1000)
+
         print("X OUT: " + str(out[0]) + " Y OUT: " + str(out[1]) + " Speed A: " + speed[Kinematics.A])
     else:
         #delay by 10 ms to double check that there is no ball
@@ -168,15 +166,18 @@ def PID(setpointX, setpointY):
             print("No ball detected")
 
     # continues moving platform and waits until 20 milliseconds have elapsed
-    timeI = time.time() * 1000  # Convert to milliseconds
-    while (time.time() * 1000 - timeI) < 20:
-        moveTo(4.25, -out[0], -out[1])  # moves the platform
+    timeI = millis() # Convert to milliseconds
+    while (millis() - timeI) < 20:
+        move_to(4.25, -out[0], -out[1])  # moves the platform
 
-async def main():
-    print("Entered main")
-    await setup()
-    print("done waiting for setup")
-    while True:
-        PID(0,0)
-
-asyncio.run(main())
+if __name__ == "__main__":
+    try:
+        setup()
+        while True:
+            PID(0,0)
+            time.sleep(0.01)
+    except KeyboardInterrupt:
+        print("Keyboard interrupt")
+    finally:
+        print("cleaning up GPIO")
+        GPIO.cleanup()
