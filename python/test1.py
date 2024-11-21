@@ -27,24 +27,26 @@ def main():
 
     # Set motor properties
     motor.set_max_speed(1000)  # Maximum speed in steps per second
-    motor.set_acceleration(1000)  # Acceleration in steps per second^2
+    motor.set_acceleration(500)  # Acceleration in steps per second^2
     motor.set_current_position(0)  # Reset current position to 0
 
-    # Move up 20 steps
-    print("Moving up 20 steps")
-    multi_stepper.move_to([100])  # Target position for the motor
-    while multi_stepper.run():  # Keep running until all motors reach their positions
-        time.sleep(0.0001)  # Small delay for smooth operation
+    while True:
+        # Move up 20 steps
+        print("Moving up 20 steps")
+        multi_stepper.move_to([200])  # Target position for the motor
+        while multi_stepper.run():  # Keep running until all motors reach their positions
+            time.sleep(0.0005)  # Small delay for smooth operation
 
-    time.sleep(1)  # Pause for 1 second at the top
+        print("Reached target position. Pausing for 1 second")
+        time.sleep(1)  # Pause for 1 second at the top
 
-    # Move back down 20 steps
-    print("Moving down 20 steps")
-    multi_stepper.move_to([0])  # Return to initial position
-    while multi_stepper.run():  # Keep running until all motors reach their positions
-        time.sleep(0.0001)  # Small delay for smooth operation
+    # Return to start position
+        print("Returning to initial position")
+        multi_stepper.move_to([0])  # Return to initial position
+        while multi_stepper.run():  # Keep running until all motors reach their positions
+            time.sleep(0.0005)  # Small delay for smooth operation
 
-    print("Done!")
+        print("Done!")
 
 if __name__ == "__main__":
     try:
