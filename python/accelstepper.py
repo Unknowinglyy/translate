@@ -425,3 +425,6 @@ class AccelStepper:
     
     def set_direction(self, direction):
         self._direction = direction
+
+    def get_speed(self):
+        return self._speed

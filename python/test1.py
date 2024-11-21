@@ -37,7 +37,7 @@ def main():
     # Move up 20 steps
     print("Moving up 20 steps")
     multi_stepper.move_to([200])  # Target position for the motor
-    print(f"Distance_to_go(): {multi_stepper._steppers[0].distance_to_go()} at _speed: {multi_stepper._steppers[0]._speed()}")
+    print(f"Distance_to_go(): {multi_stepper._steppers[0].distance_to_go()} at get_speed: {multi_stepper._steppers[0]._speed()}")
     print(f"Current Direction: {multi_stepper._steppers[0]._direction}")
     while multi_stepper.run():  # Keep running until all motors reach their positions
         time.sleep(.0001)  # Small delay for smooth operation
@@ -47,7 +47,7 @@ def main():
     print("Returning to initial position")
     multi_stepper.move_to([0])  # Return to initial position
     multi_stepper._steppers[0].set_direction(0)
-    print(f"Distance_to_go(): {multi_stepper._steppers[0].distance_to_go()} at _speed: {multi_stepper._steppers[0]._speed()}")
+    print(f"Distance_to_go(): {multi_stepper._steppers[0].distance_to_go()} at get_speed: {multi_stepper._steppers[0]._speed()}")
     print(f"Current Direction: {multi_stepper._steppers[0]._direction}")
     while multi_stepper.run():  # Keep running until all motors reach their positions
         time.sleep(.0001)  # Small delay for smooth operation
