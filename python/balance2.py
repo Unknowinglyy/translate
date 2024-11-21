@@ -10,7 +10,7 @@ from touchScreenBasicCoordOutput import read_touch_coordinates
 CENTER_X, CENTER_Y = 2025, 2045  # Touchscreen center offsets
 BALL_DETECTION_THRESHOLD = 20    # Ball detection range
 MAX_TOTAL_STEPS = 250
-angOrig = 170                    # Original angle
+angOrig = 150                    # Original angle
 angToStep = 6400 / 360           # Steps per degree
 ks = 20                          # Speed amplifying constant
 kp, ki, kd = 2E-2, 5E-4, 5E-7    # PID constants
@@ -28,9 +28,9 @@ d, e, f, g = 2, 3.125, 1.75, 3.669291339
 kinematics = Kinematics(d, e, f, g)
 
 # Initialize stepper motors
-stepper1 = AccelStepper(AccelStepper.DRIVER, 23, 24)
+stepper1 = AccelStepper(AccelStepper.DRIVER, 5, 6)
 stepper2 = AccelStepper(AccelStepper.DRIVER, 20, 21)
-stepper3 = AccelStepper(AccelStepper.DRIVER, 5, 6)
+stepper3 = AccelStepper(AccelStepper.DRIVER, 23, 24)
 
 # Configure stepper motor speeds and accelerations
 for stepper in [stepper1, stepper2, stepper3]:

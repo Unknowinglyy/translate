@@ -17,6 +17,8 @@ GPIO.output(ENA, GPIO.LOW)
 GPIO.setup(STEP_PIN, GPIO.OUT)
 GPIO.setup(DIR_PIN, GPIO.OUT)
 
+# ---------------------------------------------------------------------
+
 def main():
     # Initialize the stepper motor
     motor = AccelStepper(AccelStepper.DRIVER, STEP_PIN, DIR_PIN)
@@ -26,7 +28,7 @@ def main():
     multi_stepper.add_stepper(motor)
 
     # Set motor properties
-    motor.set_max_speed(1000)  # Maximum speed in steps per second
+    motor.set_max_speed(20)  # Maximum speed in steps per second
     motor.set_acceleration(500)  # Acceleration in steps per second^2
     motor.set_current_position(0)  # Reset current position to 0
 
@@ -34,22 +36,21 @@ def main():
     print("Moving up 20 steps")
     multi_stepper.move_to([200])  # Target position for the motor
     while multi_stepper.run():  # Keep running until all motors reach their positions
-        time.sleep(.001)  # Small delay for smooth operation
+        time.sleep(.0001)  # Small delay for smooth operation
 
-    print("Reached target position. Pausing for 1 second")
-    time.sleep(5)  # Pause for 1 second at the top
 
     # Return to start position
     print("Returning to initial position")
     multi_stepper.move_to([0])  # Return to initial position
     while multi_stepper.run():  # Keep running until all motors reach their positions
-        time.sleep(.001)  # Small delay for smooth operation
+        time.sleep(.0001)  # Small delay for smooth operation
 
-    print("Moving up 20 steps")
-    multi_stepper.move_to([200])  # Target position for the motor
-    while multi_stepper.run():  # Keep running until all motors reach their positions
-        time.sleep(.001)  # Small delay for smooth operation
+    # print("Moving up 20 steps")
+    # multi_stepper.move_to([200])  # Target position for the motor
+    # while multi_stepper.run():  # Keep running until all motors reach their positions
+    #     time.sleep(.001)  # Small delay for smooth operation
     
+    time.sleep(5)
 
 if __name__ == "__main__":
     try:
