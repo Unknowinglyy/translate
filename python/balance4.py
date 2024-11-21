@@ -16,7 +16,7 @@ MOTOR_PINS = {
 # Parameters
 #enable pin for drivers
 ENA = 17
-CENTER_X, CENTER_Y = 500, 500  # Touchscreen center offsets
+CENTER_X, CENTER_Y = 2025, 2045  # Touchscreen center offsets
 BALL_DETECTION_THRESHOLD = 20    # Ball detection range
 MAX_TOTAL_STEPS = 450
 angOrig = 170          # Original angle
