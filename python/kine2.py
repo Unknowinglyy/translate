@@ -59,7 +59,7 @@ class Kinematics:
             y = x / math.sqrt(3)
             z = hz - (self.e / 2) * (math.sqrt(3) * nx + ny)
             mag = math.sqrt(x**2 + y**2 + z**2)
-            angle = math.acos(max(-1, min(1, (math.sqrt(3) * x + y) / (-2 * mag)))) + math.acos(max(-1, min(1, (mag**2 + self.f**2 - self.g**2) / (2 * mag * self.f))))
+            angle = -(math.acos(max(-1, min(1, (math.sqrt(3) * x + y) / (-2 * mag)))) + math.acos(max(-1, min(1, (mag**2 + self.f**2 - self.g**2) / (2 * mag * self.f)))))
         elif leg == 'C':  # Leg C
             term1 = max(epsilon, nz + 1)
             x = (math.sqrt(3) / 2) * (self.d - self.e * (1 - (nx**2 - math.sqrt(3) * nx * ny) / term1))
