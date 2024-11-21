@@ -1,6 +1,6 @@
 # multi_stepper.py
 
-from accel.accelstepper import AccelStepper
+from accelstepper import AccelStepper
 
 MULTISTEPPER_MAX_STEPPERS = 10
 
