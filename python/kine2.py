@@ -1,10 +1,9 @@
 import math
 
-A = 0
-B = 1
-C = 2
-
 class Kinematics:
+    A = 0
+    B = 1
+    C = 2
     def __init__(self, d, e, f, g):
         """
         Initialize the kinematic parameters.
