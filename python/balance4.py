@@ -8,8 +8,8 @@ import threading
 # --------------------------------------------------------------------------------------------
 # GPIO setup for stepper motors
 MOTOR_PINS = {
-    'motor1': {'step': 5, 'dir': 6},
-    'motor2': {'step': 20, 'dir': 21},
+    'motor1': {'step': 20, 'dir': 21},
+    'motor2': {'step': 5, 'dir': 6},
     'motor3': {'step': 23, 'dir': 24}
 }
 
