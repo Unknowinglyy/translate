@@ -26,8 +26,8 @@ def main():
     multi_stepper.add_stepper(motor)
 
     # Set motor properties
-    motor.set_max_speed(1000000)  # Maximum speed in steps per second
-    motor.set_acceleration(500)  # Acceleration in steps per second^2
+    motor.set_max_speed(1000)  # Maximum speed in steps per second
+    motor.set_acceleration(1000)  # Acceleration in steps per second^2
     motor.set_current_position(0)  # Reset current position to 0
 
     # Move up 20 steps

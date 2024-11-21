@@ -24,7 +24,8 @@ class MultiStepper:
         for i in range(self._num_steppers):
             this_distance = absolute[i] - self._steppers[i].current_position()
             this_time = abs(this_distance) / self._steppers[i].max_speed()
-
+            print("Current Position of Stepper " + str(i) + ": " + str(self._steppers[i].current_position()))
+            print("Distance to go: " + str(this_distance) + " Time to go: " + str(this_time))
             if this_time > longest_time:
                 longest_time = this_time
         
