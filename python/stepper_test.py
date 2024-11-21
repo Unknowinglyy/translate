@@ -40,4 +40,5 @@ except KeyboardInterrupt:
     print("Keyboard interrupt")
 
 finally:
+    print("cleaning up GPIO")
     GPIO.cleanup()
