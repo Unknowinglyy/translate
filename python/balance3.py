@@ -87,11 +87,11 @@ def setup():
     #turn them on
     GPIO.output(ENA, GPIO.LOW)
 
-    move_to(4.25,0,0)
+    moveTo(4.25,0,0)
 
     steppers.run_speed_to_position()   
 
-def move_to(hz, nx, ny):
+def moveTo(hz, nx, ny):
     print("Moving to: " + str(hz) + " " + str(nx) + " " + str(ny))
     if(detected):
         for i in range(3):
@@ -105,9 +105,9 @@ def move_to(hz, nx, ny):
         stepper2.set_acceleration(speed[Kinematics.B] * 30)
         stepper3.set_acceleration(speed[Kinematics.C] * 30)
 
-        steppers.move_to(pos[Kinematics.A])
-        steppers.move_to(pos[Kinematics.B])
-        steppers.move_to(pos[Kinematics.C])
+        stepper1.move_to(pos[Kinematics.A])
+        stepper2.move_to(pos[Kinematics.B])
+        stepper3.move_to(pos[Kinematics.C])
 
         stepper1.run()
         stepper2.run()
@@ -168,7 +168,7 @@ def PID(setpointX, setpointY):
     # continues moving platform and waits until 20 milliseconds have elapsed
     timeI = millis() # Convert to milliseconds
     while (millis() - timeI) < 20:
-        move_to(4.25, -out[0], -out[1])  # moves the platform
+        moveTo(4.25, -out[0], -out[1])  # moves the platform
 
 if __name__ == "__main__":
     try:
