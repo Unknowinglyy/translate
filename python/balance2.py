@@ -11,7 +11,7 @@ DIR_PIN = 24
 ENA = 17
 
 # Constants and Parameters
-CENTER_X, CENTER_Y = 2025, 2045  # Touchscreen center offsets
+CENTER_X, CENTER_Y = 100, 100  # Touchscreen center offsets
 BALL_DETECTION_THRESHOLD = 20    # Ball detection range
 angOrig = 206                    # Original angle
 angToStep = 1600 / 360           # Steps per degree
