@@ -8,9 +8,9 @@ import threading
 # --------------------------------------------------------------------------------------------
 # GPIO setup for stepper motors
 MOTOR_PINS = {
-    'motor1': {'step': 5, 'dir': 6},
-    'motor2': {'step': 20, 'dir': 21},
-    'motor3': {'step': 23, 'dir': 24}
+    'motor1': {'step': 20, 'dir': 21},
+    'motor2': {'step': 23, 'dir': 24},
+    'motor3': {'step': 5, 'dir': 6}
 }
 
 # Parameters
@@ -64,6 +64,9 @@ def move_motor(motor, steps, clockwise):
     Updates the net total steps moved by the motor.
     """
     global total_steps_moved
+
+    if motor == 'motor2':
+        clockwise = not clockwise
 
     # Calculate the proposed change in step count
     change = steps if clockwise else -steps
