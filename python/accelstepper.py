@@ -256,6 +256,7 @@ class AccelStepper:
             numpins = 3
 
         for i in range(numpins):
+            #step and direction pins
             if self._pin[i] is not None:
                 GPIO.setup(self._pin[i], GPIO.OUT)
                 #print("setting up pin: ", self._pin[i])
@@ -274,7 +275,7 @@ class AccelStepper:
     def step1(self, step):
         #pin[0] is step, pin[1] is direction
         #set direction first else you will get rogue pulses
-        #self.set_output_pins(0b01 if self._direction else 0b00)
+        self.set_output_pins(0b01 if self._direction else 0b00)
         #step high
         self.set_output_pins(0b11 if self._direction else 0b01)
         #there is a 200ns setup time
