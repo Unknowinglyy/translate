@@ -29,17 +29,20 @@ stepper3.set_speed(500)
 stepper1.set_max_speed(1000)
 stepper2.set_max_speed(1000)
 stepper3.set_max_speed(1000)
+print("set all the speeds")
 
 steppers.add_stepper(stepper1)
 steppers.add_stepper(stepper2)
 steppers.add_stepper(stepper3)
-
+print("added all the steppers")
 
 try:
     #move to target positions
     steppers.move_to(pos)
+    print("moved to target positions")
 
     steppers.run_speed_to_position()
+    print("ran to target positions")
 
 except KeyboardInterrupt:
     print("Keyboard interrupt")
