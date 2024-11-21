@@ -43,7 +43,7 @@ stepper3 = AccelStepper(AccelStepper.DRIVER, 23, 24)
 # Configure stepper motor speeds and accelerations
 for stepper in [stepper1, stepper2, stepper3]:
     stepper.set_max_speed(100000)  # Adjust as needed
-    stepper.set_acceleration(1000)  # Adjust as needed
+    stepper.set_acceleration(100)  # Adjust as needed
 
 # Create a MultiStepper instance
 multi_stepper = MultiStepper()
@@ -75,6 +75,7 @@ def pid_control(setpoint_x, setpoint_y):
     global detected, error, integr, deriv, out, pos
 
     point = read_touch_coordinates()  # Get touchscreen data
+    debug_log(f"Touchscreen point: {point.x} {point.y}")
     if point is not None and point.x != 0:
         detected = True
         for i in range(2):  # For X and Y axes
