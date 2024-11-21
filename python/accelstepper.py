@@ -280,7 +280,7 @@ class AccelStepper:
         self.set_output_pins(0b11 if self._direction else 0b01)
         #there is a 200ns setup time
         #delay the minimum allowed pulse width
-        time.sleep(self._minPulseWidth / 1000000.0)
+        time.sleep(self._minPulseWidth / 1000.0)
         #step low
         self.set_output_pins(0b10 if self._direction else 0b00)
 
