@@ -273,7 +273,7 @@ class AccelStepper:
         self.set_output_pins(0b10 if self._direction else 0b00)
         self.set_output_pins(0b11 if self._direction else 0b01)
 
-        #time.sleep(self._minPulseWidth / 1000000.0)
+        time.sleep(self._minPulseWidth / 1000000.0)
         self.set_output_pins(0b10 if self._direction else 0b00)
 
     def step2(self, step):
@@ -388,7 +388,7 @@ class AccelStepper:
 
     def run_to_position(self):
         while(self.run()):
-            #time.sleep(0.0020)
+            time.sleep(0.0020)
             pass
 
     def run_speed_to_position(self):
