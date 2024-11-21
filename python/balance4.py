@@ -18,9 +18,9 @@ CENTER_X, CENTER_Y = 2025, 2045  # Touchscreen center offsets
 BALL_DETECTION_THRESHOLD = 20    # Ball detection range
 MAX_TOTAL_STEPS = 250
 angOrig = 170          # Original angle
-angToStep = 3200 / 360           # Steps per degree
-ks = 50                          # Speed amplifying constant
-kp, ki, kd = 5, 5E-10, 5E-9      # PID constants
+angToStep = 6400 / 360           # Steps per degree
+ks = 20                          # Speed amplifying constant
+kp, ki, kd = 2E-3, 5E-6, 5E-3      # PID constants
 
 # Kinematics parameters
 d, e, f, g = 2, 3.125, 1.75, 3.669291339
@@ -79,9 +79,9 @@ def move_motor(motor, steps, clockwise):
     GPIO.output(MOTOR_PINS[motor]['dir'], GPIO.HIGH if clockwise else GPIO.LOW)
     for _ in range(abs(steps)):
         GPIO.output(MOTOR_PINS[motor]['step'], GPIO.HIGH)
-        time.sleep(0.001)
+        time.sleep(0.0005)
         GPIO.output(MOTOR_PINS[motor]['step'], GPIO.LOW)
-        time.sleep(0.001)
+        time.sleep(0.0005)
 
     # Update the total steps moved for this motor
     total_steps_moved[motor] += change
