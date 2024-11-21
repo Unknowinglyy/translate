@@ -199,7 +199,7 @@ class AccelStepper:
             acceleration = -acceleration
         if(self._acceleration != acceleration):
             self._n = self._n * (self._acceleration / acceleration)
-            self._c0 = 0.676 * math.sqrt(2.0 / acceleration) * 1000000.0
+            self._c0 = 0.676 * math.sqrt(2.0 / acceleration) * 1_000_000.0
             self._acceleration = acceleration
             self.compute_new_speed()
 
