@@ -4,6 +4,7 @@ class Kinematics:
     A = 0
     B = 1
     C = 2
+
     def __init__(self, d, e, f, g):
         """
         Initialize the kinematic parameters.
@@ -45,6 +46,9 @@ class Kinematics:
         epsilon = 1e-9
 
         # Calculate angle A, B, or C
+        A = 0
+        B = 1
+        C = 2
         if leg == A:  # Leg A
             term1 = max(epsilon, nz + 1 - nx**2)
             term2 = max(epsilon, (nz + 1) * (nz + 1 - nx**2))
