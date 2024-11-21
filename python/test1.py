@@ -21,7 +21,7 @@ GPIO.setup(DIR_PIN, GPIO.OUT)
 
 def main():
     # Initialize the stepper motor
-    motor = AccelStepper(AccelStepper.DRIVER, STEP_PIN, DIR_PIN)
+    motor = AccelStepper(AccelStepper.DRIVER, STEP_PIN, DIR_PIN, enable_pin=ENA)
     
     # Initialize the MultiStepper and add the motor
     multi_stepper = MultiStepper()
@@ -32,9 +32,12 @@ def main():
     motor.set_acceleration(500)  # Acceleration in steps per second^2
     motor.set_current_position(0)  # Reset current position to 0
 
+    print(multi_stepper._steppers[0].current_position())
+    
     # Move up 20 steps
     print("Moving up 20 steps")
     multi_stepper.move_to([200])  # Target position for the motor
+    print(f"Distance_to_go(): {multi_stepper._steppers[0].distance_to_go()}")
     while multi_stepper.run():  # Keep running until all motors reach their positions
         time.sleep(.0001)  # Small delay for smooth operation
 
@@ -42,6 +45,7 @@ def main():
     # Return to start position
     print("Returning to initial position")
     multi_stepper.move_to([0])  # Return to initial position
+    print(f"Distance_to_go(): {multi_stepper._steppers[0].distance_to_go()}")
     while multi_stepper.run():  # Keep running until all motors reach their positions
         time.sleep(.0001)  # Small delay for smooth operation
 
