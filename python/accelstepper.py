@@ -274,9 +274,9 @@ class AccelStepper:
     def step1(self, step):
         #pin[0] is step, pin[1] is direction
         #set direction first else you will get rogue pulses
-        self.set_output_pins(0b01 if self._direction else 0b00)
+        #self.set_output_pins(0b01 if self._direction else 0b00)
         #step high
-        self.set_output_pins(0b11 if self._direction else 0b10)
+        self.set_output_pins(0b11 if self._direction else 0b01)
         #there is a 200ns setup time
         #delay the minimum allowed pulse width
         time.sleep(self._minPulseWidth / 1000000.0)
