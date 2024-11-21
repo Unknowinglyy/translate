@@ -65,7 +65,7 @@ def move_motor(motor, steps, clockwise):
     """
     global total_steps_moved
 
-    if motor == 'motor2':
+    if motor == 'motor3':
         clockwise = not clockwise
 
     # Calculate the proposed change in step count
