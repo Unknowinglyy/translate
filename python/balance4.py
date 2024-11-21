@@ -9,8 +9,8 @@ import threading
 # GPIO setup for stepper motors
 MOTOR_PINS = {
     'motor1': {'step': 23, 'dir': 24},
-    'motor2': {'step': 20, 'dir': 21},
-    'motor3': {'step': 5, 'dir': 6}
+    'motor2': {'step': 5, 'dir': 6},
+    'motor3': {'step': 20, 'dir': 21}
 }
 
 # Parameters
@@ -19,7 +19,7 @@ ENA = 17
 CENTER_X, CENTER_Y = 2025, 2045  # Touchscreen center offsets
 BALL_DETECTION_THRESHOLD = 20    # Ball detection range
 MAX_TOTAL_STEPS = 250
-angOrig = 150          # Original angle
+angOrig = 180          # Original angle
 angToStep = 12800 / 360           # Steps per degree
 ks = 20                          # Speed amplifying constant
 kp, ki, kd = 4E-4, 2E-6, 7E-3      # PID constants
