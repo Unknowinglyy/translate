@@ -2,6 +2,8 @@ import RPi.GPIO as GPIO
 import math
 import time
 
+GPIO.setmode(GPIO.BCM)
+
 def constrain(value, minn, maxn):
     return max(min(maxn, value), minn)
 
