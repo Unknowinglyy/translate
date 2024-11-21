@@ -1,4 +1,5 @@
 import time
+import math
 from accelstepper import AccelStepper
 from multistepper import MultiStepper
 import RPi.GPIO as GPIO
@@ -46,42 +47,46 @@ motor1.set_current_position(0)
 motor2.set_current_position(0)
 motor3.set_current_position(0)
 
-def move_motors_to_angle(angle1, angle2, angle3):
-    # Convert angles to steps based on your system's specifications
-    steps1 = angle1 * 3200 / 360  # Example: 3200 steps for 360 degrees
-    steps2 = angle2 * 3200 / 360
-    steps3 = angle3 * 3200 / 360
+# Function to calculate wave-like motion
+def move_motors_in_wave(amplitude, frequency, duration):
+    """
+    Moves the motors in a wave-like motion using sine functions.
 
-    # Move motors to the target positions
-    print(f"Moving motors to angles: {angle1}°, {angle2}°, {angle3}°")
-    multi_stepper.move_to([steps1, steps2, steps3])
+    :param amplitude: The maximum displacement (steps) from the center position.
+    :param frequency: The frequency of the wave (how fast the motors oscillate).
+    :param duration: How long the wave motion should run.
+    """
+    start_time = time.time()
+    while time.time() - start_time < duration:
+        # Calculate time elapsed
+        elapsed_time = time.time() - start_time
 
-    # Wait until all motors reach their positions
-    while multi_stepper.run():
-        time.sleep(0.001)  # Small delay for smooth operation
+        # Calculate the position for each motor based on a sine wave
+        position1 = amplitude * math.sin(2 * math.pi * frequency * elapsed_time)
+        position2 = amplitude * math.sin(2 * math.pi * frequency * elapsed_time + math.pi / 2)  # 90 degrees phase shift
+        position3 = amplitude * math.sin(2 * math.pi * frequency * elapsed_time + math.pi)  # 180 degrees phase shift
+
+        # Move the motors to the calculated positions
+        motor1.move_to(round(position1))
+        motor2.move_to(round(position2))
+        motor3.move_to(round(position3))
+
+        # Start moving the motors
+        multi_stepper.run()
+
+        # Small delay to avoid excessive CPU usage
+        time.sleep(0.01)
 
 def main():
     try:
-        # Move motors to tilt platform to some angle
-        move_motors_to_angle(0, 0, 45)  # Example: Tilt all motors to 45 degrees
+        # Move motors in a wave-like motion with a 200-step amplitude, 0.5 Hz frequency, and 10 seconds duration
+        move_motors_in_wave(200, 0.5, 10)  # Adjust the amplitude, frequency, and duration as needed
 
-        time.sleep(1)  # Wait for 1 second
-
-        # Return motors to initial positions (0 degrees)
-        print("Returning motors to initial position")
-        move_motors_to_angle(0, 0, 0)
-
-        time.sleep(1)  # Wait for 1 second
-
-        # Move motors to a different angle
-        move_motors_to_angle(30, 60, 90)  # Example: Tilt motors to different angles
-
-        time.sleep(1)  # Wait for 1 second
+        # After the wave motion, stop motors and clean up
+        GPIO.cleanup()
 
     except KeyboardInterrupt:
-        print("Keyboard interrupt")
-    finally:
-        print("Cleaning up GPIO")
+        print("Program interrupted.")
         GPIO.cleanup()
 
 if __name__ == "__main__":
