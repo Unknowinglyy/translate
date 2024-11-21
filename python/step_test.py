@@ -22,11 +22,11 @@ GPIO.output(ENA, GPIO.LOW)
 #small delay to allow system to settle
 time.sleep(1)
 
-stepper1.set_speed(10000)
+stepper1.set_speed(10)
 stepper2.set_speed(10000)
 stepper3.set_speed(10000)
 
-stepper1.set_max_speed(10000)
+stepper1.set_max_speed(100)
 stepper2.set_max_speed(10000)
 stepper3.set_max_speed(10000)
 print("set all the speeds")
@@ -39,6 +39,7 @@ print("added all the steppers")
 try:
     while True:
         stepper1.step1(1)
+        time.sleep(0.01)
 
 except KeyboardInterrupt:
     print("Keyboard interrupt")
