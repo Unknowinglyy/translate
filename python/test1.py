@@ -32,9 +32,9 @@ def main():
 
     # Move up 20 steps
     print("Moving up 20 steps")
-    multi_stepper.move_to([20])  # Target position for the motor
+    multi_stepper.move_to([100])  # Target position for the motor
     while multi_stepper.run():  # Keep running until all motors reach their positions
-        time.sleep(0.01)  # Small delay for smooth operation
+        time.sleep(0.001)  # Small delay for smooth operation
 
     time.sleep(1)  # Pause for 1 second at the top
 
@@ -42,7 +42,7 @@ def main():
     print("Moving down 20 steps")
     multi_stepper.move_to([0])  # Return to initial position
     while multi_stepper.run():  # Keep running until all motors reach their positions
-        time.sleep(0.01)  # Small delay for smooth operation
+        time.sleep(0.001)  # Small delay for smooth operation
 
     print("Done!")
 
