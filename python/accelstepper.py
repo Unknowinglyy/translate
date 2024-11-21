@@ -256,7 +256,9 @@ class AccelStepper:
         for i in range(numpins):
             if self._pin[i] is not None:
                 GPIO.setup(self._pin[i], GPIO.OUT)
+                print("setting up pin: ", self._pin[i])
                 GPIO.output(self._pin[i], GPIO.HIGH if mask & (1 << i) else GPIO.LOW)
+                print("outputting: ", GPIO.HIGH if mask & (1 << i) else GPIO.LOW)
     
     def step0(self, step):
         if(self._speed > 0):
