@@ -14,8 +14,8 @@ ENA = 17
 CENTER_X, CENTER_Y = 2025, 2045  # Touchscreen center offsets
 BALL_DETECTION_THRESHOLD = 20    # Ball detection range
 angOrig = 206                    # Original angle
-angToStep = 3200 / 360           # Steps per degree
-ks = 50                          # Speed amplifying constant
+angToStep = 6400 / 360           # Steps per degree
+ks = 100                          # Speed amplifying constant
 kp, ki, kd = 4E-4, 2E-6, 7E-3    # PID constants
 
 # Global variables for PID control
@@ -42,8 +42,8 @@ stepper3 = AccelStepper(AccelStepper.DRIVER, 23, 24)
 
 # Configure stepper motor speeds and accelerations
 for stepper in [stepper1, stepper2, stepper3]:
-    stepper.set_max_speed(10000)  # Adjust as needed
-    stepper.set_acceleration(1000)  # Adjust as needed
+    stepper.set_max_speed(100000)  # Adjust as needed
+    stepper.set_acceleration(10000)  # Adjust as needed
 
 # Create a MultiStepper instance
 multi_stepper = MultiStepper()
