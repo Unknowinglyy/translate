@@ -13,13 +13,23 @@ void loop() {
   // Get the touch point
   TSPoint p = ts.getPoint();
 
-  
-  Serial.print(p.x);
-  Serial.print(",");
-  Serial.print(p.y);
-  Serial.print(",");
-  Serial.print(p.z);
-  Serial.println();
+  if !(p.z > 0) {
+    Serial.print(p.x);
+    Serial.print(",");
+    Serial.print(p.y);
+    Serial.print(",");
+    Serial.print(p.z);
+    Serial.println();
+  }
+  else {
+    Serial.print(0);
+    Serial.print(",");
+    Serial.print(0);
+    Serial.print(",");
+    Serial.print(0);
+    Serial.print(",");
+    Serial.println();
+  }
 
 
   // Small delay to avoid flooding the serial monitor
