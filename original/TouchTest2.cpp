@@ -10,7 +10,7 @@ void setup() {
 
 void loop() {
   TSPoint p = ts.getPoint();
-  if (p.z > 0) {
+  if (p.z  < 17 ) {
     Serial.print((int)p.x);  // Cast to integer for clean output
     Serial.print(",");
     Serial.print((int)p.y);
