@@ -14,11 +14,11 @@ void loop() {
   TSPoint p = ts.getPoint();
 
 
-  Serial.print(p.x);
-  Serial.print(",");
-  Serial.print(p.y);
-  Serial.print(",");
-  Serial.print(p.z);
+  Serial.write(p.x);
+  Serial.write(",");
+  Serial.write(p.y);
+  Serial.write(",");
+  Serial.write(p.z);
   Serial.println();
 
   // Small delay to avoid flooding the serial monitor
