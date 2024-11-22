@@ -6,7 +6,7 @@ from multistepper import MultiStepper
 from touchScreenBasicCoordOutput import read_touch_coordinates, Point
 from touchScreenTranslatedCoordOutput import transform_coordinates
 from kine2 import Kinematics
-import serial
+# import serial
 
 # ser = serial.Serial('/dev/ttyACM0', 9600)
 
@@ -116,7 +116,10 @@ def setup():
 
     moveTo(4.25,0,0)
 
-    steppers.run_speed_to_position()   
+    steppers.run_speed_to_position()
+
+def loop():
+    PID(0,0)   
 
 def moveTo(hz, nx, ny):
     # print("Moving to: " + str(hz) + " " + str(nx) + " " + str(ny))
@@ -197,15 +200,14 @@ def PID(setpointX, setpointY):
 
     # continues moving platform and waits until 20 milliseconds have elapsed
     timeI = millis() # Convert to milliseconds
-    while (millis() - timeI) < 20:
+    while (millis() - timeI < 20):
         moveTo(4.25, -out[0], -out[1])  # moves the platform
 
 if __name__ == "__main__":
     try:
         setup()
         while True:
-            PID(0,0)
-            time.sleep(0.2)
+            loop()
 
     except KeyboardInterrupt:
         print("Keyboard interrupt")
