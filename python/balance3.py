@@ -202,7 +202,7 @@ if __name__ == "__main__":
         setup()
         while True:
             PID(0,0)
-            time.sleep(0.1)
+            time.sleep(0.2)
 
     except KeyboardInterrupt:
         print("Keyboard interrupt")
