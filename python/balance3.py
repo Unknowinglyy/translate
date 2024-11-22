@@ -19,7 +19,7 @@ def read_coords():
             line = raw_line.decode('utf-8', errors='ignore').rstrip()
             # print("===================================")
             # print(line)
-            x, y= map(int, line.split(','))
+            x, y, _= map(int, line.split(','))
             point = Point(x, y)
             ser.reset_input_buffer()
             return point
