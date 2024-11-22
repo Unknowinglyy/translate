@@ -3,6 +3,7 @@ from accelstepper import AccelStepper
 from multistepper import MultiStepper
 import RPi.GPIO as GPIO
 from kine2 import Kinematics  # Import the Kinematics class
+from touchScreenTranslatedCoordOutput import transform_coordinates
 from touchScreenTranslatedCoordOutput import read_coordinates
 
 # Define GPIO pins for the stepper motor
@@ -74,7 +75,8 @@ def move_to(hz, nx, ny):
 def pid_control(setpoint_x, setpoint_y):
     global detected, error, integr, deriv, out, pos
 
-    point = read_coordinates()  # Get touchscreen data
+    orig_point = read_coordinates()  # Get touchscreen data
+    point = transform_coordinates(orig_point)
     debug_log(f"Touchscreen point: {point.x} {point.y}")
     if point is not None and point.x != 0:
         detected = True
