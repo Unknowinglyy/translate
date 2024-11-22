@@ -107,7 +107,7 @@ def balance_ball():
     debug_log("Starting balance loop...")
     try:
         while True:
-            pid_control(0, 0)  # Maintain the ball at the center (0, 0)
+            pid_control(500, 500)  # Maintain the ball at the center (0, 0)
             time.sleep(0.01)  # Adjust delay as needed
     except KeyboardInterrupt:
         debug_log("Exiting program...")
