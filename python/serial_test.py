@@ -9,7 +9,7 @@ def read_coords():
         ser.write(b'S')
         print("Sent S")
         time.sleep(2)
-        data = ser.readline().decode('utf-8').strip()
+        data = ser.readline().decode('ascii').strip()
         print("got this data: " + data)
     except UnicodeDecodeError as e:
         print(f"Decoding error: {e}")
