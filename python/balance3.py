@@ -10,16 +10,17 @@ import serial
 ser = serial.Serial('/dev/ttyACM0', 9600)
 
 def read_coords():
+    ser.reset_input_buffer()
     if ser.in_waiting > 0:
+        raw_line = ser.readline()
         try:
-            data = ser.readline().decode('ascii')
-            print("got this data: " + data)
-            if data.count(',') == 2:
-                x, y, _  = map(int, data.split(','))
-                point = Point(x, y)
-                return point
-        except UnicodeDecodeError as e:
-            print(f"Decode error: {e}")
+            # Attempt to decode the line
+            line = raw_line.decode('utf-8').rstrip()
+            print(line)
+            
+        except UnicodeDecodeError:
+            # Log invalid data for debugging
+            print(f"Invalid data received: {raw_line}")
     return Point(0,-1)
     
 
