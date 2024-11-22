@@ -20,8 +20,6 @@ void loop() {
       Serial.print(p.x);
       Serial.print(",");
       Serial.print(p.y);
-      Serial.print(",");
-      Serial.print(p.z);
       Serial.println();
     }
 
