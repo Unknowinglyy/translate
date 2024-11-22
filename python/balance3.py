@@ -14,7 +14,8 @@ def read_coords():
     if ser.in_waiting > 0:
         data = ser.readline().decode('utf-8')
         x, y, _ = data.split(',')
-        return Point(float(x), float(y))
+        point = Point(x,y)
+        return point
     
 
 def millis():
