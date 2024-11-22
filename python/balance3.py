@@ -192,6 +192,7 @@ if __name__ == "__main__":
         setup()
         while True:
             PID(0,0)
+            print(f"Detected: {detected}")
             time.sleep(0.01)
 
     except KeyboardInterrupt:
