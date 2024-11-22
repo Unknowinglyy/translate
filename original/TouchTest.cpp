@@ -12,20 +12,20 @@ void loop() {
 
   if(Serial.available() > 0){
     char c = Serial.read();
-    Serial.print("received info")
+    Serial.print("received info");
 
     if(c == 'S'){
       // Get the touch point
       TSPoint p = ts.getPoint();
 
-      Serial.print("sending info")
+      Serial.print("sending info");
 
       Serial.write(p.x);
       Serial.write(",");
       Serial.write(p.y);
       Serial.write(",");
       Serial.write(p.z);
-      Serial.print("\n");
+      Serial.write("\n");
     }
   }
 
