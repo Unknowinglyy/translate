@@ -7,17 +7,16 @@ from touchScreenBasicCoordOutput import Point
 from kine2 import Kinematics
 import serial
 
-
 ser = serial.Serial('/dev/ttyACM0', 9600)
 
 def read_coords():
     if ser.in_waiting > 0:
-        data = ser.readline().decode('utf-8')
+        data = ser.readline().decode('utf-8').rstrip()
+        print("got this data: " + data)
         if data.count(',') == 2:
             x, y, _  = map(int, data.split(','))
             point = Point(x, y)
             return point
-    
     return Point(0,-1)
     
 
