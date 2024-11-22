@@ -19,7 +19,7 @@ def read_coords():
             print("===================================")
             print(line)
             x, y, z = map(int, line.split(','))
-            point = Point(x, y)
+            point = Point(x, y, z=0)
             ser.reset_input_buffer()
             return point
             
@@ -184,7 +184,7 @@ def PID(setpointX, setpointY):
         print("X OUT: " + str(out[0]) + " Y OUT: " + str(out[1]) + " Speed A: " + str(speed[Kinematics.A]))
     else:
         #delay by 10 ms to double check that there is no ball
-        time.sleep(0.2)
+        time.sleep(0.1)
         point = read_coords()
         if(point.x == 0):
             detected = False
@@ -201,7 +201,7 @@ if __name__ == "__main__":
         while True:
             PID(0,0)
             print(f"Detected: {detected}")
-            time.sleep(0.2)
+            time.sleep(0.1)
 
     except KeyboardInterrupt:
         print("Keyboard interrupt")
