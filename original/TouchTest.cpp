@@ -12,10 +12,13 @@ void loop() {
 
   if(Serial.available() > 0){
     char c = Serial.read();
+    Serial.print("received info")
 
     if(c == 'S'){
       // Get the touch point
       TSPoint p = ts.getPoint();
+
+      Serial.print("sending info")
 
       Serial.write(p.x);
       Serial.write(",");
