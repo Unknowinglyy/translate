@@ -75,24 +75,31 @@ def move_to(hz, nx, ny):
 def pid_control(setpoint_x, setpoint_y):
     global detected, error, integr, deriv, out, pos
 
-    orig_point = read_coordinates()  # Get touchscreen data
-    point = transform_coordinates(orig_point)
-    debug_log(f"Touchscreen point: {point.x} {point.y}")
-    if point is not None and point.x != 0:
-        detected = True
-        for i in range(2):  # For X and Y axes
-            error[i] = (CENTER_X - point.x - setpoint_x) if i == 0 else (CENTER_Y - point.y - setpoint_y)
-            integr[i] += error[i]
-            deriv[i] = error[i] - deriv[i]  # Calculate derivative
-            out[i] = kp * error[i] + ki * integr[i] + kd * deriv[i]
-            out[i] = max(min(out[i], 0.25), -0.25)  # Constrain output
-            debug_log(f"PID output {['X', 'Y'][i]}: error={error[i]}, integr={integr[i]}, deriv={deriv[i]}, out={out[i]}")
+    # Get touchscreen data (original coordinates)
+    orig_point = read_coordinates()  
+    if orig_point is not None:
+        # Transform to translated coordinates
+        point = transform_coordinates(orig_point.x, orig_point.y)
+        debug_log(f"Touchscreen point: Translated: ({point.x}, {point.y})")
+        
+        if point.x != 0 and point.y != 0:
+            detected = True
+            for i in range(2):  # For X and Y axes
+                error[i] = (CENTER_X - point.x - setpoint_x) if i == 0 else (CENTER_Y - point.y - setpoint_y)
+                integr[i] += error[i]
+                deriv[i] = error[i] - deriv[i]  # Calculate derivative
+                out[i] = kp * error[i] + ki * integr[i] + kd * deriv[i]
+                out[i] = max(min(out[i], 0.25), -0.25)  # Constrain output
+                debug_log(f"PID output {['X', 'Y'][i]}: error={error[i]}, integr={integr[i]}, deriv={deriv[i]}, out={out[i]}")
 
-        # Update motor positions
-        move_to(4.25, -out[0], -out[1])
+            # Update motor positions
+            move_to(4.25, -out[0], -out[1])
+        else:
+            detected = False
+            debug_log("Ball not detected.")
     else:
         detected = False
-        debug_log("Ball not detected.")
+        debug_log("Touchscreen data is None.")
 
 # Main Loop
 def balance_ball():
