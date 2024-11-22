@@ -18,6 +18,8 @@ def read_coords():
             point = Point(x, y)
             return point
     
+    return None
+    
 
 def millis():
     return int(time.time() * 1000)
@@ -142,7 +144,10 @@ def moveTo(hz, nx, ny):
 
 def PID(setpointX, setpointY):
     print("starting PID")
-    point = read_coords()
+    point = Point(-1, -1)
+    temp = read_coords()
+    if(temp != None):
+        point = temp
     print("read touch coordinates: " + str(point.x) + " " + str(point.y))
     if(point.x != 0):
         detected = True
