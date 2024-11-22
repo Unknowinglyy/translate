@@ -80,7 +80,7 @@ def pid_control(setpoint_x, setpoint_y):
     if orig_point is not None:
         # Transform to translated coordinates
         point = transform_coordinates(orig_point.x, orig_point.y)
-        debug_log(f"Touchscreen point: Translated: ({point.x}, {point.y})")
+        debug_log(f"Point: ({point.x}, {point.y})")
         
         if point.x != 0 and point.y != 0:
             detected = True
