@@ -18,8 +18,7 @@ void loop() {
     Serial.print(",");
     Serial.print(p.y);
     Serial.print(",");
-    Serial.print(p.z);
-    Serial.println();
+    Serial.println(p.z);  // Ensure a newline terminator here
   }
 
   // Small delay to avoid flooding the serial monitor

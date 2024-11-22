@@ -7,5 +7,11 @@ if __name__ == '__main__':
 
     while True:
         if ser.in_waiting > 0:
-            line = ser.readline().decode('utf-8').rstrip()
-            print(line)
+            raw_line = ser.readline()
+            try:
+                # Attempt to decode the line
+                line = raw_line.decode('utf-8').rstrip()
+                print(line)
+            except UnicodeDecodeError:
+                # Log invalid data for debugging
+                print(f"Invalid data received: {raw_line}")
