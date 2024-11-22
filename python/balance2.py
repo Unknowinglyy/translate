@@ -17,7 +17,7 @@ BALL_DETECTION_THRESHOLD = 20    # Ball detection range
 angOrig = 206                    # Original angle
 angToStep = 1000 / 360           # Steps per degree
 ks = 20                          # Speed amplifying constant
-kp, ki, kd = 4E-8, 2E-6, 7E-3    # PID constants
+kp, ki, kd = 4E-8, 2E-6, 7E-1    # PID constants
 
 # Global variables for PID control
 error = [0, 0]  # Error for X and Y axes
