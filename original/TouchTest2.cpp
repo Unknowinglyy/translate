@@ -9,18 +9,13 @@ void setup() {
 }
 
 void loop() {
-  // Get the touch point
   TSPoint p = ts.getPoint();
-
-  // Check if there is a valid touch
-  if (p.z == 0) {
-    Serial.print(p.x);
+  if (p.z > 0) {
+    Serial.print((int)p.x);  // Cast to integer for clean output
     Serial.print(",");
-    Serial.print(p.y);
+    Serial.print((int)p.y);
     Serial.print(",");
-    Serial.println(p.z);  // Ensure a newline terminator here
+    Serial.println((int)p.z);
   }
-
-  // Small delay to avoid flooding the serial monitor
   delay(100);
 }
