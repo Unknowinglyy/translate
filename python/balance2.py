@@ -3,7 +3,7 @@ from accelstepper import AccelStepper
 from multistepper import MultiStepper
 import RPi.GPIO as GPIO
 from kine2 import Kinematics  # Import the Kinematics class
-from touchScreenTranslatedCoordOutput import read_touch_coordinates
+from touchScreenTranslatedCoordOutput import read_coordinates
 
 # Define GPIO pins for the stepper motor
 STEP_PIN = 23
@@ -16,7 +16,7 @@ BALL_DETECTION_THRESHOLD = 20    # Ball detection range
 angOrig = 206                    # Original angle
 angToStep = 1000 / 360           # Steps per degree
 ks = 10                          # Speed amplifying constant
-kp, ki, kd = 4E-4, 2E-7, 7E-3    # PID constants
+kp, ki, kd = 4E-4, 2E-6, 7E-3    # PID constants
 
 # Global variables for PID control
 error = [0, 0]  # Error for X and Y axes
@@ -74,7 +74,7 @@ def move_to(hz, nx, ny):
 def pid_control(setpoint_x, setpoint_y):
     global detected, error, integr, deriv, out, pos
 
-    point = read_touch_coordinates()  # Get touchscreen data
+    point = read_coordinates()  # Get touchscreen data
     debug_log(f"Touchscreen point: {point.x} {point.y}")
     if point is not None and point.x != 0:
         detected = True

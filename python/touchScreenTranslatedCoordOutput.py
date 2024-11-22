@@ -47,7 +47,7 @@ def transform_coordinates(x, y):
     return Point(x_transformed, y_transformed)
 
 # Function to read touch coordinates
-def read_touch_coordinates(device_path='/dev/input/event7'):
+def read_coordinates(device_path='/dev/input/event7'):
     device = evdev.InputDevice(device_path)
 
     x, y = None, None
@@ -66,7 +66,7 @@ if __name__ == "__main__":
     # while True:
         # try:
             # Read the raw touch coordinates
-            original_point = read_touch_coordinates()
+            original_point = read_coordinates()
 
             # Transform the coordinates
             translated_point = transform_coordinates(original_point.x, original_point.y)
