@@ -17,6 +17,9 @@ def read_coords():
             # Attempt to decode the line
             line = raw_line.decode('utf-8').rstrip()
             print(line)
+            x, y, _  = map(int, line.split(','))
+            point = Point(x, y)
+            return point
             
         except UnicodeDecodeError:
             # Log invalid data for debugging
