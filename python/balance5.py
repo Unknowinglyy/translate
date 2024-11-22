@@ -17,26 +17,31 @@ def read_coords():
             print("BALL DETECTED")
             # Attempt to decode the line
             line = raw_line.decode('utf-8', errors='ignore').rstrip()
-            # print("===================================")
-            # print(line)
-            x, y, z= map(int, line.split(','))
+            print("===================================")
+            print(line)
+            values = line.split(',')
+            if len(values) == 3:
+                x, y, z = map(int, values)
+            elif len(values) == 2:
+                x, y = map(int, values)
+                z = 0  # Default value for z
+            else:
+                raise ValueError("Invalid number of parameters")
             point = Point(x, y, z)
             ser.reset_input_buffer()
             return point
             
-        except UnicodeDecodeError:
+        except (UnicodeDecodeError, ValueError) as e:
             # Log invalid data for debugging
-            print(f"Invalid data received: {raw_line}")
+            print(f"Invalid data received: {raw_line} - {e}")
             ser.reset_input_buffer()
-    return Point(0,-1,-1)
-    
-    
+    return Point(0, -1, -1)
 
 def millis():
     return int(time.time() * 1000)
 
 def constrain(value, minn, maxn):
-  return max(min(maxn, value), minn)
+    return max(min(maxn, value), minn)
 
 kinematics = Kinematics(2, 3.125, 1.75, 3.669291339)
 
@@ -49,48 +54,46 @@ stepper3 = AccelStepper(AccelStepper.DRIVER, 5, 6)
 steppers = MultiStepper()
 print("Done with steppers")
 
-#stores the target positions for each stepper motor
+# Stores the target positions for each stepper motor
 pos = [0, 0, 0]
 
-#enable pin for drivers
+# Enable pin for drivers
 ENA = 17
 
-#original angle that each leg starts at
+# Original angle that each leg starts at
 angOrig = 206.662752199
 
-#speed of the stepper motor and the speed amplifying constant
+# Speed of the stepper motor and the speed amplifying constant
 speed = [0, 0, 0]
 speedPrev = [0, 0, 0]
 ks = 20
 
-#touch screen variables
-
-#x offset for the center position of the touchscreen
+# Touch screen variables
+# X offset for the center position of the touchscreen
 xoffset = 500
-#y offset for the center position of the touchscreen
+# Y offset for the center position of the touchscreen
 yoffset = 500
 
-#PID variables
-
-#proportional gain
+# PID variables
+# Proportional gain
 kp = 4E-4
-#integral gain
+# Integral gain
 ki = 2E-6
-#derivative gain
+# Derivative gain
 kd = 7E-3
 
-#PID constants
-#PID terms for X and Y directions
+# PID constants
+# PID terms for X and Y directions
 error = [0, 0]
 errorPrev = [0, 0]
 integr = [0, 0]
 deriv = [0, 0]
 
 out = [0, 0]
-#variable to capture inital times
+# Variable to capture initial times
 timeI = 0
 
-#other variables
+# Other variables
 angToStep = 3200 / 360
 
 detected = False
@@ -102,24 +105,23 @@ def setup():
     steppers.add_stepper(stepper2)
     steppers.add_stepper(stepper3)
 
-    
     GPIO.setup(ENA, GPIO.OUT)
-    #turn motors off
+    # Turn motors off
     GPIO.output(ENA, GPIO.HIGH)
 
-    #sleeping for a second to allow the system to settle
+    # Sleeping for a second to allow the system to settle
     time.sleep(1)
 
-    #turn them on
+    # Turn them on
     GPIO.output(ENA, GPIO.LOW)
 
-    moveTo(4.25,0,0)
+    moveTo(4.25, 0, 0)
 
-    steppers.run_speed_to_position()   
+    steppers.run_speed_to_position()
 
 def moveTo(hz, nx, ny):
     # print("Moving to: " + str(hz) + " " + str(nx) + " " + str(ny))
-    if(detected):
+    if detected:
         for i in range(3):
             pos[i] = round((angOrig - kinematics.compute_angle(i, hz, nx, ny)) * angToStep)
         
@@ -140,7 +142,7 @@ def moveTo(hz, nx, ny):
         stepper3.run()
     else:
         for i in range(3):
-            pos[i] = round((angOrig - kinematics.compute_angle(i, hz, 0,0)) * angToStep)
+            pos[i] = round((angOrig - kinematics.compute_angle(i, hz, 0, 0)) * angToStep)
 
         stepper1.set_max_speed(800)
         stepper2.set_max_speed(800)
@@ -150,11 +152,12 @@ def moveTo(hz, nx, ny):
         steppers.run()
 
 def PID(setpointX, setpointY):
+    global detected
     print("===================================")
     print("starting PID")
     point = read_coords()
     print("read touch coordinates: " + str(point.x) + " " + str(point.y))
-    if(point.x != 0):
+    if point.x != 0:
         detected = True
 
         for i in range(2):
@@ -185,23 +188,23 @@ def PID(setpointX, setpointY):
 
         print("X OUT: " + str(out[0]) + " Y OUT: " + str(out[1]) + " Speed A: " + str(speed[Kinematics.A]))
     else:
-        #delay by 10 ms to double check that there is no ball
+        # Delay by 10 ms to double check that there is no ball
         time.sleep(0.1)
         point = read_coords()
-        if(point.x == 0):
+        if point.x == 0:
             detected = False
             print("No ball detected")
 
-    # continues moving platform and waits until 20 milliseconds have elapsed
-    timeI = millis() # Convert to milliseconds
+    # Continues moving platform and waits until 20 milliseconds have elapsed
+    timeI = millis()  # Convert to milliseconds
     while (millis() - timeI) < 20:
-        moveTo(4.25, -out[0], -out[1])  # moves the platform
+        moveTo(4.25, -out[0], -out[1])  # Moves the platform
 
 if __name__ == "__main__":
     try:
         setup()
         while True:
-            PID(0,0)
+            PID(0, 0)
             time.sleep(0.2)
 
     except KeyboardInterrupt:
