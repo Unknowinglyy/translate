@@ -18,14 +18,15 @@ def read_coords():
             line = raw_line.decode('utf-8').rstrip()
             print("===================================")
             print(line)
-            x, y, _  = map(int, line.split(','))
-            point = Point(x, y)
+            x, y, z = map(int, line.split(','))
+            point = Point(x, y, z)
             return point
             
         except UnicodeDecodeError:
             # Log invalid data for debugging
             print(f"Invalid data received: {raw_line}")
-    return Point(0,-1)
+    return Point(0,-1,-1)
+    
     
 
 def millis():
