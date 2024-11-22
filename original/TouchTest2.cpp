@@ -10,12 +10,6 @@ void setup() {
 
 void loop() {
   TSPoint p = ts.getPoint();
-  if (p.z > 0) {
-    Serial.print((int)p.x);  // Cast to integer for clean output
-    Serial.print(",");
-    Serial.print((int)p.y);
-    Serial.print(",");
-    Serial.println((int)p.z);
-  }
+  Serial.println("100,200,300");  // Simple test data
   delay(100);
 }
