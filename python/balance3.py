@@ -16,6 +16,7 @@ def read_coords():
         try:
             # Attempt to decode the line
             line = raw_line.decode('utf-8').rstrip()
+            print("===================================")
             print(line)
             x, y, _  = map(int, line.split(','))
             point = Point(x, y)
