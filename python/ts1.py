@@ -6,10 +6,10 @@ import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BCM)
 
 # Define BCM pin numbers for the touchscreen connections
-XL = 18  # Broadcom GPIO 18
-XR = 23  # Broadcom GPIO 23
-YD = 24  # Broadcom GPIO 24
-YU = 25  # Broadcom GPIO 25
+XL = 13  
+XR = 19  
+YD = 26  
+YU = 16  
 
 # Initialize the touchscreen
 # Use BCM pin numbers for XL, XR, YD, and YU
