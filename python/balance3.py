@@ -18,7 +18,7 @@ def read_coords():
             point = Point(x, y)
             return point
     
-    return None
+    return Point(-1,-1)
     
 
 def millis():
@@ -59,9 +59,9 @@ ks = 20
 #touch screen variables
 
 #x offset for the center position of the touchscreen
-xoffset = 2025
+xoffset = 500
 #y offset for the center position of the touchscreen
-yoffset = 2045
+yoffset = 500
 
 #PID variables
 
@@ -144,10 +144,7 @@ def moveTo(hz, nx, ny):
 
 def PID(setpointX, setpointY):
     print("starting PID")
-    point = Point(-1, -1)
-    temp = read_coords()
-    if(temp != None):
-        point = temp
+    point = read_coords()
     print("read touch coordinates: " + str(point.x) + " " + str(point.y))
     if(point.x != 0):
         detected = True
