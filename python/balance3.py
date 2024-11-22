@@ -19,6 +19,8 @@ def read_coords():
         point = Point(x,y)
         print("created point")
         return point
+    else:
+        return Point(0,0)
     
 
 def millis():
