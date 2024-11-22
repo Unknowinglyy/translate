@@ -7,7 +7,7 @@ void setup() {
   // Start the serial communication
   Serial.begin(9600);
 
-  ts.pressureThreshhold = 5;
+  ts.pressureThreshhold = 1;
 }
 
 void loop() {
