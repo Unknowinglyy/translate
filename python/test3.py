@@ -6,6 +6,7 @@ if __name__ == '__main__':
     ser.reset_input_buffer()
 
     while True:
+        print(ser.in_waiting)
         if ser.in_waiting > 0:
             raw_line = ser.readline()
             try:
