@@ -17,11 +17,11 @@ void loop() {
     // Serial.print("\tY = "); Serial.print(p.y);
     // Serial.print("\tPressure = "); Serial.println(p.z);
     if(p.z > ts.pressureThreshhold) {
-      Serial.print(p.x)
-      Serial.print(",")
-      Serial.print(p.y)
-      Serial.print(",")
-      Serial.print(p.z)
+      Serial.print(p.x);
+      Serial.print(",");
+      Serial.print(p.y);
+      Serial.print(",");
+      Serial.print(p.z);
     }
 
 
