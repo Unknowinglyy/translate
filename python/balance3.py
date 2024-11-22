@@ -17,7 +17,7 @@ def read_coords():
             print("BALL DETECTED")
             # Attempt to decode the line
             line = raw_line.decode('utf-8', errors='ignore').rstrip()
-            print("===================================")
+            # print("===================================")
             print(line)
             x, y, z = map(int, line.split(','))
             point = Point(x, y, z=0)
@@ -150,6 +150,7 @@ def moveTo(hz, nx, ny):
         steppers.run()
 
 def PID(setpointX, setpointY):
+    print("===================================")
     print("starting PID")
     point = read_coords()
     print("read touch coordinates: " + str(point.x) + " " + str(point.y))
