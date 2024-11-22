@@ -12,7 +12,7 @@ ser = serial.Serial('/dev/ttyACM0', 9600)
 def read_coords():
     if ser.in_waiting > 0:
         try:
-            data = ser.readline().decode('utf-8').rstrip()
+            data = ser.readline().decode('utf-8')
             print("got this data: " + data)
             if data.count(',') == 2:
                 x, y, _  = map(int, data.split(','))
