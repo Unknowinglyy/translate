@@ -14,12 +14,13 @@ def read_coords():
     if ser.in_waiting > 0:
         raw_line = ser.readline()
         try:
+            print("BALL DETECTED")
             # Attempt to decode the line
             line = raw_line.decode('utf-8', errors='ignore').rstrip()
             print("===================================")
             print(line)
             x, y, z = map(int, line.split(','))
-            point = Point(x, y, z=0)
+            point = Point(x, y, z)
             ser.reset_input_buffer()
             return point
             
@@ -200,7 +201,6 @@ if __name__ == "__main__":
         setup()
         while True:
             PID(0,0)
-            print(f"Detected: {detected}")
             time.sleep(0.1)
 
     except KeyboardInterrupt:
