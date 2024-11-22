@@ -13,5 +13,5 @@ void loop() {
     String data = String(p.x) + "," + String(p.y) + "," + String(p.z) + "\n";
     Serial.print(data);
   }
-  delay(500);
+  delay(200);
 }
