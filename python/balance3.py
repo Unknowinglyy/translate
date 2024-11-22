@@ -15,7 +15,7 @@ def read_coords():
         data = ser.readline().decode('utf-8')
         print("got data: " + data)
         x, y, _ = map(int, data.split(','))
-        print("split into: " + x + " " + y)
+        print("split into: " + str(x) + " " + str(y))
         point = Point(x,y)
         print("created point")
         return point
