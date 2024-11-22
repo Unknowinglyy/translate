@@ -1,9 +1,10 @@
 import evdev
 
 class Point:
-    def __init__(self, x, y):
+    def __init__(self, x, y, z):
         self.x = x
         self.y = y
+        self.z = z
 
 def read_touch_coordinates(device_path='/dev/input/event7'):
     device = evdev.InputDevice(device_path)

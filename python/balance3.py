@@ -10,7 +10,7 @@ import serial
 ser = serial.Serial('/dev/ttyACM0', 9600)
 
 def read_coords():
-    ser.reset_input_buffer()
+    print(f"serial in_waiting: {ser.in_waiting}")
     if ser.in_waiting > 0:
         raw_line = ser.readline()
         try:
@@ -18,14 +18,17 @@ def read_coords():
             line = raw_line.decode('utf-8').rstrip()
             print("===================================")
             print(line)
-            x, y, _  = map(int, line.split(','))
-            point = Point(x, y)
+            x, y, z = map(int, line.split(','))
+            point = Point(x, y, z)
+            ser.reset_input_buffer()
             return point
             
         except UnicodeDecodeError:
             # Log invalid data for debugging
             print(f"Invalid data received: {raw_line}")
-    return Point(0,-1)
+            ser.reset_input_buffer()
+    return Point(0,-1,-1)
+    
     
 
 def millis():
