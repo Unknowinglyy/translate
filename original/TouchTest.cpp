@@ -11,14 +11,10 @@ void setup() {
 void loop() {
   TSPoint p = ts.getPoint();
 
-  Serial.print("sending info");
 
-  Serial.write(p.x);
-  Serial.write(",");
-  Serial.write(p.y);
-  Serial.write(",");
-  Serial.write(p.z);
-  Serial.write("\n");
+  String data = String(p.x) + "," + String(p.y) + "," + String(p.z) + "\n";
+
+  Serial.print(data);
 
   // Small delay to avoid flooding the serial monitor
   delay(1000);
