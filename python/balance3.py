@@ -17,7 +17,8 @@ def read_coords():
             x, y, _  = map(int, data.split(','))
             point = Point(x, y)
             return point
-    return Point(-1,-1)
+    
+    return Point(0,-1)
     
 
 def millis():
