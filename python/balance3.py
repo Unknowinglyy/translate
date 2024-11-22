@@ -15,7 +15,7 @@ def read_coords():
         raw_line = ser.readline()
         try:
             # Attempt to decode the line
-            line = raw_line.decode('utf-8').rstrip()
+            line = raw_line.decode('utf-8', errors='ignore').rstrip()
             print("===================================")
             print(line)
             x, y, z = map(int, line.split(','))
