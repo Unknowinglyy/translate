@@ -13,8 +13,11 @@ ser = serial.Serial('/dev/ttyACM0', 9600)
 def read_coords():
     if ser.in_waiting > 0:
         data = ser.readline().decode('utf-8')
+        print("got data: " + data)
         x, y, _ = data.split(',')
+        print("split into: " + x + " " + y)
         point = Point(x,y)
+        print("created point")
         return point
     
 
