@@ -7,17 +7,19 @@ from touchScreenBasicCoordOutput import Point
 from kine2 import Kinematics
 import serial
 
-
 ser = serial.Serial('/dev/ttyACM0', 9600)
 
 def read_coords():
     if ser.in_waiting > 0:
-        data = ser.readline().decode('utf-8')
-        if data.count(',') == 2:
-            x, y, _  = map(int, data.split(','))
-            point = Point(x, y)
-            return point
-    
+        try:
+            data = ser.readline().decode('utf-8')
+            print("got this data: " + data)
+            if data.count(',') == 2:
+                x, y, _  = map(int, data.split(','))
+                point = Point(x, y)
+                return point
+        except UnicodeDecodeError as e:
+            print(f"Decode error: {e}")
     return Point(0,-1)
     
 
@@ -30,10 +32,6 @@ def constrain(value, minn, maxn):
 kinematics = Kinematics(2, 3.125, 1.75, 3.669291339)
 
 print("Done with kinematics")
-
-
-#send code to arduino to start
-ser.write(b'S')
 
 stepper1 = AccelStepper(AccelStepper.DRIVER, 23, 24)
 stepper2 = AccelStepper(AccelStepper.DRIVER, 20, 21)
@@ -143,8 +141,6 @@ def moveTo(hz, nx, ny):
         steppers.run()
 
 def PID(setpointX, setpointY):
-    #send code to arduino to start
-    ser.write(b'S')
     print("starting PID")
     point = read_coords()
     print("read touch coordinates: " + str(point.x) + " " + str(point.y))
@@ -204,7 +200,4 @@ if __name__ == "__main__":
     finally:
         print("cleaning up GPIO")
         GPIO.cleanup()
-
-        #send command to arduino to stop
-        ser.write(b'E')
         ser.close()
