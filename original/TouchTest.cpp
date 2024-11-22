@@ -22,6 +22,7 @@ void loop() {
       Serial.print(p.y);
       Serial.print(",");
       Serial.print(p.z);
+      Serial.println();
     }
 
 
