@@ -10,23 +10,21 @@ void setup() {
 
 void loop() {
 
-  if(Serial.available() > 0){
-    char c = Serial.read();
-    Serial.print("received info");
+  char c = Serial.read();
+  Serial.print("received info");
 
-    if(c == 'S'){
-      // Get the touch point
-      TSPoint p = ts.getPoint();
+  if(c == 'S'){
+    // Get the touch point
+    TSPoint p = ts.getPoint();
 
-      Serial.print("sending info");
+    Serial.print("sending info");
 
-      Serial.write(p.x);
-      Serial.write(",");
-      Serial.write(p.y);
-      Serial.write(",");
-      Serial.write(p.z);
-      Serial.write("\n");
-    }
+    Serial.write(p.x);
+    Serial.write(",");
+    Serial.write(p.y);
+    Serial.write(",");
+    Serial.write(p.z);
+    Serial.write("\n");
   }
 
   // Small delay to avoid flooding the serial monitor
