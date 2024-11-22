@@ -30,10 +30,6 @@ kinematics = Kinematics(2, 3.125, 1.75, 3.669291339)
 
 print("Done with kinematics")
 
-
-#send code to arduino to start
-ser.write(b'S')
-
 stepper1 = AccelStepper(AccelStepper.DRIVER, 23, 24)
 stepper2 = AccelStepper(AccelStepper.DRIVER, 20, 21)
 stepper3 = AccelStepper(AccelStepper.DRIVER, 5, 6)
@@ -142,8 +138,6 @@ def moveTo(hz, nx, ny):
         steppers.run()
 
 def PID(setpointX, setpointY):
-    #send code to arduino to start
-    ser.write(b'S')
     print("starting PID")
     point = read_coords()
     print("read touch coordinates: " + str(point.x) + " " + str(point.y))
@@ -202,7 +196,4 @@ if __name__ == "__main__":
     finally:
         print("cleaning up GPIO")
         GPIO.cleanup()
-
-        #send command to arduino to stop
-        ser.write(b'E')
         ser.close()
