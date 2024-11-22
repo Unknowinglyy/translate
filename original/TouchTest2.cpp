@@ -1,5 +1,4 @@
 #include <TouchScreen.h>
-
 // Initialize the touchscreen with the given pins
 TouchScreen ts = TouchScreen(A1, A0, A3, A2, 0);
 
@@ -11,11 +10,8 @@ void setup() {
 void loop() {
   TSPoint p = ts.getPoint();
   if (p.z  < 17 ) {
-    Serial.print((int)p.x);  // Cast to integer for clean output
-    Serial.print(",");
-    Serial.print((int)p.y);
-    Serial.print(",");
-    Serial.println((int)p.z);
+    String data = String(p.x) + "," + String(p.y) + "," + String(p.z) + "\n";
+    Serial.print(data);
   }
   delay(100);
 }
