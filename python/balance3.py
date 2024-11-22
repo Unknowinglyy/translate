@@ -117,7 +117,7 @@ def setup():
     steppers.run_speed_to_position()   
 
 def moveTo(hz, nx, ny):
-    print("Moving to: " + str(hz) + " " + str(nx) + " " + str(ny))
+    # print("Moving to: " + str(hz) + " " + str(nx) + " " + str(ny))
     if(detected):
         for i in range(3):
             pos[i] = round((angOrig - kinematics.compute_angle(i, hz, nx, ny)) * angToStep)
