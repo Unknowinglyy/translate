@@ -14,7 +14,7 @@ ENA = 17
 CENTER_X, CENTER_Y = 2025, 2045  # Touchscreen center offsets
 BALL_DETECTION_THRESHOLD = 20    # Ball detection range
 angOrig = 206                    # Original angle
-angToStep = 1200 / 360           # Steps per degree
+angToStep = 800 / 360           # Steps per degree
 ks = 10                          # Speed amplifying constant
 kp, ki, kd = 4E-4, 2E-7, 7E-3    # PID constants
 
