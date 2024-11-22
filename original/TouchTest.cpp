@@ -6,6 +6,8 @@ TouchScreen ts = TouchScreen(A1, A0, A3, A2, 0);
 void setup() {
   // Start the serial communication
   Serial.begin(9600);
+
+  ts.pressureThreshhold = 5;
 }
 
 void loop() {
