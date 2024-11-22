@@ -11,7 +11,6 @@ void setup() {
 void loop() {
   TSPoint p = ts.getPoint();
 
-
   String data = String(p.x) + "," + String(p.y) + "," + String(p.z) + "\n";
 
   Serial.print(data);
