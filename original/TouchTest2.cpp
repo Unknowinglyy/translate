@@ -21,16 +21,6 @@ void loop() {
     Serial.print(p.z);
     Serial.println();
   }
-  else {
-    Serial.print(0);
-    Serial.print(",");
-    Serial.print(0);
-    Serial.print(",");
-    Serial.print(0);
-    Serial.print(",");
-    Serial.println();
-  }
-
 
   // Small delay to avoid flooding the serial monitor
   delay(100);

@@ -191,7 +191,7 @@ if __name__ == "__main__":
     try:
         setup()
         while True:
-            PID(0,0)
+            PID(500,500)
             print(f"Detected: {detected}")
             time.sleep(0.01)
 
