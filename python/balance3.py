@@ -11,12 +11,15 @@ ser = serial.Serial('/dev/ttyACM0', 9600)
 
 def read_coords():
     if ser.in_waiting > 0:
-        data = ser.readline().decode('utf-8').rstrip()
-        print("got this data: " + data)
-        if data.count(',') == 2:
-            x, y, _  = map(int, data.split(','))
-            point = Point(x, y)
-            return point
+        try:
+            data = ser.readline().decode('utf-8').rstrip()
+            print("got this data: " + data)
+            if data.count(',') == 2:
+                x, y, _  = map(int, data.split(','))
+                point = Point(x, y)
+                return point
+        except UnicodeDecodeError as e:
+            print(f"Decode error: {e}")
     return Point(0,-1)
     
 
