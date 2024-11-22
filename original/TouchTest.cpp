@@ -7,23 +7,19 @@ void setup() {
   // Start the serial communication
   Serial.begin(9600);
 
-  ts.pressureThreshhold = 1;
 }
 
 void loop() {
   // Get the touch point
   TSPoint p = ts.getPoint();
 
-    // Print the touch point
-    // Serial.print("X = "); Serial.print(p.x);
-    // Serial.print("\tY = "); Serial.print(p.y);
-    // Serial.print("\tPressure = "); Serial.println(p.z);
-    if(p.z > ts.pressureThreshhold) {
-      Serial.print(p.x);
-      Serial.print(",");
-      Serial.print(p.y);
-      Serial.println();
-    }
+
+  Serial.print(p.x);
+  Serial.print(",");
+  Serial.print(p.y);
+  Serial.print(",");
+  Serial.print(p.z);
+  Serial.println();
 
 
   // Small delay to avoid flooding the serial monitor
