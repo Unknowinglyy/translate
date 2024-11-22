@@ -14,7 +14,7 @@ def read_coords():
     if ser.in_waiting > 0:
         data = ser.readline().decode('utf-8')
         print("got data: " + data)
-        x, y, _ = data.split(',')
+        x, y, _ = map(int, data.split(','))
         print("split into: " + x + " " + y)
         point = Point(x,y)
         print("created point")
