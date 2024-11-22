@@ -3,32 +3,33 @@ import math
 import RPi.GPIO as GPIO
 from accelstepper import AccelStepper
 from multistepper import MultiStepper
-from touchScreenBasicCoordOutput import Point
+from touchScreenBasicCoordOutput import read_touch_coordinates, Point
+from touchScreenTranslatedCoordOutput import transform_coordinates
 from kine2 import Kinematics
 import serial
 
-ser = serial.Serial('/dev/ttyACM0', 9600)
+# ser = serial.Serial('/dev/ttyACM0', 9600)
 
-def read_coords():
-    print(f"serial in_waiting: {ser.in_waiting}")
-    if ser.in_waiting > 0:
-        raw_line = ser.readline()
-        try:
-            print("BALL DETECTED")
-            # Attempt to decode the line
-            line = raw_line.decode('utf-8', errors='ignore').rstrip()
-            # print("===================================")
-            # print(line)
-            x, y, z= map(int, line.split(','))
-            point = Point(x, y, z)
-            ser.reset_input_buffer()
-            return point
+# def read_coords():
+#     print(f"serial in_waiting: {ser.in_waiting}")
+#     if ser.in_waiting > 0:
+#         raw_line = ser.readline()
+#         try:
+#             print("BALL DETECTED")
+#             # Attempt to decode the line
+#             line = raw_line.decode('utf-8', errors='ignore').rstrip()
+#             # print("===================================")
+#             # print(line)
+#             x, y, z= map(int, line.split(','))
+#             point = Point(x, y, z)
+#             ser.reset_input_buffer()
+#             return point
             
-        except UnicodeDecodeError:
-            # Log invalid data for debugging
-            print(f"Invalid data received: {raw_line}")
-            ser.reset_input_buffer()
-    return Point(0,-1,-1)
+#         except UnicodeDecodeError:
+#             # Log invalid data for debugging
+#             print(f"Invalid data received: {raw_line}")
+#             ser.reset_input_buffer()
+#     return Point(0,-1,-1)
     
     
 
@@ -152,15 +153,16 @@ def moveTo(hz, nx, ny):
 def PID(setpointX, setpointY):
     print("===================================")
     print("starting PID")
-    point = read_coords()
-    print("read touch coordinates: " + str(point.x) + " " + str(point.y))
-    if(point.x != 0):
+    point = read_touch_coordinates()
+    translated_point = transform_coordinates(point.x, point.y)
+    print("read touch coordinates: " + str(translated_point.x) + " " + str(translated_point.y))
+    if(translated_point.x != 0):
         detected = True
 
         for i in range(2):
             errorPrev[i] = error[i]
 
-            error[i] = (i == 0) * (xoffset - point.x - setpointX) + (i == 1) * (yoffset - point.y - setpointY)
+            error[i] = (i == 0) * (xoffset - translated_point.x - setpointX) + (i == 1) * (yoffset - translated_point.y - setpointY)
 
             integr[i] += error[i] + errorPrev[i]
 
@@ -187,8 +189,9 @@ def PID(setpointX, setpointY):
     else:
         #delay by 10 ms to double check that there is no ball
         time.sleep(0.1)
-        point = read_coords()
-        if(point.x == 0):
+        point = read_touch_coordinates()
+        translated_point = transform_coordinates(point.x, point.y)
+        if(translated_point is None):
             detected = False
             print("No ball detected")
 
@@ -209,4 +212,3 @@ if __name__ == "__main__":
     finally:
         print("cleaning up GPIO")
         GPIO.cleanup()
-        ser.close()
