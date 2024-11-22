@@ -18,7 +18,7 @@ def read_coords():
             point = Point(x, y)
             return point
     
-    return None
+    return Point(0,0)
     
 
 def millis():
