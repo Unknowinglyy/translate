@@ -40,9 +40,9 @@ ks = 20
 #touch screen variables
 
 #x offset for the center position of the touchscreen
-xoffset = 500
+xoffset = 2025
 #y offset for the center position of the touchscreen
-yoffset = 500
+yoffset = 2045
 
 #PID variables
 
