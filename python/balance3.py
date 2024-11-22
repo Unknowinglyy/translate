@@ -13,15 +13,10 @@ ser = serial.Serial('/dev/ttyACM0', 9600)
 def read_coords():
     if ser.in_waiting > 0:
         data = ser.readline().decode('utf-8')
-        print("got data: " + data)
-        x, y, _ = map(int, data.split(','))
-        print("split into: " + str(x) + " " + str(y))
-        point = Point(x,y)
-        print("created point")
-        return point
-    else:
-        point = Point(0,0)
-        return point
+        if data.count(',') == 2:
+            x, y, _  = map(int, data.split(','))
+            point = Point(x, y)
+            return point
     
 
 def millis():
@@ -33,6 +28,10 @@ def constrain(value, minn, maxn):
 kinematics = Kinematics(2, 3.125, 1.75, 3.669291339)
 
 print("Done with kinematics")
+
+
+#send code to arduino to start
+ser.write(b'S')
 
 stepper1 = AccelStepper(AccelStepper.DRIVER, 23, 24)
 stepper2 = AccelStepper(AccelStepper.DRIVER, 20, 21)
@@ -200,3 +199,7 @@ if __name__ == "__main__":
     finally:
         print("cleaning up GPIO")
         GPIO.cleanup()
+
+        #send command to arduino to stop
+        ser.write(b'E')
+        ser.close()
