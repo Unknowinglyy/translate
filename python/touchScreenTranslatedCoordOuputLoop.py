@@ -72,6 +72,6 @@ if __name__ == "__main__":
             translated_point = transform_coordinates(original_point.x, original_point.y)
 
             # Print the original and translated coordinates
-            print(f"Original: X: {original_point.x}, Y: {original_point.y} -> Translated: X: {translated_point.x:.2f}, Y: {translated_point.y:.2f}")
+            print(f"X: {translated_point.x:.2f}, Y: {translated_point.y:.2f}")
         except KeyboardInterrupt:
             break
