@@ -3,8 +3,19 @@ import math
 import RPi.GPIO as GPIO
 from accelstepper import AccelStepper
 from multistepper import MultiStepper
-from touchScreenBasicCoordOutput import read_touch_coordinates
+from touchScreenBasicCoordOutput import Point
 from kine2 import Kinematics
+import serial
+
+
+ser = serial.Serial('/dev/ttyACM0', 9600)
+
+def read_coords():
+    if ser.in_waiting > 0:
+        data = ser.readline().decode('utf-8')
+        x, y = data.split(',')
+        return Point(float(x), float(y))
+    
 
 def millis():
     return int(time.time() * 1000)
@@ -125,7 +136,7 @@ def moveTo(hz, nx, ny):
 
 def PID(setpointX, setpointY):
     print("starting PID")
-    point = read_touch_coordinates()
+    point = read_coords()
     print("read touch coordinates: " + str(point.x) + " " + str(point.y))
     if(point.x != 0):
         detected = True
@@ -160,7 +171,7 @@ def PID(setpointX, setpointY):
     else:
         #delay by 10 ms to double check that there is no ball
         time.sleep(0.01)
-        point = read_touch_coordinates()
+        point = read_coords()
         if(point.x == 0):
             detected = False
             print("No ball detected")
