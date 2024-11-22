@@ -1,42 +1,76 @@
 import evdev
+from scipy.linalg import lstsq
 
 class Point:
     def __init__(self, x, y):
         self.x = x
         self.y = y
 
-# Define the scaling factors
-scale_x = (950 - 50) / (3800 - 250)  # Scaling factor for X axis
-scale_y = (950 - 100) / (3950 - 150)  # Scaling factor for Y axis
+# Define the original and translated points
+original_points = [
+    (3800, 150),
+    (250, 150),
+    (3800, 3950),
+    (250, 3950)
+]
 
-# Function to translate coordinates
-def translate_coordinates(x, y):
-    translated_x = int(scale_x * (x - 250) + 50)
-    translated_y = int(scale_y * (y - 150) + 100)
-    return translated_x, translated_y
+translated_points = [
+    (50, 100),
+    (50, 950),
+    (950, 100),
+    (950, 950)
+]
 
+# Prepare the matrices for affine transformation
+original_coords = []
+translated_x = []
+translated_y = []
+
+for (ox, oy), (tx, ty) in zip(original_points, translated_points):
+    original_coords.append([ox, oy, 1])
+    translated_x.append(tx)
+    translated_y.append(ty)
+
+# Solve for the affine transformation coefficients
+original_coords = np.array(original_coords)
+translated_x = np.array(translated_x)
+translated_y = np.array(translated_y)
+
+x_coeffs, _, _, _ = lstsq(original_coords, translated_x)
+y_coeffs, _, _, _ = lstsq(original_coords, translated_y)
+
+# Define the transformation function
+def transform_coordinates(x, y):
+    x_transformed = x_coeffs[0] * x + x_coeffs[1] * y + x_coeffs[2]
+    y_transformed = y_coeffs[0] * x + y_coeffs[1] * y + y_coeffs[2]
+    return Point(x_transformed, y_transformed)
+
+# Function to read touch coordinates
 def read_touch_coordinates(device_path='/dev/input/event7'):
     device = evdev.InputDevice(device_path)
 
     x, y = None, None
 
-    # Read touch events in a loop
     for event in device.read_loop():
-        # Only process single-touch absolute X and Y events (ignore multitouch)
         if event.type == evdev.ecodes.EV_ABS:
             if event.code == evdev.ecodes.ABS_X or event.code == evdev.ecodes.ABS_MT_POSITION_X:
                 x = event.value
             elif event.code == evdev.ecodes.ABS_Y or event.code == evdev.ecodes.ABS_MT_POSITION_Y:
                 y = event.value
-            # Return translated coordinates when both X and Y are captured
             if x is not None and y is not None:
-                translated_x, translated_y = translate_coordinates(x, y)
-                return Point(translated_x, translated_y)
+                return Point(x, y)
 
+# Main loop
 if __name__ == "__main__":
     while True:
         try:
-            point = read_touch_coordinates()
-            print(f"Translated X: {point.x}, Translated Y: {point.y}")
+            # Read the raw touch coordinates
+            original_point = read_touch_coordinates()
+
+            # Transform the coordinates
+            translated_point = transform_coordinates(original_point.x, original_point.y)
+
+            # Print the original and translated coordinates
+            print(f"Original: X: {original_point.x}, Y: {original_point.y} -> Translated: X: {translated_point.x:.2f}, Y: {translated_point.y:.2f}")
         except KeyboardInterrupt:
             break
