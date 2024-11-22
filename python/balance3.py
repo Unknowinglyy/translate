@@ -143,6 +143,8 @@ def moveTo(hz, nx, ny):
         steppers.run()
 
 def PID(setpointX, setpointY):
+    #send code to arduino to start
+    ser.write(b'S')
     print("starting PID")
     point = read_coords()
     print("read touch coordinates: " + str(point.x) + " " + str(point.y))
