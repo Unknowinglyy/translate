@@ -19,7 +19,7 @@ void loop() {
   Serial.write(p.y);
   Serial.write(",");
   Serial.write(p.z);
-  Serial.println();
+  Serial.write("\n");
 
   // Small delay to avoid flooding the serial monitor
   delay(1000);
