@@ -5,23 +5,17 @@ class Point:
         self.x = x
         self.y = y
 
-# Define the original and target ranges
-original_x_min, original_x_max = 250, 3800
-original_y_min, original_y_max = 150, 3950
-
-target_x_min, target_x_max = 50, 950
-target_y_min, target_y_max = 100, 950
-
-# Calculate the scaling factors
-scale_x = (target_x_max - target_x_min) / (original_x_max - original_x_min)
-scale_y = (target_y_max - target_y_min) / (original_y_max - original_y_min)
+# Define the scaling factors and offsets
+scale_x = 0.2535
+scale_y = 0.2237
+offset_x = -13.375
+offset_y = 66.445
 
 # Function to translate coordinates
 def translate_coordinates(x, y):
-    # Apply scaling and translation
-    translated_x = target_x_min + (x - original_x_min) * scale_x
-    translated_y = target_y_min + (y - original_y_min) * scale_y
-    return int(translated_x), int(translated_y)
+    translated_x = int(x * scale_x + offset_x)
+    translated_y = int(y * scale_y + offset_y)
+    return translated_x, translated_y
 
 def read_touch_coordinates(device_path='/dev/input/event7'):
     device = evdev.InputDevice(device_path)
