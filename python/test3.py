@@ -10,7 +10,7 @@ if __name__ == '__main__':
             raw_line = ser.readline()
             try:
                 # Attempt to decode the line
-                line = raw_line.decode('utf-8').rstrip()
+                line = raw_line.rstrip()
                 print(line)
             except UnicodeDecodeError:
                 # Log invalid data for debugging
