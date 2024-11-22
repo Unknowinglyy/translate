@@ -3,7 +3,7 @@ from accelstepper import AccelStepper
 from multistepper import MultiStepper
 import RPi.GPIO as GPIO
 from kine2 import Kinematics  # Import the Kinematics class
-from touchScreenBasicCoordOutput import read_touch_coordinates
+from touchScreenTranslatedCoordOutput import read_touch_coordinates
 
 # Define GPIO pins for the stepper motor
 STEP_PIN = 23
@@ -11,7 +11,7 @@ DIR_PIN = 24
 ENA = 17
 
 # Constants and Parameters
-CENTER_X, CENTER_Y = 2025, 2045  # Touchscreen center offsets
+CENTER_X, CENTER_Y = 500, 500  # Touchscreen center offsets
 BALL_DETECTION_THRESHOLD = 20    # Ball detection range
 angOrig = 206                    # Original angle
 angToStep = 800 / 360           # Steps per degree
