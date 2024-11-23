@@ -159,7 +159,7 @@ def PID(setpointX, setpointY):
     point = read_touch_coordinates()
     translated_point = transform_coordinates(point.x, point.y)
     print("read touch coordinates: " + str(translated_point.x) + " " + str(translated_point.y))
-    if(translated_point.x != 0):
+    if(translated_point.x != 0 and translated_point.y != 0):
         detected = True
 
         for i in range(2):
@@ -194,7 +194,7 @@ def PID(setpointX, setpointY):
         time.sleep(0.1)
         point = read_touch_coordinates()
         translated_point = transform_coordinates(point.x, point.y)
-        if(translated_point is None):
+        if(translated_point.x == 0 and translated_point.y == 0):
             detected = False
             print("No ball detected")
 
