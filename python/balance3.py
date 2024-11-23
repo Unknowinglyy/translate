@@ -66,7 +66,7 @@ out = [0, 0]
 timeI = 0
 
 #other variables
-angToStep = 800 / 360
+angToStep = 3200 / 360
 
 detected = False
 
@@ -97,7 +97,7 @@ def loop():
 
 def moveTo(hz, nx, ny):
     global detected
-    print("Moving to: " + str(hz) + " " + str(nx) + " " + str(ny))
+    # print("Moving to: " + str(hz) + " " + str(nx) + " " + str(ny))
     if(detected):
         for i in range(3):
             pos[i] = round((angOrig - kinematics.compute_angle(i, hz, nx, ny)) * angToStep)
