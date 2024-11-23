@@ -6,6 +6,7 @@ from multistepper import MultiStepper
 from touchScreenBasicCoordOutput import read_touch_coordinates, Point
 from touchScreenTranslatedCoordOutput import transform_coordinates
 from kine2 import Kinematics
+'''
 # import serial
 
 # ser = serial.Serial('/dev/ttyACM0', 9600)
@@ -30,7 +31,7 @@ from kine2 import Kinematics
 #             print(f"Invalid data received: {raw_line}")
 #             ser.reset_input_buffer()
 #     return Point(0,-1,-1)
-    
+''' 
     
 
 def millis():
@@ -139,6 +140,8 @@ def moveTo(hz, nx, ny):
         stepper1.move_to(pos[Kinematics.A])
         stepper2.move_to(pos[Kinematics.B])
         stepper3.move_to(pos[Kinematics.C])
+
+        print(f"Stepper1 max_speed {speed[Kinematics.A]}, acceleration {speed[kinematics.A]}, move_to {pos[Kinematics.A]}")
 
         stepper1.run()
         stepper2.run()
