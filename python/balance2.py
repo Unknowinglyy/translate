@@ -43,8 +43,8 @@ stepper3 = AccelStepper(AccelStepper.DRIVER, 23, 24)
 
 # Configure stepper motor speeds and accelerations
 for stepper in [stepper1, stepper2, stepper3]:
-    stepper.set_max_speed(800)  # Adjust as needed
-    stepper.set_acceleration(30)  # Adjust as needed
+    stepper.set_max_speed(1000)  # Adjust as needed
+    stepper.set_acceleration(50)  # Adjust as needed
 
 # Create a MultiStepper instance
 multi_stepper = MultiStepper()
@@ -103,7 +103,7 @@ def pid_control(setpoint_x, setpoint_y):
 
 # Main Loop
 def balance_ball():
-    move_to(4.25, 0, 0)
+    # move_to(4.25, 0, 0)
     debug_log("Starting balance loop...")
     try:
         while True:
