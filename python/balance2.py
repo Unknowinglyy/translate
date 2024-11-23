@@ -88,7 +88,7 @@ def pid_control(setpoint_x, setpoint_y):
                 integr[i] += error[i]
                 deriv[i] = error[i] - deriv[i]  # Calculate derivative
                 out[i] = kp * error[i] + ki * integr[i] + kd * deriv[i]
-                out[i] = max(min(out[i], 0.25), -0.25)  # Constrain output
+                out[i] = max(min(out[i], 0.3), -0.3)  # Constrain output
                 debug_log(f"PID output {['X', 'Y'][i]}: error={error[i]}, integr={integr[i]}, deriv={deriv[i]}, out={out[i]}")
 
             # Update motor positions
