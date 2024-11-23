@@ -102,6 +102,7 @@ def moveTo(hz, nx, ny):
         for i in range(3):
             pos[i] = round((angOrig - kinematics.compute_angle(i, hz, nx, ny)) * angToStep)
         
+        
         stepper1.set_max_speed(speed[Kinematics.A])
         stepper2.set_max_speed(speed[Kinematics.B])
         stepper3.set_max_speed(speed[Kinematics.C])
@@ -113,6 +114,8 @@ def moveTo(hz, nx, ny):
         stepper1.move_to(pos[Kinematics.A])
         stepper2.move_to(pos[Kinematics.B])
         stepper3.move_to(pos[Kinematics.C])
+
+        print(f"stepper 1 max speed {speed[Kinematics.A]}, accel, move_to {pos[Kinematics.A]}")
 
         stepper1.run()
         stepper2.run()
@@ -136,7 +139,7 @@ def PID(setpointX, setpointY):
     print("read touch coordinates: " + str(point.x) + " " + str(point.y))
     if point.x != 0:
         detected = True
-
+        print("Ball Detected")
         for i in range(2):
             errorPrev[i] = error[i]
 
