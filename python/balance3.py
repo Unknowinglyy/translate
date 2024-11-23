@@ -60,7 +60,7 @@ ENA = 17
 angOrig = 206.662752199
 
 #speed of the stepper motor and the speed amplifying constant
-speed = [0, 0, 0]
+speed = [1, 1, 1]
 speedPrev = [0, 0, 0]
 ks = 20
 
@@ -175,8 +175,7 @@ def PID(setpointX, setpointY):
 
             out[i] = kp * error[i] + ki * integr[i] + kd * deriv[i]
 
-            #out[i] = constrain(out[i], -0.25, 0.25)
-            out[i] = constrain(out[i], -5, 5)
+            out[i] = constrain(out[i], -0.25, 0.25)
 
         for i in range(3):
             speedPrev[i] = speed[i]
