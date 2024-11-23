@@ -3,8 +3,7 @@ from accelstepper import AccelStepper
 from multistepper import MultiStepper
 import RPi.GPIO as GPIO
 from kine2 import Kinematics  # Import the Kinematics class
-from touchScreenTranslatedCoordOutput import transform_coordinates
-from touchScreenTranslatedCoordOutput import read_coordinates
+from touchScreenTranslatedCoordOutput import *
 
 # Define GPIO pins for the stepper motor
 STEP_PIN = 23
@@ -93,7 +92,7 @@ def pid_control(setpoint_x, setpoint_y):
                 debug_log(f"PID output {['X', 'Y'][i]}: error={error[i]}, integr={integr[i]}, deriv={deriv[i]}, out={out[i]}")
 
             # Update motor positions
-            move_to(4.25, -out[0], -out[1])
+            move_to(4.5, -out[0], -out[1])
         else:
             detected = False
             debug_log("Ball not detected.")
