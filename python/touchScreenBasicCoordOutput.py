@@ -28,7 +28,7 @@ def read_touch_coordinates(device_path='/dev/input/event7'):
             elif event.type == evdev.ecodes.EV_KEY:
                 return Point(x, y)
         else:
-            return None
+            return Point(0,0)
 
 if __name__ == "__main__":
     point = read_touch_coordinates()

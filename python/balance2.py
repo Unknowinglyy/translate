@@ -14,7 +14,7 @@ ENA = 17
 CENTER_X, CENTER_Y = 500, 500  # Touchscreen center offsets
 BALL_DETECTION_THRESHOLD = 20    # Ball detection range
 angOrig = 206                    # Original angle
-angToStep = 1200 / 360           # Steps per degree
+angToStep = 1000 / 360           # Steps per degree
 ks = 20                          # Speed amplifying constant
 kp, ki, kd = 4E-4, 2E-6, 7E-3    # PID constants
 
@@ -36,14 +36,14 @@ GPIO.setup(STEP_PIN, GPIO.OUT)
 GPIO.setup(DIR_PIN, GPIO.OUT)
 
 # Initialize stepper motors
-stepper1 = AccelStepper(AccelStepper.DRIVER, 5, 6)
-stepper2 = AccelStepper(AccelStepper.DRIVER, 20, 21)
+stepper1 = AccelStepper(AccelStepper.DRIVER, 20, 21)
+stepper2 = AccelStepper(AccelStepper.DRIVER, 5, 6)
 stepper3 = AccelStepper(AccelStepper.DRIVER, 23, 24)
 
 # Configure stepper motor speeds and accelerations
 for stepper in [stepper1, stepper2, stepper3]:
-    stepper.set_max_speed(10000)  # Adjust as needed
-    stepper.set_acceleration(500)  # Adjust as needed
+    stepper.set_max_speed(15000)  # Adjust as needed
+    stepper.set_acceleration(5000)  # Adjust as needed
 
 # Create a MultiStepper instance
 multi_stepper = MultiStepper()
@@ -69,10 +69,6 @@ def move_to(hz, nx, ny):
     # Move all motors concurrently to the calculated positions
     multi_stepper.move_to(target_positions)
     while multi_stepper.run():
-        for i, stepper in enumerate([stepper1, stepper2, stepper3]):
-            current_speed = stepper.get_speed()  # Get the current speed of the motor
-            current_acceleration = stepper.acceleration()  # Get the configured acceleration
-            debug_log(f"Motor {chr(65 + i)}: Speed={current_speed:.2f}, Acceleration={current_acceleration:.2f}")
         time.sleep(0.001)  # Allow motors to run concurrently
 
 def pid_control(setpoint_x, setpoint_y):
