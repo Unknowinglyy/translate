@@ -74,14 +74,11 @@ yoffset = 500
 #PID variables
 
 #proportional gain
-#kp = 4E-4
-kp = 4
+kp = 4E-4
 #integral gain
-# ki = 2E-6
-ki = 2
+ki = 2E-6
 #derivative gain
-# kd = 7E-3
-kd = 7
+kd = 7E-3
 
 #PID constants
 #PID terms for X and Y directions
