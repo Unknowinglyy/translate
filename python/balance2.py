@@ -69,6 +69,9 @@ def move_to(hz, nx, ny):
     # Move all motors concurrently to the calculated positions
     multi_stepper.move_to(target_positions)
     while multi_stepper.run():
+        for i, stepper in enumerate([stepper1, stepper2, stepper3]):
+            current_speed = stepper.current_speed()  # Get the current speed of the motor
+            debug_log(f"Motor {chr(65 + i)}: Speed={current_speed:.2f}, Acceleration={stepper._acceleration:.2f}")
         time.sleep(0.001)  # Allow motors to run concurrently
 
 def pid_control(setpoint_x, setpoint_y):
