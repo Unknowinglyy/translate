@@ -144,7 +144,7 @@ def PID(setpointX, setpointY):
             errorPrev[i] = error[i]
 
             error[i] = (i == 0) * (xoffset - translated_point.x - setpointX) + (i == 1) * (yoffset - translated_point.y - setpointY)
-            print(f"Error: {error[i]}")
+            # print(f"Error: {error[i]}")
             integr[i] += error[i] + errorPrev[i]
 
             deriv[i] = error[i] - errorPrev[i]
@@ -185,6 +185,7 @@ def PID(setpointX, setpointY):
 if __name__ == "__main__":
     try:
         setup()
+        time.sleep(5)
         while True:
             loop()
 
