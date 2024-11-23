@@ -175,7 +175,8 @@ def PID(setpointX, setpointY):
 
             out[i] = kp * error[i] + ki * integr[i] + kd * deriv[i]
 
-            out[i] = constrain(out[i], -0.25, 0.25)
+            #out[i] = constrain(out[i], -0.25, 0.25)
+            out[i] = constrain(out[i], -5, 5)
 
         for i in range(3):
             speedPrev[i] = speed[i]
