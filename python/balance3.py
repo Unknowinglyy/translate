@@ -88,7 +88,7 @@ def setup():
     #turn them on
     GPIO.output(ENA, GPIO.LOW)
 
-    moveTo(4.25,4.25,4.25)
+    moveTo(4.25,0,0)
 
     steppers.run_speed_to_position()
 
@@ -185,7 +185,6 @@ def PID(setpointX, setpointY):
 if __name__ == "__main__":
     try:
         setup()
-        time.sleep(5)
         while True:
             loop()
 
