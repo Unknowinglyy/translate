@@ -6,33 +6,6 @@ from multistepper import MultiStepper
 from touchScreenBasicCoordOutput import read_touch_coordinates, Point
 from touchScreenTranslatedCoordOutput import transform_coordinates
 from kine2 import Kinematics
-'''
-# import serial
-
-# ser = serial.Serial('/dev/ttyACM0', 9600)
-
-# def read_coords():
-#     print(f"serial in_waiting: {ser.in_waiting}")
-#     if ser.in_waiting > 0:
-#         raw_line = ser.readline()
-#         try:
-#             print("BALL DETECTED")
-#             # Attempt to decode the line
-#             line = raw_line.decode('utf-8', errors='ignore').rstrip()
-#             # print("===================================")
-#             # print(line)
-#             x, y, z= map(int, line.split(','))
-#             point = Point(x, y, z)
-#             ser.reset_input_buffer()
-#             return point
-            
-#         except UnicodeDecodeError:
-#             # Log invalid data for debugging
-#             print(f"Invalid data received: {raw_line}")
-#             ser.reset_input_buffer()
-#     return Point(0,-1,-1)
-''' 
-    
 
 def millis():
     return int(time.time() * 1000)
@@ -61,8 +34,8 @@ ENA = 17
 angOrig = 206.662752199
 
 #speed of the stepper motor and the speed amplifying constant
-speed = [1, 1, 1]
-speedPrev = [1, 1, 1]
+speed = [0, 0, 0]
+speedPrev = [0, 0, 0]
 ks = 20
 
 #touch screen variables
@@ -191,7 +164,7 @@ def PID(setpointX, setpointY):
 
             speed[i] = constrain(speed[i], speedPrev[i] - 200, speedPrev[i] + 200)
 
-            speed[i] = constrain(speed[i], 0, 1000)
+            speed[i] = constrain(speed[i], 1, 1000)
 
         print("X OUT: " + str(out[0]) + " Y OUT: " + str(out[1]) + " Speed A: " + str(speed[Kinematics.A]))
     else:
