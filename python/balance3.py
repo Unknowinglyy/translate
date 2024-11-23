@@ -88,7 +88,7 @@ def setup():
     #turn them on
     GPIO.output(ENA, GPIO.LOW)
 
-    moveTo(4.25,0,0)
+    moveTo(4.25,4.25,4.25)
 
     steppers.run_speed_to_position()
 
