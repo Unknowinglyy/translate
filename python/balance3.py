@@ -122,6 +122,7 @@ def loop():
     PID(0,0)   
 
 def moveTo(hz, nx, ny):
+    global detected
     # print("Moving to: " + str(hz) + " " + str(nx) + " " + str(ny))
     if(detected):
         for i in range(3):
@@ -154,6 +155,7 @@ def moveTo(hz, nx, ny):
         steppers.run()
 
 def PID(setpointX, setpointY):
+    global detected
     print("===================================")
     print("starting PID")
     point = read_touch_coordinates()
