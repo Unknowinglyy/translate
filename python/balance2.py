@@ -13,7 +13,7 @@ ENA = 17
 # Constants and Parameters
 CENTER_X, CENTER_Y = 500, 500  # Touchscreen center offsets
 BALL_DETECTION_THRESHOLD = 20    # Ball detection range
-angOrig = 230                    # Original angle
+angOrig = 206                    # Original angle
 angToStep = 1200 / 360           # Steps per degree
 ks = 20                          # Speed amplifying constant
 kp, ki, kd = 4E-4, 2E-6, 7E-3    # PID constants
@@ -42,8 +42,8 @@ stepper3 = AccelStepper(AccelStepper.DRIVER, 23, 24)
 
 # Configure stepper motor speeds and accelerations
 for stepper in [stepper1, stepper2, stepper3]:
-    stepper.set_max_speed(1000)  # Adjust as needed
-    stepper.set_acceleration(50)  # Adjust as needed
+    stepper.set_max_speed(10000)  # Adjust as needed
+    stepper.set_acceleration(500)  # Adjust as needed
 
 # Create a MultiStepper instance
 multi_stepper = MultiStepper()
@@ -92,7 +92,7 @@ def pid_control(setpoint_x, setpoint_y):
                 debug_log(f"PID output {['X', 'Y'][i]}: error={error[i]}, integr={integr[i]}, deriv={deriv[i]}, out={out[i]}")
 
             # Update motor positions
-            move_to(4.5, -out[0], -out[1])
+            move_to(4.25, -out[0], -out[1])
         else:
             detected = False
             debug_log("Ball not detected.")
