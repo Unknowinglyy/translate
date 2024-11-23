@@ -157,10 +157,9 @@ def PID(setpointX, setpointY):
     print("===================================")
     print("starting PID")
     point = read_touch_coordinates()
-    
     translated_point = transform_coordinates(point.x, point.y)
     print("read touch coordinates: " + str(translated_point.x) + " " + str(translated_point.y))
-    if(translated_point.x is not None):
+    if(translated_point.x != 0):
         detected = True
 
         for i in range(2):
