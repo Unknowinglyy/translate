@@ -60,7 +60,7 @@ ENA = 17
 angOrig = 206.662752199
 
 #speed of the stepper motor and the speed amplifying constant
-speed = [1, 1, 1]
+speed = [0, 0, 0]
 speedPrev = [0, 0, 0]
 ks = 20
 
