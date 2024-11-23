@@ -183,6 +183,7 @@ def PID(setpointX, setpointY):
             out[i] = constrain(out[i], -0.25, 0.25)
 
         for i in range(3):
+            print(f"speed[{i}] speed[i]")
             speedPrev[i] = speed[i]
 
             speed[i] = (i == Kinematics.A) * stepper1.current_position() + (i == Kinematics.B) * stepper2.current_position() + (i == Kinematics.C) * stepper3.current_position()
