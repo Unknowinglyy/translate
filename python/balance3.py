@@ -66,7 +66,7 @@ out = [0, 0]
 timeI = 0
 
 #other variables
-angToStep = 3200 / 360
+angToStep = 800 / 360
 
 detected = False
 
