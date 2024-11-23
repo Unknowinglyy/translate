@@ -103,7 +103,7 @@ def pid_control(setpoint_x, setpoint_y):
 
 # Main Loop
 def balance_ball():
-    move_to(4.25, 0, 0)
+    # move_to(4.25, 0, 0)
     debug_log("Starting balance loop...")
     try:
         while True:
