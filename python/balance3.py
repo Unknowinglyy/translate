@@ -144,7 +144,7 @@ def PID(setpointX, setpointY):
             errorPrev[i] = error[i]
 
             error[i] = (i == 0) * (xoffset - translated_point.x - setpointX) + (i == 1) * (yoffset - translated_point.y - setpointY)
-
+            print(f"Error: {error[i]}")
             integr[i] += error[i] + errorPrev[i]
 
             deriv[i] = error[i] - errorPrev[i]
@@ -156,7 +156,7 @@ def PID(setpointX, setpointY):
             out[i] = constrain(out[i], -0.25, 0.25)
 
         for i in range(3):
-            print(f"speed[{i}] {speed[i]}")
+            # print(f"speed[{i}] {speed[i]}")
             speedPrev[i] = speed[i]
 
             speed[i] = (i == Kinematics.A) * stepper1.current_position() + (i == Kinematics.B) * stepper2.current_position() + (i == Kinematics.C) * stepper3.current_position()
