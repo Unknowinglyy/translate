@@ -3,7 +3,7 @@ import math
 import RPi.GPIO as GPIO
 from accelstepper import AccelStepper
 from multistepper import MultiStepper
-from touchScreenTranslatedCoordOuputLoop import *
+from touchScreenTranslatedCoordOutputLoop import *
 from kine2 import Kinematics
 import serial
 
