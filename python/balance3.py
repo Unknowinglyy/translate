@@ -93,7 +93,7 @@ def setup():
     steppers.run_speed_to_position()
 
 def loop():
-    PID(500,500)   
+    PID(0,0)   
 
 def moveTo(hz, nx, ny):
     global detected
