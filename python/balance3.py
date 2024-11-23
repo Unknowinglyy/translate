@@ -140,6 +140,8 @@ def moveTo(hz, nx, ny):
         stepper2.move_to(pos[Kinematics.B])
         stepper3.move_to(pos[Kinematics.C])
 
+        print(f"Stepper1 max_speed {speed[Kinematics.A]}, acceleration {speed[kinematics.A]}, move_to {pos[Kinematics.A]}")
+
         stepper1.run()
         stepper2.run()
         stepper3.run()
