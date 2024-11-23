@@ -38,9 +38,9 @@ GPIO.setup(DIR_PIN, GPIO.OUT)
 
 
 # Initialize stepper motors
-stepper1 = AccelStepper(AccelStepper.DRIVER, 23, 24)
+stepper1 = AccelStepper(AccelStepper.DRIVER, 5, 6)
 stepper2 = AccelStepper(AccelStepper.DRIVER, 20, 21)
-stepper3 = AccelStepper(AccelStepper.DRIVER, 5, 6)
+stepper3 = AccelStepper(AccelStepper.DRIVER, 23, 24)
 
 # Configure stepper motor speeds and accelerations
 for stepper in [stepper1, stepper2, stepper3]:
