@@ -7,8 +7,6 @@ from touchScreenTranslatedCoordOutput import *
 import math
 
 # Define GPIO pins for the stepper motor
-STEP_PIN = 23
-DIR_PIN = 24
 ENA = 17
 
 # Constants and Parameters
@@ -35,19 +33,15 @@ kinematics = Kinematics(d, e, f, g)
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(ENA, GPIO.OUT)
 GPIO.output(ENA, GPIO.LOW)
-GPIO.setup(STEP_PIN, GPIO.OUT)
-GPIO.setup(DIR_PIN, GPIO.OUT)
-
-
 
 # Initialize stepper motors
 stepper1 = AccelStepper(AccelStepper.DRIVER, 23, 24)
-stepper2 = AccelStepper(AccelStepper.DRIVER, 20, 21)
-stepper3 = AccelStepper(AccelStepper.DRIVER, 5, 6)
+stepper2 = AccelStepper(AccelStepper.DRIVER, 5, 6)
+stepper3 = AccelStepper(AccelStepper.DRIVER, 20, 21)
 
 # Configure stepper motor speeds and accelerations
 for stepper in [stepper1, stepper2, stepper3]:
-    stepper.set_max_speed(10000)  # Adjust as needed
+    stepper.set_max_speed(800)  # Adjust as needed
     stepper.set_acceleration(2400)  # Adjust as needed
 
 # Create a MultiStepper instance
