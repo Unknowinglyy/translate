@@ -12,7 +12,7 @@ stepper3 = AccelStepper(AccelStepper.DRIVER, 5, 6)
 steppers = MultiStepper()
 
 #target positions for each motor
-pos = [400, 400, 400]
+pos = [420, 420, 420]
 #enable pin for drivers
 ENA = 17
 
