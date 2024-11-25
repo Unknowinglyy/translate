@@ -1,4 +1,5 @@
 import evdev
+import time
 
 class Point:
     def __init__(self, x, y, z=0):
@@ -6,14 +7,16 @@ class Point:
         self.y = y
         self.z = z
 
-def read_touch_coordinates(device_path='/dev/input/event4'):
+def read_touch_coordinates(device_path='/dev/input/event4', timeout=1.0):
     device = evdev.InputDevice(device_path)
     x, y, z = None, None, None
     samples_x, samples_y = [], []
     NUMSAMPLES = 2
+    start_time = time.time()
 
-    # Read touch events in a loop
-    for event in device.read_loop():
+    # Read touch events until a valid point is captured or timeout occurs
+
+    for event in device.read_one():
         if event.type == evdev.ecodes.EV_ABS:
             if event.code == evdev.ecodes.ABS_X or event.code == evdev.ecodes.ABS_MT_POSITION_X:
                 samples_x.append(event.value)
@@ -39,4 +42,4 @@ def read_touch_coordinates(device_path='/dev/input/event4'):
 
 if __name__ == "__main__":
     point = read_touch_coordinates()
-    print(f"X: {point.x}, Y: {point.y}, Z: {point.z}")
+    print(f"({point.x}, {point.y})")
