@@ -17,7 +17,7 @@ NOTE:
 #stepper motors
 
 stepperB = AccelStepper(AccelStepper.DRIVER, 23, 24) # Stepper B
-steppers = MultiStepper
+steppers = MultiStepper()
 
 
 ENA = 17                    #enable pin for the drivers
