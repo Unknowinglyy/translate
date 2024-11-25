@@ -16,10 +16,10 @@ original_points = [
 ]
 
 translated_points = [
-    (50, 100),
     (50, 950),
-    (950, 100),
-    (950, 950)
+    (50, 50),
+    (950, 950),
+    (950, 50)
 ]
 
 # Prepare the matrices for affine transformation
