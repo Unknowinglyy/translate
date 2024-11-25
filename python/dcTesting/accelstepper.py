@@ -379,13 +379,13 @@ class AccelStepper:
             #time.sleep(0.0020)
             pass
 
-    def run_speed_to_position(self):
+    def run_speed_to_position(self): # DC - Original CWW,CW
         if (self._targetPos == self._currentPos):
             return False
         if (self._targetPos > self._currentPos):
-            self._direction = self.DIRECTION_CW
+            self._direction = self.DIRECTION_CWW
         else:
-            self._direction = self.DIRECTION_CCW 
+            self._direction = self.DIRECTION_CW 
         return self.run_speed()
 
     def run_to_new_position(self, position):

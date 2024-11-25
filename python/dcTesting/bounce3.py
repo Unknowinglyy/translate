@@ -9,43 +9,53 @@ from touchScreenBasicCoordOutput import read_touch_coordinates, Point
 from touchScreenTranslatedCoordOutput import transform_coordinates
 from kine2 import Kinematics
 # ----------------------------------------------------------------------------------
-# Setup one motor:
-STEP_PIN = 23
-DIR_PIN  = 24
-ENA_PIN  = 17
-stepper = AccelStepper(AccelStepper.DRIVER, STEP_PIN, DIR_PIN)
+'''
+NOTE:
+    - Testing negative values for move_to
+'''
+# ----------------------------------------------------------------------------------
+#stepper motors
 
+stepperB = AccelStepper(AccelStepper.DRIVER, 23, 24) # Stepper B
+steppers = MultiStepper()
+
+
+ENA = 17                    #enable pin for the drivers
+# ----------------------------------------------------------------------------------
 def setup():
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(ENA_PIN, GPIO.OUT)
-    GPIO.output(ENA_PIN, GPIO.LOW)  # Enable the stepper driver
+  #Set iniial maximum speed value for the steppers (steps/sec)
+  stepperB.set_max_speed(100)
+  stepperB.set_acceleration(80)
+  steppers.add_stepper(stepperB)
 
+  GPIO.setup(ENA, GPIO.OUT)  
+  print("3 Seconds to setup motors")
+  time.sleep(3)
+  GPIO.output(ENA, GPIO.LOW)      #set enable pin low to enable the drivers
+  
 
-    # Change these to suit your stepper if you want
-    stepper.set_max_speed(100)
-    stepper.set_acceleration(20)
-
-
-    stepper.move_to(400)
-    time.sleep(3)
-    print("Setup Complete. Starting loop in 3 seconds.")
 
 def loop():
-    while True:
-        # If at the end of travel go to the other end
-        print(f"Distance remaining: {stepper.distance_to_go()}")
-        if stepper.distance_to_go() == 0:
-            print(f"Moving to {-stepper.current_position()}")
-            stepper.move_to(-stepper.current_position())
-            time.sleep(1)
-        stepper.run()
+  print(f"Moving to {200}")
+  steppers.move_to([200])
+
+  while True:
+    if stepperB.distance_to_go() == 0:
+      print(f"Moving to {-stepperB.current_position()}")
+      steppers.move_to([-stepperB.current_position()])
+
+    steppers.run_speed_to_position()
+
+
+  
+
 
 if __name__ == "__main__":
-    try:
-        setup()
-        loop()
-    except KeyboardInterrupt:
-        print("Program stopped by user")
-    finally:
-        GPIO.cleanup()
-        print("GPIO cleaned up")
+  try:
+    setup()
+    loop()
+  except KeyboardInterrupt:
+    print("Program stopped by user")
+  finally:
+    GPIO.cleanup()
+    print("GPIO cleaned up")
