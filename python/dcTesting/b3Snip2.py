@@ -62,7 +62,7 @@ timeI = 0
 #other variables
 angToStep = 3200 / 360 # ~ 8.8889 (8.9 steps per degree)
 
-detected = True
+detected = False
 # ----------------------------------------------------------------------------------
 def setup():
     steppers.add_stepper(stepperA)
