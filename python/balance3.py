@@ -5,7 +5,11 @@ from accelstepper import AccelStepper, constrain
 from multistepper import MultiStepper
 from touchScreenBasicCoordOutput import read_touch_coordinates, Point
 from touchScreenTranslatedCoordOutput import transform_coordinates
-from kine3 import Machine, A, B, C
+from kine3 import Machine
+
+A = Machine.A
+B = Machine.B
+C = Machine.C
 
 start_time = time.perf_counter()
 
