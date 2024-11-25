@@ -24,7 +24,7 @@ ENA = 17                    #enable pin for the drivers
 # ----------------------------------------------------------------------------------
 def setup():
   #Set iniial maximum speed value for the steppers (steps/sec)
-  stepperB.set_max_speed(200)
+  stepperB.set_max_speed(600)
   steppers.add_stepper(stepperB)
 
   GPIO.setup(ENA, GPIO.OUT)  
