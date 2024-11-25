@@ -1,7 +1,7 @@
 import time
 import math
 import RPi.GPIO as GPIO
-from accelstepper import AccelStepper
+from accelstepper import AccelStepper, constrain
 from multistepper import MultiStepper
 from touchScreenBasicCoordOutput import read_touch_coordinates, Point
 from touchScreenTranslatedCoordOutput import transform_coordinates
@@ -152,7 +152,7 @@ def PID(setpointX, setpointY):
 
             out[i] = kp * error[i] + ki * integr[i] + kd * deriv[i]
 
-            out[i] = AccelStepper.constrain(out[i], -0.25, 0.25)
+            out[i] = constrain(out[i], -0.25, 0.25)
 
         for i in range(3):
             # print(f"speed[{i}] {speed[i]}")
@@ -162,9 +162,9 @@ def PID(setpointX, setpointY):
         
             speed[i] = abs(speed[i] - pos[i]) * ks
 
-            speed[i] = AccelStepper.constrain(speed[i], speedPrev[i] - 200, speedPrev[i] + 200)
+            speed[i] = constrain(speed[i], speedPrev[i] - 200, speedPrev[i] + 200)
 
-            speed[i] = AccelStepper.constrain(speed[i], 0, 1000)
+            speed[i] = constrain(speed[i], 0, 1000)
 
         print("X OUT: " + str(out[0]) + " Y OUT: " + str(out[1]) + " Speed A: " + str(speed[Kinematics.A]))
     else:
