@@ -96,9 +96,9 @@ def moveTo(hz, nx, ny):
         b = speed[Kinematics.B] + 800
         c = speed[Kinematics.C] + 800
 
-        d = (speed[Kinematics.A] * 30) + 800
-        e = (speed[Kinematics.B] * 30) + 800
-        f = (speed[Kinematics.C] * 30) + 800
+        d = (speed[Kinematics.A] * 30) + 2000
+        e = (speed[Kinematics.B] * 30) + 2000
+        f = (speed[Kinematics.C] * 30) + 2000
 
         g = pos[kinematics.A]
         h = pos[kinematics.B]
