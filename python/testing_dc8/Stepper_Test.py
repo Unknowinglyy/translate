@@ -21,7 +21,7 @@ pos = [400, 400, 400]   #An array to store the target positions for each stepper
 ENA = 17                    #enable pin for the drivers
 
 
-def setup() 
+def setup():
   #Set iniial maximum speed value for the steppers (steps/sec)
   stepperA.set_max_speed(200)
   stepperB.set_max_speed(200)
