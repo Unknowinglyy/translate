@@ -47,3 +47,13 @@ def setup():
   steppers.move_to(pos);  # Calculates the required speed for all motors
   steppers.run_speed_to_position();  # blocks until all steppers reach their target position
 
+
+
+if __name__ == "__main__":
+  try:
+    setup()
+  except KeyboardInterrupt:
+    print("Program stopped by user")
+  finally:
+    GPIO.cleanup()
+    print("GPIO cleaned up")
