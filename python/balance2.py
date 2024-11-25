@@ -14,7 +14,7 @@ CENTER_X, CENTER_Y = 500, 500  # Touchscreen center offsets
 angOrig = 206                    # Original angle
 angToStep = 3200 / 360           # Steps per degree
 ks = 20                          # Speed amplifying constant
-kp, ki, kd = .0002, 0, 0    # PID constants
+kp, ki, kd = .00015, 0, 0    # PID constants
 
 # Global variables for PID control
 error = [0, 0]  # Error for X and Y axes
@@ -51,8 +51,8 @@ stepper3 = AccelStepper(AccelStepper.DRIVER, 23, 24)
 
 # Configure stepper motor speeds and accelerations
 for stepper in [stepper1, stepper2, stepper3]:
-    stepper.set_max_speed(600)  # Adjust as needed
-    stepper.set_acceleration(600)  # Adjust as needed
+    stepper.set_max_speed(900)  # Adjust as needed
+    stepper.set_acceleration(900)  # Adjust as needed
 
 # Create a MultiStepper instance
 multi_stepper = MultiStepper()
@@ -103,8 +103,6 @@ def pid_control(setpoint_x, setpoint_y):
                 out[i] = kp * error[i] + ki * integr[i] + kd * deriv[i]
                 out[i] = max(min(out[i], 0.25), -0.25)  # Constrain output
                 debug_log(f"PID output {['X', 'Y'][i]}: error={error[i]}, integr={integr[i]}, deriv={deriv[i]}, out={out[i]}")
-
-            move_to(4.25, -out[0], -out[1])
         else:
             detected = False
             debug_log("Ball not detected on first check.")
@@ -116,6 +114,8 @@ def pid_control(setpoint_x, setpoint_y):
     else:
         detected = False
         debug_log("Touchscreen data is None.")
+
+    move_to(4.25, -out[0], -out[1])
 
 # Main Loop
 def balance_ball():
