@@ -1,2 +1,8 @@
 multi  : (-) works
 single : 
+
+
+Motor Positions:
+A : "Middle" Motor [Motor 2]
+B : Located to the right of A [Motor 3]
+C : Located toft of A [Motor 1]
