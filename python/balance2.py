@@ -14,7 +14,7 @@ CENTER_X, CENTER_Y = 500, 500  # Touchscreen center offsets
 angOrig = 206                    # Original angle
 angToStep = 1600 / 360           # Steps per degree
 ks = 20                          # Speed amplifying constant
-kp, ki, kd = .0004, 0, 0    # PID constants
+kp, ki, kd = .00035, 0, 0    # PID constants
 
 # Global variables for PID control
 error = [0, 0]  # Error for X and Y axes
