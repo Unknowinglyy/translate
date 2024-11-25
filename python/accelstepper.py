@@ -157,6 +157,10 @@ class AccelStepper:
     def set_max_speed(self, speed):
         if(speed < 0.0):
             speed = -speed
+        if speed == 0.0:
+            self._maxSpeed = 0
+            self._cmin = float('inf')
+            return
         if self._maxSpeed != speed:
             self._maxSpeed = speed
             self._cmin = 1000000.0 / speed
