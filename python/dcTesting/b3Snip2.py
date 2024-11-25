@@ -197,6 +197,7 @@ def PID(setpointX, setpointY):
     # continues moving platform and waits until 20 milliseconds have elapsed
     timeI = millis() # Convert to milliseconds
     while (millis() - timeI < 20):
+        print("test")
         moveTo(4.25, -out[0], -out[1])  # moves the platform
 
 def loop():
