@@ -199,12 +199,16 @@ def PID(setpointX, setpointY):
     while (millis() - timeI < 20):
         moveTo(4.25, -out[0], -out[1])  # moves the platform
 
+def loop():
+    PID(0, 0)
 
 if __name__ == "__main__":
     try:
         setup()
         print("Setup Complete")
         time.sleep(2)
+        while True:
+            PID(0, 0)   
     except KeyboardInterrupt:
         print("Program stopped by user")
     finally:
