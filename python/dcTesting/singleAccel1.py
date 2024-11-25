@@ -31,21 +31,27 @@ def setup():
     GPIO.setup(ENA_PIN, GPIO.OUT)
     GPIO.output(ENA_PIN, GPIO.LOW)  # Enable the stepper driver
 
+
     # Change these to suit your stepper if you want
     stepper.set_max_speed(800)
     stepper.set_acceleration(20)
-    stepper.move_to(500)
+    stepper.move_to(400)
+    steppers.run_speed_to_position();
 
 def loop():
     while True:
         # If at the end of travel go to the other end
         if stepper.distance_to_go() == 0:
+            print(f"Moving to {-stepper.current_position()}")
             stepper.move_to(-stepper.current_position())
+            steppers.run_speed_to_position();
         stepper.run()
 
 if __name__ == "__main__":
     try:
         setup()
+        time.sleep(3)
+        print("Setup Complete. Starting loop in 3 seconds.")
         loop()
     except KeyboardInterrupt:
         print("Program stopped by user")
