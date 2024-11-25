@@ -23,9 +23,9 @@ ENA = 17                    #enable pin for the drivers
 
 def setup():
   #Set iniial maximum speed value for the steppers (steps/sec)
-  stepperA.set_max_speed(200)
-  stepperB.set_max_speed(200)
-  stepperC.set_max_speed(200)
+  stepperA.set_max_speed(800)
+  stepperB.set_max_speed(800)
+  stepperC.set_max_speed(800)
 
 
   # Adding the steppers to the steppersControl instance for multi stepper control
@@ -48,7 +48,7 @@ def setup():
   steppers.run_speed_to_position();  # blocks until all steppers reach their target position
   time.sleep(1)
   print("Moving to 100,100,100")
-  steppers.move_to([100,100,100])
+  steppers.move_to([420,420,420])
   steppers.run_speed_to_position();
   time.sleep(1)
   print("Moving to 200,200,200")

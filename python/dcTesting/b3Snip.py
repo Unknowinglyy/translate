@@ -92,32 +92,44 @@ def moveTo(hz, nx, ny):
         print(f"Pos: {pos}")
 
         # Set Speed and Acceleration
-        stepperA.set_max_speed(speed[Kinematics.A] + 5)
-        stepperB.set_max_speed(speed[Kinematics.B] + 5)
-        stepperC.set_max_speed(speed[Kinematics.C] + 5)
+        a = speed[Kinematics.A] + 800
+        b = speed[Kinematics.B] + 800
+        c = speed[Kinematics.C] + 800
 
-        stepperA.set_acceleration(5 + speed[Kinematics.A] * 30)
-        stepperB.set_acceleration(5 + speed[Kinematics.B] * 30)
-        stepperC.set_acceleration(5 + speed[Kinematics.C] * 30)
+        d = (speed[Kinematics.A] * 30) + 1000
+        e = (speed[Kinematics.B] * 30) + 1000
+        f = (speed[Kinematics.C] * 30) + 1000
+
+        g = pos[kinematics.A]
+        h = pos[kinematics.B]
+        i = pos[kinematics.C]
+
+        stepperA.set_max_speed(a)
+        stepperB.set_max_speed(b)
+        stepperC.set_max_speed(c)
+
+        stepperA.set_acceleration(d)
+        stepperB.set_acceleration(e)
+        stepperC.set_acceleration(f)
 
         # Move to Position
-        stepperA.move_to(pos[Kinematics.A])
-        stepperB.move_to(pos[Kinematics.B])
-        stepperC.move_to(pos[Kinematics.C])
+        stepperA.move_to(g)
+        stepperB.move_to(h)
+        stepperC.move_to(i)
 
         print(f"""
         Stepper A:
-            Max Speed: {speed[Kinematics.A]}
-            Acceleration: {speed[Kinematics.A] * 30}
-            Move To: {pos[Kinematics.A]}
+            Max Speed: {a}
+            Acceleration: {d}
+            Move To: {g}
         Stepper B:
-            Max Speed: {speed[Kinematics.B]}
-            Acceleration: {speed[Kinematics.B] * 30}
-            Move To: {pos[Kinematics.B]}
+            Max Speed: {b}
+            Acceleration: {e}
+            Move To: {h}
         Stepper C:
-            Max Speed: {speed[Kinematics.C]}
-            Acceleration: {speed[Kinematics.C] * 30}
-            Move To: {pos[Kinematics.C]}
+            Max Speed: {c}
+            Acceleration: {f}
+            Move To: {i}
         """)
 
         stepperA.run()
@@ -190,6 +202,7 @@ def PID(setpointX, setpointY):
 if __name__ == "__main__":
     try:
         setup()
+        print("Setup Complete")
         time.sleep(2)
     except KeyboardInterrupt:
         print("Program stopped by user")
