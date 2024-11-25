@@ -6,6 +6,7 @@ from multistepper import MultiStepper
 from touchScreenBasicCoordOutput import read_touch_coordinates, Point
 from touchScreenTranslatedCoordOutput import transform_coordinates
 from kine3 import Machine
+from serial_point import get_touch_point
 
 A = Machine.A
 B = Machine.B
@@ -140,16 +141,14 @@ def PID(setpointX, setpointY):
     global detected
     print("===================================")
     print("starting PID")
-    point = read_touch_coordinates()
-    translated_point = transform_coordinates(point.x, point.y)
-    print("read touch coordinates: " + str(translated_point.x) + " " + str(translated_point.y))
-    if(translated_point.x != 0 and translated_point.y != 0):
+    x, y, z = get_touch_point()
+    if(x != 0):
         detected = True
 
         for i in range(2):
             errorPrev[i] = error[i]
 
-            error[i] = (i == 0) * (xoffset - translated_point.x - setpointX) + (i == 1) * (yoffset - translated_point.y - setpointY)
+            error[i] = (i == 0) * (xoffset - x - setpointX) + (i == 1) * (yoffset - y - setpointY)
             # print(f"Error: {error[i]}")
             integr[i] += error[i] + errorPrev[i]
 
@@ -177,9 +176,8 @@ def PID(setpointX, setpointY):
     else:
         #delay by 10 ms to double check that there is no ball
         time.sleep(0.1)
-        point = read_touch_coordinates()
-        translated_point = transform_coordinates(point.x, point.y)
-        if(translated_point.x == 0 and translated_point.y == 0):
+        x, y, z = get_touch_point()
+        if(x == 0):
             detected = False
             print("No ball detected")
 
