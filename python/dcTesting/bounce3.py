@@ -25,7 +25,7 @@ ENA = 17                    #enable pin for the drivers
 def setup():
   #Set iniial maximum speed value for the steppers (steps/sec)
   stepperB.set_max_speed(100)
-  stepperB.set_acceleration(20)
+  stepperB.set_acceleration(80)
   steppers.add_stepper(stepperB)
 
   GPIO.setup(ENA, GPIO.OUT)  
@@ -36,7 +36,7 @@ def setup():
 
 
 def loop():
-  print(f"Moving to {400}")
+  print(f"Moving to {200}")
   steppers.move_to([200])
 
   while True:
