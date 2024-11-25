@@ -21,7 +21,7 @@ pos = [400, 400, 400]   #An array to store the target positions for each stepper
 ENA = 17                    #enable pin for the drivers
 
 
-def setup() {
+def setup() 
   #Set iniial maximum speed value for the steppers (steps/sec)
   stepperA.set_max_speed(200)
   stepperB.set_max_speed(200)
@@ -29,9 +29,9 @@ def setup() {
 
 
   # Adding the steppers to the steppersControl instance for multi stepper control
-  steppers.add_stepper(stepperA);
-  steppers.add_stepper(stepperB);
-  steppers.add_stepper(stepperC);
+  steppers.add_stepper(stepperA)
+  steppers.add_stepper(stepperB)
+  steppers.add_stepper(stepperC)
 
 
   #Enable pin
@@ -46,4 +46,4 @@ def setup() {
   #Movemement
   steppers.move_to(pos);  # Calculates the required speed for all motors
   steppers.run_speed_to_position();  # blocks until all steppers reach their target position
-}
+
