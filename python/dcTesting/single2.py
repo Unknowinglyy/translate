@@ -9,6 +9,11 @@ from touchScreenBasicCoordOutput import read_touch_coordinates, Point
 from touchScreenTranslatedCoordOutput import transform_coordinates
 from kine2 import Kinematics
 # ----------------------------------------------------------------------------------
+'''
+NOTE:
+    - Testing negative values for move_to
+'''
+# ----------------------------------------------------------------------------------
 #stepper motors
 
 stepperB = AccelStepper(AccelStepper.DRIVER, 23, 24) # Stepper B

@@ -9,22 +9,13 @@ from touchScreenBasicCoordOutput import read_touch_coordinates, Point
 from touchScreenTranslatedCoordOutput import transform_coordinates
 from kine2 import Kinematics
 # ----------------------------------------------------------------------------------
-#stepper motors
-
-stepperB = AccelStepper(AccelStepper.DRIVER, 23, 24) # Stepper B
-
-steppers = MultiStepper()
-
-
-#stepper motor variables
-pos = [400, 400, 400]   #An array to store the target positions for each stepper motor
-ENA = 17                    #enable pin for the drivers
-# ----------------------------------------------------------------------------------
 # Setup one motor:
 STEP_PIN = 23
 DIR_PIN  = 24
 ENA_PIN  = 17
 stepper = AccelStepper(AccelStepper.DRIVER, STEP_PIN, DIR_PIN)
+steppers = MultiStepper()
+steppers.add_stepper(stepper)
 
 def setup():
     GPIO.setmode(GPIO.BCM)
@@ -34,9 +25,10 @@ def setup():
 
     # Change these to suit your stepper if you want
     stepper.set_max_speed(800)
-    stepper.set_acceleration(20)
+    stepper.set_acceleration(200)
     stepper.move_to(400)
     steppers.run_speed_to_position();
+    print("Setup Complete. Starting loop in 3 seconds.")
 
 def loop():
     while True:
@@ -50,8 +42,6 @@ def loop():
 if __name__ == "__main__":
     try:
         setup()
-        time.sleep(3)
-        print("Setup Complete. Starting loop in 3 seconds.")
         loop()
     except KeyboardInterrupt:
         print("Program stopped by user")
