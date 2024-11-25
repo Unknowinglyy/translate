@@ -22,9 +22,9 @@ GPIO.output(ENA, GPIO.LOW)
 #small delay to allow system to settle
 time.sleep(1)
 
-stepper1.set_max_speed(100)
-stepper2.set_max_speed(100)
-stepper3.set_max_speed(100)
+stepper1.set_max_speed(200)
+stepper2.set_max_speed(200)
+stepper3.set_max_speed(200)
 print("set all the speeds")
 
 steppers.add_stepper(stepper1)
