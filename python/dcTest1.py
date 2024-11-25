@@ -46,14 +46,22 @@ def setup():
   #Movemement
   steppers.move_to(pos);  # Calculates the required speed for all motors
   steppers.run_speed_to_position();  # blocks until all steppers reach their target position
-  time.sleep(2)
+  time.sleep(1)
+  print("Moving to 100,100,100")
   steppers.move_to([100,100,100])
+  steppers.run_speed_to_position();
   time.sleep(1)
+  print("Moving to 200,200,200")
   steppers.move_to([200,200,200])
+  steppers.run_speed_to_position();
   time.sleep(1)
+  print("Moving to 300,300,300")
   steppers.move_to([300,300,300])
+  steppers.run_speed_to_position();
   time.sleep(1)
-  steppers.move_to([400,400,400]) 
+  print("Moving to 400,400,400")
+  steppers.move_to([400,400,400])
+  steppers.run_speed_to_position(); 
   time.sleep(1)
 
 
