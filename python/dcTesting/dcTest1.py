@@ -48,7 +48,7 @@ def setup():
   steppers.run_speed_to_position();  # blocks until all steppers reach their target position
   time.sleep(1)
   print("Moving to 100,100,100")
-  steppers.move_to([100,100,100])
+  steppers.move_to([420,420,420])
   steppers.run_speed_to_position();
   time.sleep(1)
   print("Moving to 200,200,200")
