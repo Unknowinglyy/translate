@@ -20,6 +20,11 @@ stepper1 = AccelStepper(AccelStepper.DRIVER, 23, 24)
 stepper2 = AccelStepper(AccelStepper.DRIVER, 20, 21)
 stepper3 = AccelStepper(AccelStepper.DRIVER, 5, 6)
 
+
+stepper1.set_speed(1)
+stepper2.set_speed(1)
+stepper3.set_speed(1)
+
 steppers = MultiStepper()
 print("Done with steppers")
 
@@ -33,7 +38,7 @@ ENA = 17
 angOrig = 206.662752199
 
 #speed of the stepper motor and the speed amplifying constant
-speed = [1, 1, 1]
+speed = [0, 0, 0]
 speedPrev = [0, 0, 0]
 ks = 20
 
@@ -75,6 +80,7 @@ def setup():
     steppers.add_stepper(stepper1)
     steppers.add_stepper(stepper2)
     steppers.add_stepper(stepper3)
+
 
     
     GPIO.setup(ENA, GPIO.OUT)
