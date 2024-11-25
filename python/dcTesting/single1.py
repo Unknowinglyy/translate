@@ -35,9 +35,12 @@ def setup():
 
 
   #Movemement
+  print("Moving Stepper B to 400")
   stepperB.move_to(400);  # Calculates the required speed for all motors
+  stepperB.run_speed_to_position();  # blocks until all steppers reach their target position
   time.sleep(2)
   stepperB.move_to(-400);
+  stepperB.run_speed_to_position();
   time.sleep(2)
 
   
