@@ -16,14 +16,9 @@ kinematics = Kinematics(2, 3.125, 1.75, 3.669291339)
 
 print("Done with kinematics")
 
-stepper1 = AccelStepper(AccelStepper.DRIVER, 23, 24)
-stepper2 = AccelStepper(AccelStepper.DRIVER, 20, 21)
+stepper2 = AccelStepper(AccelStepper.DRIVER, 23, 24)
+stepper1 = AccelStepper(AccelStepper.DRIVER, 20, 21)
 stepper3 = AccelStepper(AccelStepper.DRIVER, 5, 6)
-
-
-stepper1.set_speed(1)
-stepper2.set_speed(1)
-stepper3.set_speed(1)
 
 steppers = MultiStepper()
 print("Done with steppers")
