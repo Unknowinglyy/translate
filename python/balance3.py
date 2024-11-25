@@ -5,20 +5,20 @@ from accelstepper import AccelStepper, constrain
 from multistepper import MultiStepper
 from touchScreenBasicCoordOutput import read_touch_coordinates, Point
 from touchScreenTranslatedCoordOutput import transform_coordinates
-from kine2 import Kinematics
+from kine3 import Machine, A, B, C
 
 start_time = time.perf_counter()
 
 def millis():
     return int((time.perf_counter() - start_time) * 1000)
 
-kinematics = Kinematics(2, 3.125, 1.75, 3.669291339)
+machine = Machine(2, 3.125, 1.75, 3.669291339)
 
 print("Done with kinematics")
 
-stepper1 = AccelStepper(AccelStepper.DRIVER, 23, 24)
-stepper2 = AccelStepper(AccelStepper.DRIVER, 20, 21)
-stepper3 = AccelStepper(AccelStepper.DRIVER, 5, 6)
+stepper1 = AccelStepper(1, 23, 24)
+stepper2 = AccelStepper(1, 20, 21)
+stepper3 = AccelStepper(1, 5, 6)
 
 steppers = MultiStepper()
 print("Done with steppers")
@@ -75,8 +75,6 @@ def setup():
     steppers.add_stepper(stepper1)
     steppers.add_stepper(stepper2)
     steppers.add_stepper(stepper3)
-
-
     
     GPIO.setup(ENA, GPIO.OUT)
     #turn motors off
@@ -100,20 +98,20 @@ def moveTo(hz, nx, ny):
     print("Moving to: " + str(hz) + " " + str(nx) + " " + str(ny))
     if(detected):
         for i in range(3):
-            pos[i] = round((angOrig - kinematics.compute_angle(i, hz, nx, ny)) * angToStep)
+            pos[i] = round((angOrig - machine.theta(i, hz, nx, ny)) * angToStep)
             print(f"Motor {i} target position: {pos[i]}")
         
-        stepper1.set_max_speed(speed[Kinematics.A])
-        stepper2.set_max_speed(speed[Kinematics.B])
-        stepper3.set_max_speed(speed[Kinematics.C])
+        stepper1.set_max_speed(speed[A])
+        stepper2.set_max_speed(speed[B])
+        stepper3.set_max_speed(speed[C])
 
-        stepper1.set_acceleration(speed[Kinematics.A] * 30)
-        stepper2.set_acceleration(speed[Kinematics.B] * 30)
-        stepper3.set_acceleration(speed[Kinematics.C] * 30)
+        stepper1.set_acceleration(speed[A] * 30)
+        stepper2.set_acceleration(speed[B] * 30)
+        stepper3.set_acceleration(speed[C] * 30)
 
-        stepper1.move_to(pos[Kinematics.A])
-        stepper2.move_to(pos[Kinematics.B])
-        stepper3.move_to(pos[Kinematics.C])
+        stepper1.move_to(pos[A])
+        stepper2.move_to(pos[B])
+        stepper3.move_to(pos[C])
 
         # print(f"Stepper1 max_speed {speed[Kinematics.A]}, acceleration {speed[kinematics.A]}, move_to {pos[Kinematics.A]}")
 
@@ -123,7 +121,7 @@ def moveTo(hz, nx, ny):
     else:
         print("Ball not detected, moving to original position")
         for i in range(3):
-            pos[i] = round((angOrig - kinematics.compute_angle(i, hz, 0,0)) * angToStep)
+            pos[i] = round((angOrig - machine.theta(i, hz, 0,0)) * angToStep)
             print(f"Motor {i} target position: {pos[i]}")
 
         stepper1.set_max_speed(800)
@@ -162,7 +160,7 @@ def PID(setpointX, setpointY):
             # print(f"speed[{i}] {speed[i]}")
             speedPrev[i] = speed[i]
 
-            speed[i] = (i == Kinematics.A) * stepper1.current_position() + (i == Kinematics.B) * stepper2.current_position() + (i == Kinematics.C) * stepper3.current_position()
+            speed[i] = (i == A) * stepper1.current_position() + (i == B) * stepper2.current_position() + (i == C) * stepper3.current_position()
         
             speed[i] = abs(speed[i] - pos[i]) * ks
 
@@ -170,7 +168,7 @@ def PID(setpointX, setpointY):
 
             speed[i] = constrain(speed[i], 0, 1000)
 
-        print("X OUT: " + str(out[0]) + " Y OUT: " + str(out[1]) + " Speed A: " + str(speed[Kinematics.A]))
+        print("X OUT: " + str(out[0]) + " Y OUT: " + str(out[1]) + " Speed A: " + str(speed[Machine.A]))
     else:
         #delay by 10 ms to double check that there is no ball
         time.sleep(0.1)
