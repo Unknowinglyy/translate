@@ -7,11 +7,10 @@ from touchScreenBasicCoordOutput import read_touch_coordinates, Point
 from touchScreenTranslatedCoordOutput import transform_coordinates
 from kine2 import Kinematics
 
-def millis():
-    return int(time.time() * 1000)
+start_time = time.perf_counter()
 
-def constrain(value, minn, maxn):
-  return max(min(maxn, value), minn)
+def millis():
+    return int((time.perf_counter() - start_time) * 1000)
 
 kinematics = Kinematics(2, 3.125, 1.75, 3.669291339)
 
@@ -60,8 +59,8 @@ error = [0, 0]
 errorPrev = [0, 0]
 integr = [0, 0]
 deriv = [0, 0]
-
 out = [0, 0]
+
 #variable to capture inital times
 timeI = 0
 
@@ -88,7 +87,7 @@ def setup():
     #turn them on
     GPIO.output(ENA, GPIO.LOW)
 
-    moveTo(4.25,0,0)
+    moveTo(4.25, 0, 0)
 
     steppers.run_speed_to_position()
 
@@ -149,11 +148,11 @@ def PID(setpointX, setpointY):
 
             deriv[i] = error[i] - errorPrev[i]
 
-            deriv[i] = 0 if math.isnan(deriv[i]) or math.isinf(deriv[i]) else deriv[i]
+            deriv[i] = 0 if (math.isnan(deriv[i]) or math.isinf(deriv[i])) else deriv[i]
 
             out[i] = kp * error[i] + ki * integr[i] + kd * deriv[i]
 
-            out[i] = constrain(out[i], -0.25, 0.25)
+            out[i] = AccelStepper.constrain(out[i], -0.25, 0.25)
 
         for i in range(3):
             # print(f"speed[{i}] {speed[i]}")
@@ -163,9 +162,9 @@ def PID(setpointX, setpointY):
         
             speed[i] = abs(speed[i] - pos[i]) * ks
 
-            speed[i] = constrain(speed[i], speedPrev[i] - 200, speedPrev[i] + 200)
+            speed[i] = AccelStepper.constrain(speed[i], speedPrev[i] - 200, speedPrev[i] + 200)
 
-            speed[i] = constrain(speed[i], 1, 1000)
+            speed[i] = AccelStepper.constrain(speed[i], 0, 1000)
 
         print("X OUT: " + str(out[0]) + " Y OUT: " + str(out[1]) + " Speed A: " + str(speed[Kinematics.A]))
     else:
