@@ -118,20 +118,20 @@ def moveTo(hz, nx, ny):
         stepperB.move_to(h)
         stepperC.move_to(i)
 
-        print(f"""
-        Stepper A:
-            Max Speed: {a}
-            Acceleration: {d}
-            Move To: {g}
-        Stepper B:
-            Max Speed: {b}
-            Acceleration: {e}
-            Move To: {h}
-        Stepper C:
-            Max Speed: {c}
-            Acceleration: {f}
-            Move To: {i}
-        """)
+        # print(f"""
+        # Stepper A:
+        #     Max Speed: {a}
+        #     Acceleration: {d}
+        #     Move To: {g}
+        # Stepper B:
+        #     Max Speed: {b}
+        #     Acceleration: {e}
+        #     Move To: {h}
+        # Stepper C:
+        #     Max Speed: {c}
+        #     Acceleration: {f}
+        #     Move To: {i}
+        # """)
 
         stepperA.run()
         stepperB.run()
@@ -197,7 +197,7 @@ def PID(setpointX, setpointY):
     # continues moving platform and waits until 20 milliseconds have elapsed
     timeI = millis() # Convert to milliseconds
     while (millis() - timeI < 20):
-        print("test")
+        print("hello from PID")
         moveTo(4.25, -out[0], -out[1])  # moves the platform
 
 def loop():
