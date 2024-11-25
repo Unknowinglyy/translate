@@ -14,8 +14,6 @@ STEP_PIN = 23
 DIR_PIN  = 24
 ENA_PIN  = 17
 stepper = AccelStepper(AccelStepper.DRIVER, STEP_PIN, DIR_PIN)
-steppers = MultiStepper()
-steppers.add_stepper(stepper)
 
 def setup():
     GPIO.setmode(GPIO.BCM)
@@ -26,8 +24,9 @@ def setup():
     # Change these to suit your stepper if you want
     stepper.set_max_speed(800)
     stepper.set_acceleration(200)
-    steppers.move_to(400)
-    steppers.run_speed_to_position();
+
+
+    stepper.move_to(400)
     print("Setup Complete. Starting loop in 3 seconds.")
 
 def loop():
@@ -36,7 +35,6 @@ def loop():
         if stepper.distance_to_go() == 0:
             print(f"Moving to {-stepper.current_position()}")
             stepper.move_to(-stepper.current_position())
-            steppers.run_speed_to_position();
         stepper.run()
 
 if __name__ == "__main__":
