@@ -16,8 +16,8 @@ kinematics = Kinematics(2, 3.125, 1.75, 3.669291339)
 
 print("Done with kinematics")
 
-stepper2 = AccelStepper(AccelStepper.DRIVER, 23, 24)
-stepper1 = AccelStepper(AccelStepper.DRIVER, 20, 21)
+stepper1 = AccelStepper(AccelStepper.DRIVER, 23, 24)
+stepper2 = AccelStepper(AccelStepper.DRIVER, 20, 21)
 stepper3 = AccelStepper(AccelStepper.DRIVER, 5, 6)
 
 steppers = MultiStepper()
@@ -97,12 +97,11 @@ def loop():
 
 def moveTo(hz, nx, ny):
     global detected
-    # print("Moving to: " + str(hz) + " " + str(nx) + " " + str(ny))
+    print("Moving to: " + str(hz) + " " + str(nx) + " " + str(ny))
     if(detected):
         for i in range(3):
             pos[i] = round((angOrig - kinematics.compute_angle(i, hz, nx, ny)) * angToStep)
-
-        print("setting max speed to: " + str(speed[Kinematics.A]) + " " + str(speed[Kinematics.B]) + " " + str(speed[Kinematics.C]))
+            print(f"Motor {i} target position: {pos[i]}")
         
         stepper1.set_max_speed(speed[Kinematics.A])
         stepper2.set_max_speed(speed[Kinematics.B])
@@ -122,8 +121,10 @@ def moveTo(hz, nx, ny):
         stepper2.run()
         stepper3.run()
     else:
+        print("Ball not detected, moving to original position")
         for i in range(3):
             pos[i] = round((angOrig - kinematics.compute_angle(i, hz, 0,0)) * angToStep)
+            print(f"Motor {i} target position: {pos[i]}")
 
         stepper1.set_max_speed(800)
         stepper2.set_max_speed(800)
