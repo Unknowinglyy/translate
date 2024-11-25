@@ -32,7 +32,7 @@ def read_touch_coordinates(device_path='/dev/input/event4', timeout=1.0):
             
 
                 # Process samples when we have enough
-
+                print("hello")
                 if len(samples_x) == NUMSAMPLES and len(samples_y) == NUMSAMPLES and x is not None and y is not None: 
                     # Sort samples to get the median value
                     samples_x.sort()
