@@ -13,11 +13,6 @@ from kine2 import Kinematics
 
 stepperB = AccelStepper(AccelStepper.DRIVER, 23, 24) # Stepper B
 
-steppers = MultiStepper()
-
-
-#stepper motor variables
-pos = [400, 400, 400]   #An array to store the target positions for each stepper motor
 ENA = 17                    #enable pin for the drivers
 # ----------------------------------------------------------------------------------
 
@@ -38,10 +33,7 @@ def setup():
   print("Moving Stepper B to 400")
   stepperB.move_to(400);  # Calculates the required speed for all motors
   stepperB.run_speed_to_position();  # blocks until all steppers reach their target position
-  time.sleep(2)
-  stepperB.move_to(-400);
-  stepperB.run_speed_to_position();
-  time.sleep(2)
+
 
   
 
