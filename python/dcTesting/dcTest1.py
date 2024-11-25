@@ -63,6 +63,7 @@ def setup():
   steppers.move_to([400,400,400])
   steppers.run_speed_to_position(); 
   time.sleep(1)
+  
 
 
 if __name__ == "__main__":
