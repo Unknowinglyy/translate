@@ -27,6 +27,7 @@ def setup():
 
 
     stepper.move_to(400)
+    time.sleep(3)
     print("Setup Complete. Starting loop in 3 seconds.")
 
 def loop():
