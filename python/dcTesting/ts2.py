@@ -17,6 +17,7 @@ def read_touch_coordinates(device_path='/dev/input/event4', timeout=1.0):
     # Read touch events until a valid point is captured or timeout occurs
 
     try:
+        print("READING")
         for event in device.read_one():
             print("hello1")
             if event.type == evdev.ecodes.EV_ABS:
