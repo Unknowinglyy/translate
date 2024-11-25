@@ -37,16 +37,16 @@ ENA = 17
 angOrig = 206.662752199
 
 #speed of the stepper motor and the speed amplifying constant
-speed = [0, 0, 0]
-speedPrev = [0, 0, 0]
-ks = 20
+speed = [0.0, 0.0, 0.0]
+speedPrev = [0.0, 0.0, 0.0]
+ks = float(20)
 
 #touch screen variables
 
 #x offset for the center position of the touchscreen
-xoffset = 500
+xoffset = float(500)
 #y offset for the center position of the touchscreen
-yoffset = 500
+yoffset = float(500)
 
 #PID variables
 
