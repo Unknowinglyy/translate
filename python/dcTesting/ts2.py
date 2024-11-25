@@ -33,12 +33,12 @@ def read_touch_coordinates(device_path='/dev/input/event4', timeout=1.0):
 
                 # Process samples when we have enough
 
-            if len(samples_x) == NUMSAMPLES and len(samples_y) == NUMSAMPLES:
-                # Sort samples to get the median value
-                samples_x.sort()
-                samples_y.sort()
-                x = samples_x[NUMSAMPLES // 2]
-                y = samples_y[NUMSAMPLES // 2]
+                if len(samples_x) == NUMSAMPLES and len(samples_y) == NUMSAMPLES:
+                    # Sort samples to get the median value
+                    samples_x.sort()
+                    samples_y.sort()
+                    x = samples_x[NUMSAMPLES // 2]
+                    y = samples_y[NUMSAMPLES // 2]
 
                 # Return the point with x, y, and z values
                 return Point(x, y, z if z is not None else 0)
