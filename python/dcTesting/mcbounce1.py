@@ -18,13 +18,14 @@ NOTE:
 
 stepperB = AccelStepper(AccelStepper.DRIVER, 23, 24) # Stepper B
 steppers = MultiStepper
-steppers.add_stepper(stepperB)
+
 
 ENA = 17                    #enable pin for the drivers
 # ----------------------------------------------------------------------------------
 def setup():
   #Set iniial maximum speed value for the steppers (steps/sec)
-  stepperB.set_max_speed(500)
+  stepperB.set_max_speed(200)
+  steppers.add_stepper(stepperB)
 
   GPIO.setup(ENA, GPIO.OUT)  
   print("3 Seconds to setup motors")
