@@ -26,7 +26,7 @@ def setup():
     # Change these to suit your stepper if you want
     stepper.set_max_speed(800)
     stepper.set_acceleration(200)
-    stepper.move_to(400)
+    steppers.move_to(400)
     steppers.run_speed_to_position();
     print("Setup Complete. Starting loop in 3 seconds.")
 
