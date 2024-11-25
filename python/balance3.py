@@ -100,6 +100,8 @@ def moveTo(hz, nx, ny):
     if(detected):
         for i in range(3):
             pos[i] = round((angOrig - kinematics.compute_angle(i, hz, nx, ny)) * angToStep)
+
+        print("setting max speed to: " + str(speed[Kinematics.A]) + " " + str(speed[Kinematics.B]) + " " + str(speed[Kinematics.C]))
         
         stepper1.set_max_speed(speed[Kinematics.A])
         stepper2.set_max_speed(speed[Kinematics.B])
