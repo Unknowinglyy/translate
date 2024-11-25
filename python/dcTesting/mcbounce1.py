@@ -43,7 +43,7 @@ def loop():
       print(f"Moving to {-stepperB.current_position()}")
       steppers.move_to([-stepperB.current_position()])
 
-    stepperB.run()
+    steppers.run_speed_to_position()
 
 
   
