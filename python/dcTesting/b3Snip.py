@@ -85,15 +85,16 @@ def moveTo(hz, nx, ny):
     # print("Moving to: " + str(hz) + " " + str(nx) + " " + str(ny))
 
     if(detected):
-        for i in range(3):
+        # compute_angle() returns the angle of each leg in degrees
+        for i in range(3): 
             pos[i] = round((angOrig - kinematics.compute_angle(i, hz, nx, ny)) * angToStep)
         
         print(f"Pos: {pos}")
 
         # Set Speed and Acceleration
-        stepperA.set_max_speed(speed[Kinematics.A])
-        stepperB.set_max_speed(speed[Kinematics.B])
-        stepperC.set_max_speed(speed[Kinematics.C])
+        stepperA.set_max_speed(speed[Kinematics.A] + 0.1)
+        stepperB.set_max_speed(speed[Kinematics.B] + 0.1)
+        stepperC.set_max_speed(speed[Kinematics.C] + 0.1)
 
         stepperA.set_acceleration(speed[Kinematics.A] * 30)
         stepperB.set_acceleration(speed[Kinematics.B] * 30)
