@@ -18,6 +18,7 @@ def read_touch_coordinates(device_path='/dev/input/event4', timeout=1.0):
 
     try:
         for event in device.read_one():
+            print("hello1")
             if event.type == evdev.ecodes.EV_ABS:
                 if event.code == evdev.ecodes.ABS_X or event.code == evdev.ecodes.ABS_MT_POSITION_X:
                     samples_x.append(event.value)
