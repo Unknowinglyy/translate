@@ -39,4 +39,4 @@ def read_touch_coordinates(device_path='/dev/input/event4'):
 
 if __name__ == "__main__":
     point = read_touch_coordinates()
-    print(f"() {point.x}, {point.y})")
+    print(f"({point.x}, {point.y})")
