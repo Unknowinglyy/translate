@@ -9,16 +9,16 @@ class Point:
 
 # Define the original and translated points
 original_points = [
-    (3800, 150),
-    (250, 150),
-    (3800, 3950),
-    (250, 3950)
+    (3900, 100),
+    (100, 100),
+    (3900, 3900),
+    (100, 3900)
 ]
 
 translated_points = [
-    (50, 100),
+    (50, 50),
     (50, 950),
-    (950, 100),
+    (950, 50),
     (950, 950)
 ]
 
