@@ -44,3 +44,4 @@ if __name__ == "__main__":
             print(f"({point.x}, {point.y})")
         except KeyboardInterrupt:
             print("\nExiting...")
+            break
