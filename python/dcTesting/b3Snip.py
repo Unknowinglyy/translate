@@ -7,6 +7,11 @@ from touchScreenBasicCoordOutput import read_touch_coordinates, Point
 from touchScreenTranslatedCoordOutput import transform_coordinates
 from kine2 import Kinematics
 # ----------------------------------------------------------------------------------
+'''
+NOTES:
+    - Kinematics A,B,C == 0,1,2
+'''
+# ----------------------------------------------------------------------------------
 # TIME FUNCTIONS:
 start_time = time.perf_counter()
 
@@ -26,7 +31,7 @@ steppers = MultiStepper()
 
 
 pos = [0, 0, 0]
-ENA = 1
+ENA = 17
 
 
 angOrig   = 206.662752199 #original angle that each leg starts at
@@ -57,8 +62,24 @@ timeI = 0
 #other variables
 angToStep = 3200 / 360 # ~ 8.8889 (8.9 steps per degree)
 
-detected = False
+detected = True
 # ----------------------------------------------------------------------------------
+def setup():
+    steppers.add_stepper(stepperA)
+    steppers.add_stepper(stepperB)
+    steppers.add_stepper(stepperC)
+
+    # setup enable pin and allow time to manually reset
+    GPIO.setup(ENA, GPIO.OUT)
+    GPIO.output(ENA, GPIO.HIGH)
+    time.sleep(1)
+
+    # turn on motors
+    GPIO.output(ENA, GPIO.LOW)
+    moveTo(4.25, 0, 0)
+
+    steppers.run_speed_to_position()
+
 def moveTo(hz, nx, ny):
     global detected
     # print("Moving to: " + str(hz) + " " + str(nx) + " " + str(ny))
@@ -67,6 +88,9 @@ def moveTo(hz, nx, ny):
         for i in range(3):
             pos[i] = round((angOrig - kinematics.compute_angle(i, hz, nx, ny)) * angToStep)
         
+        print(f"Pos: {pos}")
+
+        # Set Speed and Acceleration
         stepperA.set_max_speed(speed[Kinematics.A])
         stepperB.set_max_speed(speed[Kinematics.B])
         stepperC.set_max_speed(speed[Kinematics.C])
@@ -75,11 +99,26 @@ def moveTo(hz, nx, ny):
         stepperB.set_acceleration(speed[Kinematics.B] * 30)
         stepperC.set_acceleration(speed[Kinematics.C] * 30)
 
+        # Move to Position
         stepperA.move_to(pos[Kinematics.A])
         stepperB.move_to(pos[Kinematics.B])
         stepperC.move_to(pos[Kinematics.C])
 
-        # print(f"stepperA max_speed {speed[Kinematics.A]}, acceleration {speed[kinematics.A]}, move_to {pos[Kinematics.A]}")stepperB
+        print(f"""
+        Stepper A:
+            Max Speed: {speed[Kinematics.A]}
+            Acceleration: {speed[Kinematics.A] * 30}
+            Move To: {pos[Kinematics.A]}
+        Stepper B:
+            Max Speed: {speed[Kinematics.B]}
+            Acceleration: {speed[Kinematics.B] * 30}
+            Move To: {pos[Kinematics.B]}
+        Stepper C:
+            Max Speed: {speed[Kinematics.C]}
+            Acceleration: {speed[Kinematics.C] * 30}
+            Move To: {pos[Kinematics.C]}
+        """)
+
         stepperA.run()
         stepperB.run()
         stepperC.run()
@@ -94,9 +133,66 @@ def moveTo(hz, nx, ny):
         steppers.move_to(pos)
         steppers.run()
 
+def PID(setpointX, setpointY):
+    global detected
+    print("===================================")
+    print("starting PID")
+    point = read_touch_coordinates()
+    translated_point = transform_coordinates(point.x, point.y)
+    print("read touch coordinates: " + str(translated_point.x) + " " + str(translated_point.y))
+    if(translated_point.x != 0 and translated_point.y != 0):
+        detected = True
+
+        for i in range(2):
+            errorPrev[i] = error[i]
+
+            error[i] = (i == 0) * (xoffset - translated_point.x - setpointX) + (i == 1) * (yoffset - translated_point.y - setpointY)
+            # print(f"Error: {error[i]}")
+            integr[i] += error[i] + errorPrev[i]
+
+            deriv[i] = error[i] - errorPrev[i]
+
+            deriv[i] = 0 if (math.isnan(deriv[i]) or math.isinf(deriv[i])) else deriv[i]
+
+            out[i] = kp * error[i] + ki * integr[i] + kd * deriv[i]
+
+            out[i] = constrain(out[i], -0.25, 0.25)
+
+        for i in range(3):
+            # print(f"speed[{i}] {speed[i]}")
+            speedPrev[i] = speed[i]
+
+            speed[i] = (i == Kinematics.A) * stepperA.current_position() + (i == Kinematics.B) * stepperB.current_position() + (i == Kinematics.C) * stepperC.current_position()
+        
+            speed[i] = abs(speed[i] - pos[i]) * ks
+
+            speed[i] = constrain(speed[i], speedPrev[i] - 200, speedPrev[i] + 200)
+
+            speed[i] = constrain(speed[i], 0, 1000)
+
+        print("X OUT: " + str(out[0]) + " Y OUT: " + str(out[1]) + " Speed A: " + str(speed[Kinematics.A]))
+    else:
+        #delay by 10 ms to double check that there is no ball
+        time.sleep(0.1)
+        point = read_touch_coordinates()
+        translated_point = transform_coordinates(point.x, point.y)
+        if(translated_point.x == 0 and translated_point.y == 0):
+            detected = False
+            print("No ball detected")
+
+    # continues moving platform and waits until 20 milliseconds have elapsed
+    timeI = millis() # Convert to milliseconds
+    while (millis() - timeI < 20):
+        moveTo(4.25, -out[0], -out[1])  # moves the platform
 
 
-
-
-
+if __name__ == "__main__":
+    try:
+        setup()
+        time.sleep(2)
+    except KeyboardInterrupt:
+        print("Program stopped by user")
+    finally:
+        GPIO.cleanup()
+        print("GPIO cleaned up")
         
