@@ -10,7 +10,7 @@ import math
 ENA = 17
 
 # Constants and Parameters
-CENTER_X, CENTER_Y = 250, 3940  # Touchscreen center offsets
+CENTER_X, CENTER_Y = 3800, 150  # Touchscreen center offsets
 angOrig = 220                    # Original angle
 angToStep = 1600 / 360           # Steps per degree
 ks = 20                          # Speed amplifying constant
