@@ -1,4 +1,4 @@
-import evdev 
+import evdev
 
 class Point:
     def __init__(self, x, y, z=0):
