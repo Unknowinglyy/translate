@@ -2,13 +2,20 @@ import time
 import random
 from accelstepper import AccelStepper
 import RPi.GPIO as GPIO
+# ----------------------------------------------------------------------------------
+# TIME FUNCTIONS:
+start_time = time.perf_counter()
 
-# Define GPIO pins for the stepper motor
+def millis():
+    return int((time.perf_counter() - start_time) * 1000)
+
+def constrain(value, minn, maxn):
+  return max(min(maxn, value), minn)
+# ----------------------------------------------------------------------------------
+# Setup one motor:
 STEP_PIN = 23
-DIR_PIN = 24
-ENA_PIN = 17
-
-# Initialize the stepper motor
+DIR_PIN  = 24
+ENA_PIN  = 17
 stepper = AccelStepper(AccelStepper.DRIVER, STEP_PIN, DIR_PIN)
 
 def setup():
@@ -22,7 +29,7 @@ def loop():
             # Random change to speed, position, and acceleration
             # Make sure we don't get 0 speed or acceleration
             time.sleep(1)
-            stepper.move_to(random.randint(100, 200))
+            stepper.move_to(random.randint(10, 20))
             stepper.set_max_speed(random.randint(1, 200) * 5)
             stepper.set_acceleration(random.randint(1, 200))
         stepper.run()
