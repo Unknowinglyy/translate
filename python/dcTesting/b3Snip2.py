@@ -152,6 +152,7 @@ def PID(setpointX, setpointY):
     print("===================================")
     print("starting PID")
     point = read_touch_coordinates()
+    print("read touch coordinates: " + str(point.x) + " " + str(point.y))
     translated_point = transform_coordinates(point.x, point.y)
     print("read touch coordinates: " + str(translated_point.x) + " " + str(translated_point.y))
     if(translated_point.x != 0 and translated_point.y != 0):
@@ -209,13 +210,13 @@ if __name__ == "__main__":
         setup()
         print("Setup Complete")
         time.sleep(2)
-        print("Moving to 400")
-        steppers.move_to([400,400,400])
-        steppers.run_speed_to_position()
-        steppers.move_to([0,0,0])
-        steppers.run_speed_to_position()
-        # while True:
-        #     PID(0, 0)   
+        # print("Moving to 400")
+        # steppers.move_to([400,400,400])
+        # steppers.run_speed_to_position()
+        # steppers.move_to([0,0,0])
+        # steppers.run_speed_to_position()
+        while True:
+            PID(0, 0)   
     except KeyboardInterrupt:
         print("Program stopped by user")
     finally:
