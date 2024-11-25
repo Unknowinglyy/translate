@@ -22,8 +22,8 @@ def loop():
             # Random change to speed, position, and acceleration
             # Make sure we don't get 0 speed or acceleration
             time.sleep(1)
-            stepper.move_to(random.randint(0, 200))
-            stepper.set_max_speed(random.randint(1, 200))
+            stepper.move_to(random.randint(100, 200))
+            stepper.set_max_speed(random.randint(1, 200) * 5)
             stepper.set_acceleration(random.randint(1, 200))
         stepper.run()
 
