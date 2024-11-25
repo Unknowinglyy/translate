@@ -211,7 +211,9 @@ if __name__ == "__main__":
         time.sleep(2)
         print("Moving to 400")
         steppers.move_to([400,400,400])
+        steppers.run_speed_to_position()
         steppers.move_to([0,0,0])
+        steppers.run_speed_to_position()
         # while True:
         #     PID(0, 0)   
     except KeyboardInterrupt:
