@@ -209,6 +209,7 @@ if __name__ == "__main__":
         setup()
         print("Setup Complete")
         time.sleep(2)
+        print("Moving to 400")
         steppers.move_to([400,400,400])
         steppers.move_to([0,0,0])
         # while True:
