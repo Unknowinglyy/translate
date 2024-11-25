@@ -142,6 +142,7 @@ def PID(setpointX, setpointY):
     print("===================================")
     print("starting PID")
     x, y, z = get_touch_point()
+    print(f"Touch point - X: {x}, Y: {y}, Z: {z}")
     if(x != 0):
         detected = True
 
@@ -177,6 +178,7 @@ def PID(setpointX, setpointY):
         #delay by 10 ms to double check that there is no ball
         time.sleep(0.1)
         x, y, z = get_touch_point()
+        print(f"Touch point - X: {x}, Y: {y}, Z: {z}")
         if(x == 0):
             detected = False
             print("No ball detected")
