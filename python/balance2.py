@@ -14,7 +14,7 @@ CENTER_X, CENTER_Y = 500, 500  # Touchscreen center offsets
 angOrig = 220                    # Original angle
 angToStep = 1200 / 360           # Steps per degree
 ks = 20                          # Speed amplifying constant
-kp, ki, kd = 1, 0, 0    # PID constants
+kp, ki, kd = .0005, 0, 0    # PID constants
 
 # Global variables for PID control
 error = [0, 0]  # Error for X and Y axes
@@ -52,7 +52,7 @@ stepper3 = AccelStepper(AccelStepper.DRIVER, 23, 24)
 # Configure stepper motor speeds and accelerations
 for stepper in [stepper1, stepper2, stepper3]:
     stepper.set_max_speed(800)  # Adjust as needed
-    stepper.set_acceleration(2400)  # Adjust as needed
+    stepper.set_acceleration(1000)  # Adjust as needed
 
 # Create a MultiStepper instance
 multi_stepper = MultiStepper()
@@ -78,7 +78,7 @@ def move_to(hz, nx, ny):
     # Move all motors concurrently to the calculated positions
     multi_stepper.move_to(target_positions)
     while multi_stepper.run():
-        time.sleep(0.0001)  # Allow motors to run concurrently
+        time.sleep(0.001)  # Allow motors to run concurrently
 
 def pid_control(setpoint_x, setpoint_y):
     global detected, error, error_prev, integr, deriv, out, pos
