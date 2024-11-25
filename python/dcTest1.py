@@ -37,7 +37,7 @@ def setup():
   #Enable pin
   GPIO.setup(ENA, GPIO.OUT)  #define enable pin as output
   
-  GPIO.output(ENA, LOW)      #set enable pin low to enable the drivers
+  GPIO.output(ENA, GPIO.LOW)      #set enable pin low to enable the drivers
 
   print("3 Seconds to setup motors")
   time.sleep(3)             #small delay to allow the user to reset the platform
