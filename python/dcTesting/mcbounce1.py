@@ -36,7 +36,7 @@ def setup():
 
 def loop():
   print(f"Moving to {400}")
-  steppers.move_to([400])
+  steppers.move_to([200])
 
   while True:
     if stepperB.distance_to_go() == 0:
