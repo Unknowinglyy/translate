@@ -3,14 +3,14 @@ from accelstepper import AccelStepper
 from multistepper import MultiStepper
 import RPi.GPIO as GPIO
 from kine2 import Kinematics  # Import the Kinematics class
-from touchScreenBasicCoordOutput import *
+from touchScreenTranslatedCoordOutput import *
 import math
 
 # Define GPIO pins for the stepper motor
 ENA = 17
 
 # Constants and Parameters
-CENTER_X, CENTER_Y = 3800, 150  # Touchscreen center offsets
+CENTER_X, CENTER_Y = 250, 150  # Touchscreen center offsets
 angOrig = 220                    # Original angle
 angToStep = 1600 / 360           # Steps per degree
 ks = 20                          # Speed amplifying constant
@@ -83,7 +83,8 @@ def pid_control(setpoint_x, setpoint_y):
     orig_point = read_coordinates()
     if orig_point is not None:
         # Transform to translated coordinates
-        point = transform_coordinates(orig_point.x, orig_point.y)
+        # point = transform_coordinates(orig_point.x, orig_point.y)
+        point = orig_point
         debug_log(f"Point: ({point.x}, {point.y})")
 
         if point.x != 0 and point.y != 0:
