@@ -44,6 +44,7 @@ def loop():
         if stepper.distance_to_go() == 0:
             print(f"Moving to {-stepper.current_position()}")
             stepper.move_to(-stepper.current_position())
+            steppers.run_speed_to_position();
         stepper.run()
 
 if __name__ == "__main__":
