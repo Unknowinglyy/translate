@@ -36,6 +36,8 @@ def read_touch_coordinates(device_path='/dev/input/event4'):
 
                 # Return the point with x, y, and z values
                 return Point(x, y, z if z is not None else 0)
+        else:
+            return Point(0, 0)
 
 if __name__ == "__main__":
     while True:

@@ -25,8 +25,8 @@ kinematics = Kinematics(2, 3.125, 1.75, 3.669291339)
 # ----------------------------------------------------------------------------------
 # SETUP MOTORS:
 stepperA = AccelStepper(AccelStepper.DRIVER, 20, 21) # Stepper located btwn two corners
-stepperB = AccelStepper(AccelStepper.DRIVER, 5, 6)
-stepperC = AccelStepper(AccelStepper.DRIVER, 23, 24)
+stepperB = AccelStepper(AccelStepper.DRIVER, 5, 6)   # Motor 3
+stepperC = AccelStepper(AccelStepper.DRIVER, 23, 24) # Motor 1
 steppers = MultiStepper()
 
 
@@ -193,6 +193,7 @@ def PID(setpointX, setpointY):
         if(translated_point.x == 0 and translated_point.y == 0):
             detected = False
             print("No ball detected")
+            steppers.move_to([0,0,0])
 
     # continues moving platform and waits until 20 milliseconds have elapsed
     timeI = millis() # Convert to milliseconds
@@ -208,8 +209,10 @@ if __name__ == "__main__":
         setup()
         print("Setup Complete")
         time.sleep(2)
-        while True:
-            PID(0, 0)   
+        steppers.move_to([400,400,400])
+        steppers.move_to([0,0,0])
+        # while True:
+        #     PID(0, 0)   
     except KeyboardInterrupt:
         print("Program stopped by user")
     finally:
