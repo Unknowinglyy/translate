@@ -104,7 +104,8 @@ def moveTo(hz, nx, ny):
         for i in range(3):
             pos[i] = round((angOrig - machine.theta(i, hz, nx, ny)) * angToStep)
             print(f"Motor {i} target position: {pos[i]}")
-        
+
+        print("setting max speed to " + str(speed[A]) + " " + str(speed[B]) + " " + str(speed[C]))
         stepper1.set_max_speed(speed[A])
         stepper2.set_max_speed(speed[B])
         stepper3.set_max_speed(speed[C])
