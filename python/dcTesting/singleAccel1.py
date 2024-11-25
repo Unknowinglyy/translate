@@ -36,6 +36,7 @@ def setup():
     stepper.set_max_speed(800)
     stepper.set_acceleration(20)
     stepper.move_to(400)
+    steppers.run_speed_to_position();
 
 def loop():
     while True:
