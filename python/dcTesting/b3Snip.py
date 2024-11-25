@@ -92,13 +92,13 @@ def moveTo(hz, nx, ny):
         print(f"Pos: {pos}")
 
         # Set Speed and Acceleration
-        stepperA.set_max_speed(speed[Kinematics.A] + 0.1)
-        stepperB.set_max_speed(speed[Kinematics.B] + 0.1)
-        stepperC.set_max_speed(speed[Kinematics.C] + 0.1)
+        stepperA.set_max_speed(speed[Kinematics.A] + 5)
+        stepperB.set_max_speed(speed[Kinematics.B] + 5)
+        stepperC.set_max_speed(speed[Kinematics.C] + 5)
 
-        stepperA.set_acceleration(speed[Kinematics.A] * 30)
-        stepperB.set_acceleration(speed[Kinematics.B] * 30)
-        stepperC.set_acceleration(speed[Kinematics.C] * 30)
+        stepperA.set_acceleration(5 + speed[Kinematics.A] * 30)
+        stepperB.set_acceleration(5 + speed[Kinematics.B] * 30)
+        stepperC.set_acceleration(5 + speed[Kinematics.C] * 30)
 
         # Move to Position
         stepperA.move_to(pos[Kinematics.A])
