@@ -80,6 +80,7 @@ def setup():
 
     steppers.run_speed_to_position()
 
+
 def moveTo(hz, nx, ny):
     global detected
     # print("Moving to: " + str(hz) + " " + str(nx) + " " + str(ny))

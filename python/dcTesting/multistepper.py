@@ -41,8 +41,7 @@ class MultiStepper:
             if self._steppers[i].distance_to_go() != 0:
                 self._steppers[i].run_speed()
                 running = True
-            #might not be needed
-            else:
+            else: #might not be needed
                 self._steppers[i].set_current_position(self._steppers[i].current_position())
         return running
 

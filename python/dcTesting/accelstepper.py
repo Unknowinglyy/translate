@@ -401,6 +401,7 @@ class AccelStepper:
             else:
                 self.move(-stepsToStop)
 
+
     def is_running(self):
         return not (self._speed == 0.0 and self._targetPos == self._currentPos)
     
