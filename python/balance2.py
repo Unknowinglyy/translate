@@ -12,7 +12,7 @@ ENA = 17
 # Constants and Parameters
 CENTER_X, CENTER_Y = 500, 500  # Touchscreen center offsets
 angOrig = 220                    # Original angle
-angToStep = 1600 / 360           # Steps per degree
+angToStep = 1200 / 360           # Steps per degree
 ks = 20                          # Speed amplifying constant
 kp, ki, kd = 1, 0, 0    # PID constants
 
@@ -37,10 +37,13 @@ GPIO.output(ENA, GPIO.LOW)
 # Initialize stepper motors
 '''
 hardware wiring:
-    motor 1: 23 24 C
-    motor 2: 20 21 A
-    motor 3: 5 6 B
-working for when ribbon is right of stepper 2: 5 6 , 20 21 , 23 24
+    motor 1: 23 24
+    motor 2: 20 21
+    motor 3: 5 6
+working: 
+    A: 20 21
+    B: 5 6
+    C: 23 24
 '''
 stepper1 = AccelStepper(AccelStepper.DRIVER, 20, 21) 
 stepper2 = AccelStepper(AccelStepper.DRIVER, 5, 6)
