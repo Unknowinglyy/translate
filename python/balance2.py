@@ -10,7 +10,7 @@ import math
 ENA = 17
 
 # Constants and Parameters
-CENTER_X, CENTER_Y = 500, 500  # Touchscreen center offsets
+CENTER_X, CENTER_Y = 50, 50  # Touchscreen center offsets
 angOrig = 206                    # Original angle
 angToStep = 1100 / 360           # Steps per degree
 ks = 20                          # Speed amplifying constant
@@ -37,13 +37,13 @@ GPIO.output(ENA, GPIO.LOW)
 # Initialize stepper motors
 '''
 hardware wiring:
-    motor 1: 23 24
-    motor 2: 20 21
-    motor 3: 5 6
+    motor 1: 23 24 C
+    motor 2: 20 21 A
+    motor 3: 5 6 B
 working for when ribbon is right of stepper 2: 5 6 , 20 21 , 23 24
 '''
-stepper1 = AccelStepper(AccelStepper.DRIVER, 5, 6) 
-stepper2 = AccelStepper(AccelStepper.DRIVER, 20, 21)
+stepper1 = AccelStepper(AccelStepper.DRIVER, 20, 21) 
+stepper2 = AccelStepper(AccelStepper.DRIVER, 5, 6)
 stepper3 = AccelStepper(AccelStepper.DRIVER, 23, 24)
 
 # Configure stepper motor speeds and accelerations
@@ -84,8 +84,8 @@ def pid_control(setpoint_x, setpoint_y):
     orig_point = read_coordinates()
     if orig_point is not None:
         # Transform to translated coordinates
-        # point = transform_coordinates(orig_point.x, orig_point.y)
-        point = orig_point
+        point = transform_coordinates(orig_point.x, orig_point.y)
+        # point = orig_point
         debug_log(f"Point: ({point.x}, {point.y})")
 
         if point.x != 0 and point.y != 0:
