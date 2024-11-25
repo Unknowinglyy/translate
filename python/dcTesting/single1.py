@@ -35,9 +35,9 @@ def setup():
 
 
   #Movemement
-  stepperB.move_to(100);  # Calculates the required speed for all motors
+  stepperB.move_to(400);  # Calculates the required speed for all motors
   time.sleep(2)
-  stepperB.move_to(-100);
+  stepperB.move_to(-400);
   time.sleep(2)
 
   
