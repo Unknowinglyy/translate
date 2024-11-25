@@ -37,6 +37,7 @@ def setup():
     stepper.set_acceleration(20)
     stepper.move_to(400)
     steppers.run_speed_to_position();
+    print("Setup Complete. Starting loop in 3 seconds.")
 
 def loop():
     while True:
@@ -50,8 +51,6 @@ def loop():
 if __name__ == "__main__":
     try:
         setup()
-        time.sleep(3)
-        print("Setup Complete. Starting loop in 3 seconds.")
         loop()
     except KeyboardInterrupt:
         print("Program stopped by user")
