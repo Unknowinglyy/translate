@@ -28,8 +28,8 @@ def loop():
         if stepper.distance_to_go() == 0:
             # Random change to speed, position, and acceleration
             time.sleep(1)
-            stepper.move_to(random.randint(10, 11))
-            stepper.set_max_speed(random.randint(1, 200) * 5)
+            stepper.move_to(random.randint(10, 400))
+            stepper.set_max_speed(random.randint(500, 800))
             stepper.set_acceleration(random.randint(1, 200))
         stepper.run()
 

@@ -145,8 +145,8 @@ class AccelStepper:
         self._stepInterval = self._cn
         self._speed = 1000000.0 / self._cn 
 
-        print(f"FROM ACCELSTEPPER: SPEED = {self._speed}")
-        
+        # print(f"FROM ACCELSTEPPER: SPEED = {self._speed}")
+
         if(self._direction == self.DIRECTION_CCW):
             self._speed = -self._speed
         return self._stepInterval

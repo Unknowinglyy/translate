@@ -25,20 +25,39 @@ def setup():
   #Set iniial maximum speed value for the steppers (steps/sec)
   stepperB.set_max_speed(800)
 
+
+  # Adding the steppers to the steppersControl instance for multi stepper control
+  steppers.add_stepper(stepperB)
+
+
   #Enable pin
   GPIO.setup(ENA, GPIO.OUT)  #define enable pin as output
-
-  print("3 Seconds to setup motors")
-  time.sleep(3)             #small delay to allow the user to reset the platform
   
   GPIO.output(ENA, GPIO.LOW)      #set enable pin low to enable the drivers
 
+  print("3 Seconds to setup motors")
+  time.sleep(3)             #small delay to allow the user to reset the platform
+
 
   #Movemement
-  stepperB.move_to(100);  # Calculates the required speed for all motors
-  time.sleep(2)
-  stepperB.move_to(-100);
-  time.sleep(2)
+  steppers.move_to([100,100,100]);  # Calculates the required speed for all motors
+  steppers.run_speed_to_position();  # blocks until all steppers reach their target position
+  time.sleep(1)
+  steppers.move_to([200,200,200]);  
+  steppers.run_speed_to_position();  
+  time.sleep(1)
+  steppers.move_to([100,100,100]);  
+  steppers.run_speed_to_position();  
+  time.sleep(1)
+  steppers.move_to([0,0,0]);  
+  steppers.run_speed_to_position();  
+  time.sleep(1)
+  steppers.move_to([100,100,100]);  
+  steppers.run_speed_to_position();  
+  time.sleep(1)
+  steppers.move_to([0,0,0]);  
+  steppers.run_speed_to_position();  
+  time.sleep(1)
 
   
 
