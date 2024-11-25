@@ -190,6 +190,7 @@ def PID(setpointX, setpointY):
 if __name__ == "__main__":
     try:
         setup()
+        print("Setup Complete")
         time.sleep(2)
     except KeyboardInterrupt:
         print("Program stopped by user")
