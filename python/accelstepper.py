@@ -4,14 +4,26 @@ import time
 
 GPIO.setmode(GPIO.BCM)
 
-def constrain(value, minn, maxn):
-    return max(min(maxn, value), minn)
+start_time = time.perf_counter()
 
 def micros():
-  """
-  Mymics the Arduino micros() function.
-  """
-  return int(time.time() * 1000000)
+    """
+    Mimics Arduino micros() using high-precision timer.
+    """
+    return int((time.perf_counter() - start_time) * 1_000_000)
+
+def constrain(value, minn, maxn):
+    if value < minn:
+        return minn
+    elif value > maxn:
+        return maxn
+    else:
+        return value
+
+def delayMicroseconds(microseconds):
+    start = time.perf_counter()
+    while (time.perf_counter() - start) < (microseconds / 1_000_000):
+        pass
 
 class AccelStepper:
 
@@ -26,50 +38,13 @@ class AccelStepper:
     DIRECTION_CCW = 0
     DIRECTION_CW = 1
 
-    #do we need to translate this?
-    '''AccelStepper::AccelStepper(void (*forward)(), void (*backward)())
-    {
-        _interface = 0;
-        _currentPos = 0;
-        _targetPos = 0;
-        _speed = 0.0;
-        _maxSpeed = 0.0;
-        _acceleration = 0.0;
-        _sqrt_twoa = 1.0;
-        _stepInterval = 0;
-        _minPulseWidth = 1;
-        _enablePin = 0xff;
-        _lastStepTime = 0;
-        _pin[0] = 0;
-        _pin[1] = 0;
-        _pin[2] = 0;
-        _pin[3] = 0;
-        _forward = forward;
-        _backward = backward;
-
-        // NEW
-        _n = 0;
-        _c0 = 0.0;
-        _cn = 0.0;
-        _cmin = 1.0;
-        _direction = DIRECTION_CCW;
-
-        int i;
-        for (i = 0; i < 4; i++)
-        _pinInverted[i] = 0;
-        // Some reasonable default
-        setAcceleration(1);
-        setMaxSpeed(1);
-    }
-    '''
-
-    def __init__(self, interface, pin1, pin2, pin3=None, pin4=None, enable_pin=False, enable=True):
+    def __init__(self, interface, pin1, pin2, pin3=None, pin4=None, enable=True):
         self._interface = interface
         self._currentPos = 0
         self._targetPos = 0
-        self._speed = 0
+        self._speed = 0.0
         self._maxSpeed = 1.0
-        self._acceleration = 0
+        self._acceleration = 0.0
         self._sqrt_twoa = 1.0
         self._stepInterval = 0
         self._minPulseWidth = 1
@@ -145,18 +120,18 @@ class AccelStepper:
         
         if(distance_to > 0):
             if(self._n > 0):
-                if(steps_to_stop >= distance_to or self._direction == self.DIRECTION_CCW):
+                if((steps_to_stop >= distance_to) or self._direction == self.DIRECTION_CCW):
                     self._n = -steps_to_stop
             elif(self._n < 0):
-                if(steps_to_stop < distance_to and self._direction == self.DIRECTION_CW):
+                if((steps_to_stop < distance_to) and self._direction == self.DIRECTION_CW):
                     self._n = -self._n
 
         elif(distance_to < 0):
             if(self._n > 0):
-                if(steps_to_stop >= -distance_to or self._direction == self.DIRECTION_CW):
+                if((steps_to_stop >= -distance_to) or self._direction == self.DIRECTION_CW):
                     self._n = -steps_to_stop
             elif(self._n < 0):
-                if(steps_to_stop < -distance_to and self._direction == self.DIRECTION_CCW):
+                if((steps_to_stop < -distance_to) and self._direction == self.DIRECTION_CCW):
                     self._n = -self._n
         
         if(self._n == 0):
@@ -186,7 +161,7 @@ class AccelStepper:
             self._maxSpeed = speed
             self._cmin = 1000000.0 / speed
             if self._n > 0:
-                self._n = (self._speed * self._speed) / (2.0 * self._acceleration)
+                self._n = ((self._speed * self._speed) / (2.0 * self._acceleration))
                 self.compute_new_speed()
 
     def max_speed(self):
@@ -209,13 +184,16 @@ class AccelStepper:
     def set_speed(self, speed):
         if(self._speed == speed):
             return
+        
         speed = constrain(speed,  -self._maxSpeed, self._maxSpeed)
+
         if(speed == 0.0):
             self._stepInterval = 0
         else:
             self._stepInterval = abs(1000000.0 / speed)
             self._direction = self.DIRECTION_CW if speed > 0.0 else self.DIRECTION_CCW
-            self._speed = speed
+
+        self._speed = speed
 
     def speed(self):
         return self._speed
@@ -259,7 +237,7 @@ class AccelStepper:
             #step and direction pins
             if self._pin[i] is not None:
                 #print("setting up pin: ", self._pin[i])
-                GPIO.output(self._pin[i], GPIO.HIGH if mask & (1 << i) else GPIO.LOW)
+                GPIO.output(self._pin[i], (GPIO.HIGH ^ self._pinInverted[i]) if mask & (1 << i) else (GPIO.LOW ^ self._pinInverted[i]))
                 #print("outputting: ", GPIO.HIGH if mask & (1 << i) else GPIO.LOW)
     
     def step0(self, step):
@@ -279,7 +257,7 @@ class AccelStepper:
         self.set_output_pins(0b11 if self._direction else 0b01)
         #there is a 200ns setup time
         #delay the minimum allowed pulse width
-        time.sleep(self._minPulseWidth / 1_000_000)
+        delayMicroseconds(self._minPulseWidth)
         #step low
         self.set_output_pins(0b10 if self._direction else 0b00)
 
@@ -354,7 +332,7 @@ class AccelStepper:
         self.set_output_pins(0)
         if(self._enablePin != 0xff):
             GPIO.setup(self._enablePin, GPIO.OUT)
-            GPIO.output(self._enablePin, GPIO.LOW if not self._enableInverted else GPIO.HIGH)
+            GPIO.output(self._enablePin, GPIO.LOW ^ self._enableInverted)
 
     def enable_outputs(self):
         if (not self._interface):
@@ -368,7 +346,7 @@ class AccelStepper:
             GPIO.setup(self._pin[2], GPIO.OUT)
         if (self._enablePin != 0xff):
             GPIO.setup(self._enablePin, GPIO.OUT)
-            GPIO.output(self._enablePin, GPIO.HIGH if not self._enableInverted else GPIO.LOW)
+            GPIO.output(self._enablePin, GPIO.HIGH ^ self._enableInverted)
 
     def set_min_pulse_width(self, minWidth):
         self._minPulseWidth = minWidth
@@ -378,12 +356,12 @@ class AccelStepper:
 
         if self._enablePin != 0xff:
             GPIO.setup(self._enablePin, GPIO.OUT)
-            GPIO.output(self._enablePin, GPIO.HIGH if self._enableInverted else GPIO.LOW)
+            GPIO.output(self._enablePin, GPIO.HIGH ^ self._enableInverted)
 
 
     def set_pins_inverted(self, directionInvert, stepInvert, enableInvert):
-        self._pinInverted[0] = directionInvert
-        self._pinInverted[1] = stepInvert
+        self._pinInverted[0] = stepInvert
+        self._pinInverted[1] = directionInvert
         self._enableInverted = enableInvert
     
     def set_pins_inverted(self, pin1Invert, pin2Invert, pin3Invert, pin4Invert, enableInvert):
@@ -395,7 +373,7 @@ class AccelStepper:
 
     def run_to_position(self):
         while(self.run()):
-            time.sleep(0.0020)
+            #time.sleep(0.0020)
             pass
 
     def run_speed_to_position(self):
@@ -421,7 +399,7 @@ class AccelStepper:
                 self.move(-stepsToStop)
 
     def is_running(self):
-        return (self._speed == 0.0 and self._targetPos == self._currentPos)
+        return not (self._speed == 0.0 and self._targetPos == self._currentPos)
     
     def set_direction(self, direction):
         self._direction = direction
