@@ -10,11 +10,11 @@ import math
 ENA = 17
 
 # Constants and Parameters
-CENTER_X, CENTER_Y = 500, 500  # Touchscreen center offsets
+CENTER_X, CENTER_Y = 50, 50  # Touchscreen center offsets
 angOrig = 220                    # Original angle
 angToStep = 1100 / 360           # Steps per degree
 ks = 20                          # Speed amplifying constant
-kp, ki, kd = 4E-4, 2E-6, 7E-1    # PID constants
+kp, ki, kd = 1, 0, 0    # PID constants
 
 # Global variables for PID control
 error = [0, 0]  # Error for X and Y axes
@@ -35,9 +35,15 @@ GPIO.setup(ENA, GPIO.OUT)
 GPIO.output(ENA, GPIO.LOW)
 
 # Initialize stepper motors
-stepper1 = AccelStepper(AccelStepper.DRIVER, 23, 24)
-stepper2 = AccelStepper(AccelStepper.DRIVER, 5, 6)
-stepper3 = AccelStepper(AccelStepper.DRIVER, 20, 21)
+'''
+hardware wiring:
+    motor 1: 23 24
+    motor 2: 20 21
+    motor 3: 5 6
+'''
+stepper1 = AccelStepper(AccelStepper.DRIVER, 23, 24) 
+stepper2 = AccelStepper(AccelStepper.DRIVER, 20, 21)
+stepper3 = AccelStepper(AccelStepper.DRIVER, 5, 6)
 
 # Configure stepper motor speeds and accelerations
 for stepper in [stepper1, stepper2, stepper3]:
