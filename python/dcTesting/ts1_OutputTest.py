@@ -40,7 +40,10 @@ def read_touch_coordinates(device_path='/dev/input/event4'):
             return Point(0, 0)
 
 if __name__ == "__main__":
-    point = read_touch_coordinates()
-    print(f"({point.x}, {point.y})")
-    
-        
+    while True:
+        try:
+            point = read_touch_coordinates()
+            print(f"({point.x}, {point.y})")
+        except KeyboardInterrupt:
+            print("\nExiting...")
+            break
