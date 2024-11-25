@@ -22,8 +22,8 @@ def setup():
 
 
     # Change these to suit your stepper if you want
-    stepper.set_max_speed(800)
-    stepper.set_acceleration(200)
+    stepper.set_max_speed(100)
+    stepper.set_acceleration(20)
 
 
     stepper.move_to(400)
