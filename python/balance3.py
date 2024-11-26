@@ -29,9 +29,10 @@ print("Done with kinematics")
 #motor A = motor 2 (pins 20 & 21)
 #motor B = motor 3 (pins 5 & 6)
 #motor c = motor 1 (pins 23 & 24)
-stepper3 = AccelStepper(1, 23, 24)
-stepper1 = AccelStepper(1, 20, 21)
-stepper2 = AccelStepper(1, 5, 6)
+
+stepperA = AccelStepper(1, 20, 21)
+stepperB = AccelStepper(1, 5, 6)
+stepperC = AccelStepper(1, 23, 24)
 
 steppers = MultiStepper()
 print("Done with steppers")
@@ -90,9 +91,9 @@ ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
 time.sleep(2)
 
 def setup():
-    steppers.add_stepper(stepper1)
-    steppers.add_stepper(stepper2)
-    steppers.add_stepper(stepper3)
+    steppers.add_stepper(stepperA)
+    steppers.add_stepper(stepperB)
+    steppers.add_stepper(stepperC)
     
     GPIO.setup(ENA, GPIO.OUT)
     #turn motors off
@@ -120,32 +121,32 @@ def moveTo(hz, nx, ny):
             print(f"Motor {i} target position: {pos[i]}")
 
         print("setting max speed to " + str(speed[A]) + " " + str(speed[B]) + " " + str(speed[C]))
-        stepper1.set_max_speed(speed[A])
-        stepper2.set_max_speed(speed[B])
-        stepper3.set_max_speed(speed[C])
+        stepperA.set_max_speed(speed[A])
+        stepperB.set_max_speed(speed[B])
+        stepperC.set_max_speed(speed[C])
 
-        stepper1.set_acceleration(speed[A] * 30)
-        stepper2.set_acceleration(speed[B] * 30)
-        stepper3.set_acceleration(speed[C] * 30)
+        stepperA.set_acceleration(speed[A] * 30)
+        stepperB.set_acceleration(speed[B] * 30)
+        stepperC.set_acceleration(speed[C] * 30)
 
-        stepper1.move_to(pos[A])
-        stepper2.move_to(pos[B])
-        stepper3.move_to(pos[C])
+        stepperA.move_to(pos[A])
+        stepperB.move_to(pos[B])
+        stepperC.move_to(pos[C])
 
         # print(f"Stepper1 max_speed {speed[Kinematics.A]}, acceleration {speed[kinematics.A]}, move_to {pos[Kinematics.A]}")
 
-        stepper1.run()
-        stepper2.run()
-        stepper3.run()
+        stepperA.run()
+        stepperB.run()
+        stepperC.run()
     else:
         print("Ball not detected, moving to original position")
         for i in range(3):
             pos[i] = round((angOrig - machine.theta(i, hz, 0,0)) * angToStep)
             print(f"Motor {i} target position: {pos[i]}")
 
-        stepper1.set_max_speed(800)
-        stepper2.set_max_speed(800)
-        stepper3.set_max_speed(800)
+        stepperA.set_max_speed(800)
+        stepperB.set_max_speed(800)
+        stepperC.set_max_speed(800)
 
         steppers.move_to(pos)
         steppers.run()
@@ -178,7 +179,7 @@ def PID(setpointX, setpointY):
             # print(f"speed[{i}] {speed[i]}")
             speedPrev[i] = speed[i]
 
-            speed[i] = (i == A) * stepper1.current_position() + (i == B) * stepper2.current_position() + (i == C) * stepper3.current_position()
+            speed[i] = (i == A) * stepperA.current_position() + (i == B) * stepperB.current_position() + (i == C) * stepperC.current_position()
         
             speed[i] = abs(speed[i] - pos[i]) * ks
 
