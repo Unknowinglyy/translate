@@ -48,7 +48,7 @@ yoffset = 500
 
 
 # kp = 4E-4
-kp = 1E-4
+kp = .00005
 ki = 2E-6
 # kd = 7E-3
 kd = 7E-3
