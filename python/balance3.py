@@ -15,8 +15,16 @@ C = Machine.C
 
 start_time = time.perf_counter()
 
-def delay(miliseconds):
-    time.sleep(miliseconds / 1000.0)
+def delay(milliseconds):
+    """
+    Mimics the Arduino delay() function with reduced CPU usage.
+    """
+    start_time = time.perf_counter()
+    end_time = start_time + (milliseconds / 1000.0)
+    
+    while time.perf_counter() < end_time:
+        # Sleep briefly to reduce CPU load, but not too long
+        time.sleep(0.001)  # Sleep for 1 ms
 
 def millis():
     return int((time.perf_counter() - start_time) * 1000)
