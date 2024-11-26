@@ -194,6 +194,7 @@ def PID(setpointX, setpointY):
             detected = False
             print("No ball detected")
             steppers.move_to([0,0,0])
+            steppers.run_speed_to_position()
 
     # continues moving platform and waits until 20 milliseconds have elapsed
     timeI = millis() # Convert to milliseconds
