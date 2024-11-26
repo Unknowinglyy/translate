@@ -27,8 +27,8 @@ kinematics = Kinematics(2, 3.125, 1.75, 3.669291339)
 # ----------------------------------------------------------------------------------
 # SETUP MOTORS:
 stepperA = AccelStepper(AccelStepper.DRIVER, 20, 21) # Stepper located btwn two corners
-stepperB = AccelStepper(AccelStepper.DRIVER, 23, 24)   # Motor 3
-stepperC = AccelStepper(AccelStepper.DRIVER, 5, 6) # Motor 1
+stepperB = AccelStepper(AccelStepper.DRIVER, 5, 6)   # Motor 3
+stepperC = AccelStepper(AccelStepper.DRIVER, 23, 24) # Motor 1
 steppers = MultiStepper()
 
 
