@@ -196,7 +196,7 @@ def PID(setpointX, setpointY):
         if(x == 0):
             detected = False
             print("No ball detected")
-            if (steppers.current_position() != [400,400,400]):
+            if (stepperA.current_position() != 0 and stepperB.current_position() != 0 and stepperC.current_position() != 0):
                 steppers.move_to([400, 400, 400])
                 steppers.run_speed_to_position()
 
