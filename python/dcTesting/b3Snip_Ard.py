@@ -28,8 +28,8 @@ kinematics = Kinematics(2, 3.125, 1.75, 3.669291339)
 # ----------------------------------------------------------------------------------
 # SETUP MOTORS:
 stepperA = AccelStepper(AccelStepper.DRIVER, 20, 21) # Stepper located btwn two corners
-stepperB = AccelStepper(AccelStepper.DRIVER, 23, 24)   # Motor 3
-stepperC = AccelStepper(AccelStepper.DRIVER, 5, 6) # Motor 1
+stepperB = AccelStepper(AccelStepper.DRIVER, 5, 6)   # Motor 3
+stepperC = AccelStepper(AccelStepper.DRIVER, 23, 24) # Motor 1
 steppers = MultiStepper()
 
 
@@ -207,7 +207,7 @@ def PID(setpointX, setpointY):
 
     # continues moving platform and waits until 20 milliseconds have elapsed
     timeI = millis() # Convert to milliseconds
-    while (millis() - timeI < 30): # DC - changed from 20 to 5
+    while (millis() - timeI < 10): # DC - changed from 20 to 5
         moveTo(4.25, -out[0], -out[1])  # moves the platform
 
 def loop():
