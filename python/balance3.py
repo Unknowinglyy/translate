@@ -160,7 +160,7 @@ def moveTo(hz, nx, ny):
         steppers.run()
 
 def PID(setpointX, setpointY):
-    global detected
+    global detected, ser
     print("===================================")
     print("starting PID")
     x, y, z = get_touch_point(ser)
