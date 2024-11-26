@@ -189,7 +189,7 @@ def PID(setpointX, setpointY):
         #delay by 10 ms to double check that there is no ball
         time.sleep(0.1)
         
-        x,y,z = get_touch_point
+        x,y,z = get_touch_point()
         if(x == 0):
             detected = False
             print("No ball detected")
