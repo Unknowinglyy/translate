@@ -197,8 +197,8 @@ def PID(setpointX, setpointY):
 
         print("X OUT: " + str(out[0]) + " Y OUT: " + str(out[1]) + " Speed A: " + str(speed[Machine.A]))
     else:
-        #delay by 1 ms to double check that there is no ball
-        delay(1)
+        #delay by 10 ms to double check that there is no ball
+        delay(10)
         x, y, z = get_touch_point(ser)
         print(f"Touch point - X: {x}, Y: {y}, Z: {z}")
         if(x == 0):
