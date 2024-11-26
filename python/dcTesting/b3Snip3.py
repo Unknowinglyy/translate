@@ -154,7 +154,7 @@ def PID(setpointX, setpointY):
     print("starting PID")
     x,y,z = get_touch_point()
     print(f"Touch point - X: {x}, Y: {y}, Z: {z}")
-    if(x != 0 and y!= 0):
+    if(x != 0):
         detected = True
 
         for i in range(2):
@@ -198,7 +198,6 @@ def PID(setpointX, setpointY):
     # continues moving platform and waits until 20 milliseconds have elapsed
     timeI = millis() # Convert to milliseconds
     while (millis() - timeI < 20):
-        print("hello from PID")
         moveTo(4.25, -out[0], -out[1])  # moves the platform
 
 def loop():
