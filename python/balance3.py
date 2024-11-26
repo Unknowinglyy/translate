@@ -14,6 +14,9 @@ C = Machine.C
 
 start_time = time.perf_counter()
 
+def delay(miliseconds):
+    time.sleep(miliseconds / 1000.0)
+
 def millis():
     return int((time.perf_counter() - start_time) * 1000)
 
@@ -86,7 +89,7 @@ def setup():
     GPIO.output(ENA, GPIO.HIGH)
 
     #sleeping for a second to allow the system to settle
-    time.sleep(1)
+    delay(1000)
 
     #turn them on
     GPIO.output(ENA, GPIO.LOW)
@@ -175,8 +178,8 @@ def PID(setpointX, setpointY):
 
         print("X OUT: " + str(out[0]) + " Y OUT: " + str(out[1]) + " Speed A: " + str(speed[Machine.A]))
     else:
-        #delay by 10 ms to double check that there is no ball
-        time.sleep(0.1)
+        #delay by 1 ms to double check that there is no ball
+        delay(1)
         x, y, z = get_touch_point()
         print(f"Touch point - X: {x}, Y: {y}, Z: {z}")
         if(x == 0):
