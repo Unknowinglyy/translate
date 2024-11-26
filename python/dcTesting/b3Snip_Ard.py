@@ -48,7 +48,7 @@ yoffset = 500
 
 
 # kp = 4E-4
-kp = 4E-4
+kp = 1E-4
 ki = 2E-6
 # kd = 7E-3
 kd = 7E-3
@@ -207,7 +207,7 @@ def PID(setpointX, setpointY):
 
     # continues moving platform and waits until 20 milliseconds have elapsed
     timeI = millis() # Convert to milliseconds
-    while (millis() - timeI < 40): # DC - changed from 20 to 5
+    while (millis() - timeI < 30): # DC - changed from 20 to 5
         moveTo(4.25, -out[0], -out[1])  # moves the platform
 
 def loop():
