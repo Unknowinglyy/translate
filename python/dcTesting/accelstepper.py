@@ -383,9 +383,9 @@ class AccelStepper:
         if (self._targetPos == self._currentPos):
             return False
         if (self._targetPos > self._currentPos):
-            self._direction = self.DIRECTION_CWW
+            self._direction = self.DIRECTION_CW
         else:
-            self._direction = self.DIRECTION_CW 
+            self._direction = self.DIRECTION_CWW 
         return self.run_speed()
 
     def run_to_new_position(self, position):
