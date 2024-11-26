@@ -27,11 +27,11 @@ print("Done with kinematics")
 
 
 #motor A = motor 2 (pins 20 & 21)
-#motor B = motor 3 (pins 5 & 6)
-#motor c = motor 1 (pins 23 & 24)
-stepper3 = AccelStepper(1, 23, 24)
+#motor B = motor 1 (pins 23 & 24)
+#motor c = motor 3 (pins 5 & 6)
+stepper2 = AccelStepper(1, 23, 24)
 stepper1 = AccelStepper(1, 20, 21)
-stepper2 = AccelStepper(1, 5, 6)
+stepper3 = AccelStepper(1, 5, 6)
 
 steppers = MultiStepper()
 print("Done with steppers")
