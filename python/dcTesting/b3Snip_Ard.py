@@ -175,6 +175,8 @@ def PID(setpointX, setpointY):
 
             out[i] = constrain(out[i], -0.25, 0.25)
         print(f"Error: {error}")
+
+
         for i in range(3):
             # print(f"speed[{i}] {speed[i]}")
             speedPrev[i] = speed[i]
@@ -202,7 +204,7 @@ def PID(setpointX, setpointY):
 
     # continues moving platform and waits until 20 milliseconds have elapsed
     timeI = millis() # Convert to milliseconds
-    while (millis() - timeI < 20):
+    while (millis() - timeI < .02):
         moveTo(4.25, -out[0], -out[1])  # moves the platform
 
 def loop():
