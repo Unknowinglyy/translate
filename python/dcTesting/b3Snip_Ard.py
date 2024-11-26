@@ -48,10 +48,10 @@ yoffset = 500
 
 
 # kp = 4E-4
-kp = 2E-4
+kp = 4E-4
 ki = 2E-6
 # kd = 7E-3
-kd = 9E-3
+kd = 7E-3
 
 
 error     = [0, 0]
