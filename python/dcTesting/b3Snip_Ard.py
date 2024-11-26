@@ -48,7 +48,7 @@ yoffset = 500
 
 
 # kp = 4E-4
-kp = 4E-4
+kp = .00005
 ki = 2E-6
 # kd = 7E-3
 kd = 7E-3
@@ -201,13 +201,13 @@ def PID(setpointX, setpointY):
         if(x == 0):
             detected = False
             print("No ball detected")
-            if (stepperA.current_position() != 400 and stepperB.current_position() != 400 and stepperC.current_position() != 400):
-                steppers.move_to([400, 400, 400])
-                steppers.run_speed_to_position()
+            # if (stepperA.current_position() != 400 and stepperB.current_position() != 400 and stepperC.current_position() != 400):
+                # steppers.move_to([400, 400, 400])
+                # steppers.run_speed_to_position()
 
     # continues moving platform and waits until 20 milliseconds have elapsed
     timeI = millis() # Convert to milliseconds
-    while (millis() - timeI < 40): # DC - changed from 20 to 5
+    while (millis() - timeI < 25): 
         moveTo(4.25, -out[0], -out[1])  # moves the platform
 
 def loop():
