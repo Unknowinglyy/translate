@@ -3,7 +3,7 @@ import math
 import RPi.GPIO as GPIO
 from accelstepper import AccelStepper
 from multistepper import MultiStepper
-from ts1 import read_touch_coordinates, Point
+# from ts1 import read_touch_coordinates, Point
 from touchScreenTranslatedCoordOutput import transform_coordinates
 from kine2 import Kinematics
 from serial_point import get_touch_point
