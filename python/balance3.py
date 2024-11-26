@@ -26,9 +26,9 @@ machine = Machine(2, 3.125, 1.75, 3.669291339)
 print("Done with kinematics")
 
 
-#motor A = motor 2
-#motor B = motor 3
-#motor c = motor 1
+#motor A = motor 2 (pins 20 & 21)
+#motor B = motor 3 (pins 5 & 6)
+#motor c = motor 1 (pins 23 & 24)
 stepper3 = AccelStepper(1, 23, 24)
 stepper1 = AccelStepper(1, 20, 21)
 stepper2 = AccelStepper(1, 5, 6)
