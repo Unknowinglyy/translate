@@ -15,8 +15,16 @@ C = Machine.C
 
 start_time = time.perf_counter()
 
-def delay(miliseconds):
-    time.sleep(miliseconds / 1000.0)
+def delay(milliseconds):
+    """
+    Mimics the Arduino delay() function with reduced CPU usage.
+    """
+    start_time = time.perf_counter()
+    end_time = start_time + (milliseconds / 1000.0)
+    
+    while time.perf_counter() < end_time:
+        # Sleep briefly to reduce CPU load, but not too long
+        time.sleep(0.001)  # Sleep for 1 ms
 
 def millis():
     return int((time.perf_counter() - start_time) * 1000)
@@ -152,7 +160,7 @@ def moveTo(hz, nx, ny):
         steppers.run()
 
 def PID(setpointX, setpointY):
-    global detected
+    global detected, ser
     print("===================================")
     print("starting PID")
     x, y, z = get_touch_point(ser)
@@ -189,8 +197,8 @@ def PID(setpointX, setpointY):
 
         print("X OUT: " + str(out[0]) + " Y OUT: " + str(out[1]) + " Speed A: " + str(speed[Machine.A]))
     else:
-        #delay by 1 ms to double check that there is no ball
-        delay(1)
+        #delay by 10 ms to double check that there is no ball
+        delay(10)
         x, y, z = get_touch_point(ser)
         print(f"Touch point - X: {x}, Y: {y}, Z: {z}")
         if(x == 0):
