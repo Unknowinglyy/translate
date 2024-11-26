@@ -7,6 +7,7 @@ from touchScreenBasicCoordOutput import read_touch_coordinates, Point
 from touchScreenTranslatedCoordOutput import transform_coordinates
 from kine3 import Machine
 from serial_point import get_touch_point
+import serial
 
 A = Machine.A
 B = Machine.B
@@ -83,6 +84,11 @@ detected = False
 
 print("Done with variables")
 
+ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
+
+#wait for arduino to initailize
+time.sleep(2)
+
 def setup():
     steppers.add_stepper(stepper1)
     steppers.add_stepper(stepper2)
@@ -148,7 +154,7 @@ def PID(setpointX, setpointY):
     global detected
     print("===================================")
     print("starting PID")
-    x, y, z = get_touch_point()
+    x, y, z = get_touch_point(ser)
     print(f"Touch point - X: {x}, Y: {y}, Z: {z}")
     if(x != 0):
         detected = True
@@ -184,7 +190,7 @@ def PID(setpointX, setpointY):
     else:
         #delay by 1 ms to double check that there is no ball
         delay(1)
-        x, y, z = get_touch_point()
+        x, y, z = get_touch_point(ser)
         print(f"Touch point - X: {x}, Y: {y}, Z: {z}")
         if(x == 0):
             detected = False
