@@ -1,6 +1,7 @@
 import time
 import math
 import RPi.GPIO as GPIO
+import serial
 from accelstepper import AccelStepper
 from multistepper import MultiStepper
 # from ts1 import read_touch_coordinates, Point
@@ -64,6 +65,8 @@ timeI = 0
 angToStep = 3200 / 360 # ~ 8.8889 (8.9 steps per degree)
 
 detected = False
+
+ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
 # ----------------------------------------------------------------------------------
 def setup():
     steppers.add_stepper(stepperA)
@@ -152,7 +155,7 @@ def PID(setpointX, setpointY):
     global detected
     print("===================================")
     print("starting PID")
-    x,y,z = get_touch_point()
+    x,y,z = get_touch_point(ser)
     print(f"Touch point - X: {x}, Y: {y}, Z: {z}")
     if(x != 0):
         detected = True
@@ -189,7 +192,7 @@ def PID(setpointX, setpointY):
         #delay by 10 ms to double check that there is no ball
         time.sleep(0.1)
         
-        x,y,z = get_touch_point()
+        x,y,z = get_touch_point(ser)
         if(x == 0):
             detected = False
             print("No ball detected")
