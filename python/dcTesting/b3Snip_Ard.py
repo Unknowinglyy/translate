@@ -18,6 +18,7 @@ NOTES:
 start_time = time.perf_counter()
 
 def millis():
+    # Returns the number of ms since the program started
     return int((time.perf_counter() - start_time) * 1000)
 
 def constrain(value, minn, maxn):
@@ -46,9 +47,11 @@ xoffset = 500
 yoffset = 500
 
 
-kp = 4E-4
+# kp = 4E-4
+kp = 2E-4
 ki = 2E-6
-kd = 7E-3
+# kd = 7E-3
+kd = 9E-3
 
 
 error     = [0, 0]
@@ -204,7 +207,7 @@ def PID(setpointX, setpointY):
 
     # continues moving platform and waits until 20 milliseconds have elapsed
     timeI = millis() # Convert to milliseconds
-    while (millis() - timeI < .02):
+    while (millis() - timeI < 5): # DC - changed from 20 to 5
         moveTo(4.25, -out[0], -out[1])  # moves the platform
 
 def loop():
