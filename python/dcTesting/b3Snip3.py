@@ -156,7 +156,7 @@ def PID(setpointX, setpointY):
     print("===================================")
     print("starting PID")
     x,y,z = get_touch_point(ser)
-    print(f"Touch point - X: {x}, Y: {y}, Z: {z}")
+    # print(f"Touch point - X: {x}, Y: {y}, Z: {z}")
     if(x != 0):
         detected = True
 
@@ -164,7 +164,7 @@ def PID(setpointX, setpointY):
             errorPrev[i] = error[i]
 
             error[i] = (i == 0) * (xoffset - x - setpointX) + (i == 1) * (yoffset - y - setpointY)
-            # print(f"Error: {error[i]}")
+            
             integr[i] += error[i] + errorPrev[i]
 
             deriv[i] = error[i] - errorPrev[i]
@@ -174,7 +174,7 @@ def PID(setpointX, setpointY):
             out[i] = kp * error[i] + ki * integr[i] + kd * deriv[i]
 
             out[i] = constrain(out[i], -0.25, 0.25)
-
+        print(f"Error: {error}")
         for i in range(3):
             # print(f"speed[{i}] {speed[i]}")
             speedPrev[i] = speed[i]
