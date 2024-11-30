@@ -47,7 +47,7 @@ class AccelStepper:
         self._acceleration = 0.0
         self._sqrt_twoa = 1.0
         self._stepInterval = 0
-        self._minPulseWidth = 1
+        self._minPulseWidth = 0.1
         self._enablePin = 0xff
         self._lastStepTime = 0
         self._pin = [pin1, pin2, pin3, pin4]

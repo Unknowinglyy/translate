@@ -1,55 +1,73 @@
 import time
 import math
 import RPi.GPIO as GPIO
+import serial
 from accelstepper import AccelStepper
 from multistepper import MultiStepper
-from touchScreenTranslatedCoordOutput import transform_coordinates, read_coordinates
 from kine2 import Kinematics
 from serial_point import get_touch_point
 
-# Define GPIO pins for the stepper motor
-ENA_PIN = 17
+# ----------------------------------------------------------------------------------
+'''
+NOTES:
+    - Kinematics A,B,C == 0,1,2
+'''
+# ----------------------------------------------------------------------------------
+# TIME FUNCTIONS:
+start_time = time.perf_counter()
 
-# Constants and Parameters
-CENTER_X, CENTER_Y = 500, 500  # Touchscreen center offsets
-BALL_DETECTION_THRESHOLD = 20  # Ball detection range
-angOrig = 206  # Original angle
-angToStep = 1200 / 360  # Steps per degree
-ks = 20  # Speed amplifying constant
-kp, ki, kd = 4E-8, 2E-6, 7E-1  # PID constants
+def millis():
+    # Returns the number of ms since the program started
+    return int((time.perf_counter() - start_time) * 1000)
 
-# Global variables for PID control
-error = [0, 0]  # Error for X and Y axes
-integr = [0, 0]  # Integral term for X and Y axes
-deriv = [0, 0]  # Derivative term for X and Y axes
-out = [0, 0]  # PID output for X and Y axes
-pos = [0, 0, 0]  # Position of each motor
-detected = False  # Ball detection flag
+def constrain(value, minn, maxn):
+    return max(min(maxn, value), minn)
 
-# Kinematics parameters
-d, e, f, g = 2, 3.125, 1.75, 3.669291339
-kinematics = Kinematics(d, e, f, g)
+kinematics = Kinematics(2, 3.125, 1.75, 3.669291339)
+# ----------------------------------------------------------------------------------
+# SETUP MOTORS:
+stepperA = AccelStepper(AccelStepper.DRIVER, 20, 21)  # Stepper located btwn two corners
+stepperB = AccelStepper(AccelStepper.DRIVER, 5, 6)    # Motor 3
+stepperC = AccelStepper(AccelStepper.DRIVER, 23, 24)  # Motor 1
+steppers = MultiStepper()
+
+pos = [0, 0, 0]
+ENA = 17
+
+angOrig = 206.662752199  # Original angle that each leg starts at
+speed = [0, 0, 0]
+speedPrev = [0, 0, 0]
+ks = 20  # Amplifying constant
+
+xoffset = 500
+yoffset = 500
+
+# PID constants
+kp = 6E-4  # Increased proportional gain
+ki = 3E-6  # Increased integral gain
+kd = 5E-3  # Decreased derivative gain
+
+error = [0, 0]
+errorPrev = [0, 0]
+integr = [0, 0]
+deriv = [0, 0]
+
+out = [0, 0]
 
 # Initialize GPIO
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(ENA_PIN, GPIO.OUT)
-GPIO.output(ENA_PIN, GPIO.LOW)
-
-# Initialize stepper motors
-stepper1 = AccelStepper(AccelStepper.DRIVER, 5, 6)
-stepper2 = AccelStepper(AccelStepper.DRIVER, 20, 21)
-stepper3 = AccelStepper(AccelStepper.DRIVER, 23, 24)
+GPIO.setup(ENA, GPIO.OUT)
+GPIO.output(ENA, GPIO.LOW)
 
 # Configure stepper motor speeds and accelerations
-for stepper in [stepper1, stepper2, stepper3]:
+for stepper in [stepperA, stepperB, stepperC]:
     stepper.set_max_speed(800)  # Adjust as needed
     stepper.set_acceleration(30)  # Adjust as needed
 
-# Create a MultiStepper instance
-multi_stepper = MultiStepper()
-multi_stepper.add_stepper(stepper1)
-multi_stepper.add_stepper(stepper2)
-multi_stepper.add_stepper(stepper3)
+# Add steppers to MultiStepper
+steppers.add_stepper(stepperA)
+steppers.add_stepper(stepperB)
+steppers.add_stepper(stepperC)
 
 # Helper Functions
 def debug_log(msg):
@@ -60,25 +78,23 @@ def move_to(hz, nx, ny):
     debug_log(f"move_to called with hz={hz}, nx={nx}, ny={ny}")
 
     target_positions = []
-    for i, stepper in enumerate([stepper1, stepper2, stepper3]):
+    for i, stepper in enumerate([stepperA, stepperB, stepperC]):
         target_angle = kinematics.compute_angle(i, hz, nx, ny)
         pos[i] = round((angOrig - target_angle) * angToStep)  # Calculate position in steps
         target_positions.append(pos[i])
         debug_log(f"Motor {chr(65 + i)}: Target angle={target_angle:.2f}, Steps={pos[i]}")
 
     # Move all motors concurrently to the calculated positions
-    multi_stepper.move_to(target_positions)
-    while multi_stepper.run():
+    steppers.move_to(target_positions)
+    while steppers.run():
         time.sleep(0.001)  # Allow motors to run concurrently
 
 def pid_control(setpoint_x, setpoint_y):
     global detected, error, integr, deriv, out, pos
 
-    # Get touchscreen data (original coordinates)
-    orig_point = read_coordinates()  
-    if orig_point is not None:
-        # Transform to translated coordinates
-        point = transform_coordinates(orig_point.x, orig_point.y)
+    # Get touchscreen data from serial_point
+    point = get_touch_point()
+    if point is not None:
         debug_log(f"Point: ({point.x}, {point.y})")
         
         if point.x != 0 and point.y != 0:
