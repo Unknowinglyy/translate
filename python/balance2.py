@@ -12,7 +12,7 @@ ENA = 17
 # Constants and Parameters
 CENTER_X, CENTER_Y = 500, 500  # Touchscreen center offsets
 angOrig = 206                    # Original angle
-angToStep = 3200 / 360           # Steps per degree
+angToStep = 1400 / 360           # Steps per degree
 ks = 20                          # Speed amplifying constant
 kp, ki, kd = .0004, 0, 0    # PID constants
 
@@ -51,8 +51,8 @@ stepper3 = AccelStepper(AccelStepper.DRIVER, 23, 24)
 
 # Configure stepper motor speeds and accelerations
 for stepper in [stepper1, stepper2, stepper3]:
-    stepper.set_max_speed(8000)  # Adjust as needed
-    stepper.set_acceleration(8000)  # Adjust as needed
+    stepper.set_max_speed(1000)  # Adjust as needed
+    stepper.set_acceleration(1000)  # Adjust as needed
 
 # Create a MultiStepper instance
 multi_stepper = MultiStepper()
