@@ -126,7 +126,12 @@ def balance_ball():
             # Ask the user for 3 numbers
             positions = []
             for i in range(3):
-                pos = float(input(f"Enter position for motor {i+1}: "))
+                if i == 0:
+                    pos = float(input(f"Enter position for motor A: "))
+                elif i == 1:
+                    pos = float(input(f"Enter position for motor B: "))
+                else:
+                    pos = float(input(f"Enter position for motor C: "))
                 positions.append(pos)
             
             # Move the motors to the specified positions
