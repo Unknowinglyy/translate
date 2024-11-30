@@ -4,6 +4,7 @@ from multistepper import MultiStepper
 import RPi.GPIO as GPIO
 from kine2 import Kinematics  # Import the Kinematics class
 from touchScreenTranslatedCoordOutput import *
+from ts2 import *
 import math
 
 # Define GPIO pins for the stepper motor
@@ -86,7 +87,7 @@ def pid_control(setpoint_x, setpoint_y):
     global detected, error, error_prev, integr, deriv, out, pos, prev_point
 
     # Get touchscreen data (original coordinates)
-    orig_point = read_coordinates()
+    orig_point = read_touch_coordinates_with_timeout()
     if orig_point is not None:
         # Transform to translated coordinates
         point = transform_coordinates(orig_point.x, orig_point.y)
@@ -109,14 +110,13 @@ def pid_control(setpoint_x, setpoint_y):
             detected = False
             debug_log("Ball not detected on first check.")
             time.sleep(0.01)  # 10 ms delay
-            orig_point = read_coordinates()  # Check again
+            orig_point = read_touch_coordinates_with_timeout()  # Check again
             if orig_point is None or (orig_point.x == 0 and orig_point.y == 0):
                 detected = False
                 debug_log("Ball not detected on second check.")
     else:
         detected = False
-        pid_control(prev_point["x"], prev_point["y"])  # Use the previous point if the current one is None
-        debug_log("Touchscreen data is None. Reusing previous point.")
+        debug_log("Touchscreen data is None.")
 
     move_to(4.25, -out[0], -out[1])
 
