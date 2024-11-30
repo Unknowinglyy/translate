@@ -198,7 +198,7 @@ class AccelStepper:
             self._stepInterval = 0
         else:
             self._stepInterval = abs(1000000.0 / speed)
-            self._direction = self.DIRECTION_CW if speed > 0.0 else self.DIRECTION_CCW+
+            self._direction = self.DIRECTION_CW if speed > 0.0 else self.DIRECTION_CCW
 
         self._speed = speed
 
