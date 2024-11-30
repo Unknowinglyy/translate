@@ -44,10 +44,11 @@ working:
     A: 20 21            13 19
     B: 5 6
     C: 23 24
-'''
-stepper1 = AccelStepper(AccelStepper.DRIVER, 13, 19) 
-stepper2 = AccelStepper(AccelStepper.DRIVER, 5, 6) 
-stepper3 = AccelStepper(AccelStepper.DRIVER, 23, 24) 
+''' 
+stepper1 = AccelStepper(AccelStepper.DRIVER, 13, 19)   # aka "Motor A"
+stepper2 = AccelStepper(AccelStepper.DRIVER, 5, 6)    # aka "Motor B"
+stepper3 = AccelStepper(AccelStepper.DRIVER, 23, 24)     # aka "Motor C"
+
 
 # Configure stepper motor speeds and accelerations
 for stepper in [stepper1, stepper2, stepper3]:
