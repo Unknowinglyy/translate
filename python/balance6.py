@@ -116,8 +116,7 @@ def pid_control(setpoint_x, setpoint_y):
                 debug_log("Ball not detected on second check.")
     else:
         detected = False
-        pid_control(prev_point["x"], prev_point["y"])  # Use the previous point if the current one is None
-        debug_log("Touchscreen data is None. Reusing previous point.")
+        debug_log("Touchscreen data is None.")
 
     move_to(4.25, -out[0], -out[1])
 
