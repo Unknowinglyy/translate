@@ -6,7 +6,7 @@ import time
 GPIO.setmode(GPIO.BCM)
 #parameters = driver type, step pin, direction pin
 stepper1 = AccelStepper(AccelStepper.DRIVER, 23, 24)
-stepper2 = AccelStepper(AccelStepper.DRIVER, 20, 21)
+stepper2 = AccelStepper(AccelStepper.DRIVER, 13, 19)
 stepper3 = AccelStepper(AccelStepper.DRIVER, 5, 6)
 
 steppers = MultiStepper()
