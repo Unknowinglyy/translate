@@ -1,195 +1,138 @@
 import time
-import math
-import RPi.GPIO as GPIO
 from accelstepper import AccelStepper
 from multistepper import MultiStepper
-from touchScreenTranslatedCoordOutputLoop import *
-from kine2 import Kinematics
-import serial
+import RPi.GPIO as GPIO
+from kine2 import Kinematics  # Import the Kinematics class
+from touchScreenTranslatedCoordOutput import *
+import math
 
-ser = serial.Serial('/dev/ttyACM0', 9600)
-
-def read_coords():
-    
-   
-    return Point(0, -1, -1)
-
-def millis():
-    return int(time.time() * 1000)
-
-def constrain(value, minn, maxn):
-    return max(min(maxn, value), minn)
-
-kinematics = Kinematics(2, 3.125, 1.75, 3.669291339)
-
-print("Done with kinematics")
-
-stepper1 = AccelStepper(AccelStepper.DRIVER, 23, 24)
-stepper2 = AccelStepper(AccelStepper.DRIVER, 20, 21)
-stepper3 = AccelStepper(AccelStepper.DRIVER, 5, 6)
-
-steppers = MultiStepper()
-print("Done with steppers")
-
-# Stores the target positions for each stepper motor
-pos = [0, 0, 0]
-
-# Enable pin for drivers
+# Define GPIO pins for the stepper motor
 ENA = 17
 
-# Original angle that each leg starts at
-angOrig = 206.662752199
+# Constants and Parameters
+CENTER_X, CENTER_Y = 500, 500  # Touchscreen center offsets
+angOrig = 206                    # Original angle
+angToStep = 1100 / 360           # Steps per degree
+ks = 25                          # Speed amplifying constant
+kp, ki, kd = .00036, 0, 0    # PID constants
 
-# Speed of the stepper motor and the speed amplifying constant
-speed = [0, 0, 0]
-speedPrev = [0, 0, 0]
-ks = 20
+# Global variables for PID control
+error = [0, 0]  # Error for X and Y axes
+error_prev = [0, 0]  # Previous error for X and Y axes
+integr = [0, 0]  # Integral term for X and Y axes
+deriv = [0, 0]  # Derivative term for X and Y axes
+out = [0, 0]  # PID output for X and Y axes
+pos = [0, 0, 0]  # Position of each motor
+speed = [0, 0, 0]    # Speed for each motor
+speed_prev = [0, 0, 0]  # Previous speed for each motor
+detected = False  # Ball detection flag
 
-# Touch screen variables
-# X offset for the center position of the touchscreen
-xoffset = 500
-# Y offset for the center position of the touchscreen
-yoffset = 500
+d, e, f, g = 2, 3.125, 1.75, 3.669291339
+kinematics = Kinematics(d, e, f, g)
 
-# PID variables
-# Proportional gain
-kp = 4E-4
-# Integral gain
-ki = 2E-6
-# Derivative gain
-kd = 7E-3
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(ENA, GPIO.OUT)
+GPIO.output(ENA, GPIO.LOW)
 
-# PID constants
-# PID terms for X and Y directions
-error = [0, 0]
-errorPrev = [0, 0]
-integr = [0, 0]
-deriv = [0, 0]
+# Initialize stepper motors
+'''
+hardware wiring:
+    motor 1: 23 24      
+    motor 2: 20 21      13 19
+    motor 3: 5 6
+working: 
+    A: 20 21            13 19
+    B: 5 6
+    C: 23 24
+'''
+stepper1 = AccelStepper(AccelStepper.DRIVER, 13, 19) 
+stepper2 = AccelStepper(AccelStepper.DRIVER, 5, 6) 
+stepper3 = AccelStepper(AccelStepper.DRIVER, 23, 24) 
 
-out = [0, 0]
-# Variable to capture initial times
-timeI = 0
+# Configure stepper motor speeds and accelerations 
+for stepper in [stepper1, stepper2, stepper3]: 
+    stepper.set_max_speed(8000)  # Adjust as needed 
+    stepper.set_acceleration(8000)  # Adjust as needed 
 
-# Other variables
-angToStep = 3200 / 360
+# Create a MultiStepper instance
+multi_stepper = MultiStepper()
+multi_stepper.add_stepper(stepper1)
+multi_stepper.add_stepper(stepper2)
+multi_stepper.add_stepper(stepper3)
 
-detected = False
+prev_point = {"x": 0, "y": 0}  # Previous point for filtering
 
-print("Done with variables")
+# Helper Functions
+def debug_log(msg):
+    print(f"[{time.time():.2f}] {msg}")
 
-def setup():
-    steppers.add_stepper(stepper1)
-    steppers.add_stepper(stepper2)
-    steppers.add_stepper(stepper3)
+def move_to(hz, nx, ny):
+    global pos
+    debug_log(f"move_to called with hz={hz}, nx={nx}, ny={ny}")
 
-    GPIO.setup(ENA, GPIO.OUT)
-    # Turn motors off
-    GPIO.output(ENA, GPIO.HIGH)
+    target_positions = []
+    for i, stepper in enumerate([stepper1, stepper2, stepper3]):
+        target_angle = kinematics.compute_angle(i, hz, nx, ny)
+        pos[i] = round((angOrig - target_angle) * angToStep)  # Calculate position in steps
+        target_positions.append(pos[i])
+        debug_log(f"Motor {chr(65 + i)}: Target angle={target_angle:.2f}, Steps={pos[i]}")
 
-    # Sleeping for a second to allow the system to settle
-    time.sleep(1)
+    # Move all motors concurrently to the calculated positions
+    multi_stepper.move_to(target_positions)
+    while multi_stepper.run():
+        time.sleep(0.005)  # Allow motors to run concurrently
 
-    # Turn them on
-    GPIO.output(ENA, GPIO.LOW)
+def pid_control(setpoint_x, setpoint_y):
+    global detected, error, error_prev, integr, deriv, out, pos, prev_point
 
-    moveTo(4.25, 0, 0)
-
-    steppers.run_speed_to_position()
-
-def moveTo(hz, nx, ny):
-    # print("Moving to: " + str(hz) + " " + str(nx) + " " + str(ny))
-    if detected:
-        for i in range(3):
-            pos[i] = round((angOrig - kinematics.compute_angle(i, hz, nx, ny)) * angToStep)
-        
-        
-        stepper1.set_max_speed(speed[Kinematics.A])
-        stepper2.set_max_speed(speed[Kinematics.B])
-        stepper3.set_max_speed(speed[Kinematics.C])
-
-        stepper1.set_acceleration(speed[Kinematics.A] * 30)
-        stepper2.set_acceleration(speed[Kinematics.B] * 30)
-        stepper3.set_acceleration(speed[Kinematics.C] * 30)
-
-        stepper1.move_to(pos[Kinematics.A])
-        stepper2.move_to(pos[Kinematics.B])
-        stepper3.move_to(pos[Kinematics.C])
-
-        print(f"stepper 1 max speed {speed[Kinematics.A]}, accel, move_to {pos[Kinematics.A]}")
-
-        stepper1.run()
-        stepper2.run()
-        stepper3.run()
-    else:
-        for i in range(3):
-            pos[i] = round((angOrig - kinematics.compute_angle(i, hz, 0, 0)) * angToStep)
-
-        stepper1.set_max_speed(800)
-        stepper2.set_max_speed(800)
-        stepper3.set_max_speed(800)
-
-        steppers.move_to(pos)
-        steppers.run()
-
-def PID(setpointX, setpointY):
-    global detected
-    print("===================================")
-    print("starting PID")
-    point = read_coords()
-    print("read touch coordinates: " + str(point.x) + " " + str(point.y))
-    if point.x != 0:
-        detected = True
-        print("Ball Detected")
-        for i in range(2):
-            errorPrev[i] = error[i]
-
-            error[i] = (i == 0) * (xoffset - point.x - setpointX) + (i == 1) * (yoffset - point.y - setpointY)
-
-            integr[i] += error[i] + errorPrev[i]
-
-            deriv[i] = error[i] - errorPrev[i]
-
-            deriv[i] = 0 if math.isnan(deriv[i]) or math.isinf(deriv[i]) else deriv[i]
-
-            out[i] = kp * error[i] + ki * integr[i] + kd * deriv[i]
-
-            out[i] = constrain(out[i], -0.25, 0.25)
-
-        for i in range(3):
-            speedPrev[i] = speed[i]
-
-            speed[i] = (i == Kinematics.A) * stepper1.current_position() + (i == Kinematics.B) * stepper2.current_position() + (i == Kinematics.C) * stepper3.current_position()
-        
-            speed[i] = abs(speed[i] - pos[i]) * ks
-
-            speed[i] = constrain(speed[i], speedPrev[i] - 200, speedPrev[i] + 200)
-
-            speed[i] = constrain(speed[i], 0, 1000)
-
-        print("X OUT: " + str(out[0]) + " Y OUT: " + str(out[1]) + " Speed A: " + str(speed[Kinematics.A]))
-    else:
-        # Delay by 10 ms to double check that there is no ball
-        time.sleep(0.1)
-        point = read_coords()
-        if point.x == 0:
+    # Get touchscreen data (original coordinates)
+    orig_point = read_coordinates()
+    if orig_point is not None:
+        # Transform to translated coordinates
+        point = transform_coordinates(orig_point.x, orig_point.y)
+        # point = orig_point
+        debug_log(f"Point: ({point.x}, {point.y})")
+        prev_point["x"], prev_point["y"] = point.x, point.y # Store the point in history
+        if point.x != 0 and point.y != 0:
+            detected = True
+            for i in range(2):  # For X and Y axes
+                # Update PID terms
+                error_prev[i] = error[i]
+                error[i] = (CENTER_X - point.x - setpoint_x) if i == 0 else (CENTER_Y - point.y - setpoint_y)
+                integr[i] += error[i] + error_prev[i]
+                deriv[i] = error[i] - error_prev[i]
+                deriv[i] = 0 if math.isnan(deriv[i]) or math.isinf(deriv[i]) else deriv[i]
+                out[i] = kp * error[i] + ki * integr[i] + kd * deriv[i]
+                out[i] = max(min(out[i], 0.25), -0.25)  # Constrain output
+                debug_log(f"PID output {['X', 'Y'][i]}: error={error[i]}, integr={integr[i]}, deriv={deriv[i]}, out={out[i]}")
+        else:
             detected = False
-            print("No ball detected")
+            debug_log("Ball not detected on first check.")
+            time.sleep(0.01)  # 10 ms delay
+            orig_point = read_coordinates()  # Check again
+            if orig_point is None or (orig_point.x == 0 and orig_point.y == 0):
+                detected = False
+                debug_log("Ball not detected on second check.")
+    else:
+        detected = False
+        pid_control(prev_point["x"], prev_point["y"])  # Use the previous point if the current one is None
+        debug_log("Touchscreen data is None. Reusing previous point.")
 
-    # Continues moving platform and waits until 20 milliseconds have elapsed
-    timeI = millis()  # Convert to milliseconds
-    while (millis() - timeI) < 20:
-        moveTo(4.25, -out[0], -out[1])  # Moves the platform
+    move_to(4.25, -out[0], -out[1])
+
+# Main Loop
+def balance_ball():
+    move_to(4.25, 0, 0)
+    debug_log("Starting balance loop...")
+    try:
+        while True:
+            pid_control(0, 0)  # Maintain the ball at the center (0, 0)
+            time.sleep(0.01)  # Adjust delay as needed
+    except KeyboardInterrupt:
+        debug_log("Exiting program...")
+    finally:
+        GPIO.cleanup()  # Clean up GPIO or any other resources
 
 if __name__ == "__main__":
-    try:
-        setup()
-        while True:
-            PID(0, 0)
-            time.sleep(0.2)
-
-    except KeyboardInterrupt:
-        print("Keyboard interrupt")
-    finally:
-        print("cleaning up GPIO")
-        GPIO.cleanup()
-        ser.close()
+    debug_log("Initializing...")
+    balance_ball()
