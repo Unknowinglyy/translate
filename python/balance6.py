@@ -12,7 +12,7 @@ ENA = 17
 # Constants and Parameters
 CENTER_X, CENTER_Y = 500, 500  # Touchscreen center offsets
 angOrig = 206                    # Original angle
-angToStep = 800 / 360           # Steps per degree
+angToStep = 900 / 360           # Steps per degree
 ks = 30                         # Speed amplifying constant
 kp, ki, kd = .00034, 0, 0.0007    # PID constants
 
@@ -122,7 +122,7 @@ def balance_ball():
     move_to(4.25, 0, 0)
     print("Setting up motor offsets...")
     multi_stepper.move_to([400, 0, 400])
-    time.sleep(5)
+    time.sleep(2)
     debug_log("Starting balance loop...")
     try:
         while True:
