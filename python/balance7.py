@@ -118,17 +118,21 @@ def pid_control(setpoint_x, setpoint_y):
 
     move_to(4.25, -out[0], -out[1])
 
-# Main Loop
 def balance_ball():
     try:
-        move_to(4.25, 0, 0)
-        print("Setting up motor offsets...")
-        multi_stepper.move_to([0, 50, 50])
-        multi_stepper.run_speed_to_position()
-        time.sleep(10)
-        multi_stepper.move_to([0, 100, 100])
-        multi_stepper.run_speed_to_position() 
-        time.sleep(10)
+        while True:
+            # Ask the user for 3 numbers
+            positions = []
+            for i in range(3):
+                pos = float(input(f"Enter position for motor {i+1}: "))
+                positions.append(pos)
+            
+            # Move the motors to the specified positions
+            multi_stepper.move_to(positions)
+            multi_stepper.run_speed_to_position()
+            
+            # Optional: Add a small delay to avoid overwhelming the system
+            time.sleep(0.1)
     except KeyboardInterrupt:
         debug_log("Exiting program...")
     finally:
