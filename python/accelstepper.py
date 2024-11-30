@@ -138,7 +138,11 @@ class AccelStepper:
             self._cn = self._c0
             self._direction = self.DIRECTION_CW if distance_to > 0 else self.DIRECTION_CCW
         else:
-            self._cn = self._cn - ((2.0 * self._cn) / ((4.0 * self._n) + 1))
+            if((4.0 * self._n) + 1 != 0):
+                self._cn = self._cn - ((2.0 * self._cn) / ((4.0 * self._n) + 1))
+            else:
+                self._cn = self._cn - ((2.0 * self._cn) / 0.0001)
+                
             self._cn = max(self._cn, self._cmin)
 
         self._n += 1
