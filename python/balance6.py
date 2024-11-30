@@ -14,7 +14,7 @@ ENA = 17
 CENTER_X, CENTER_Y = 500, 500  # Touchscreen center offsets
 angOrig = 206                    # Original angle
 angToStep = 1100 / 360           # Steps per degree
-ks = 25                          # Speed amplifying constant
+ks = 20                          # Speed amplifying constant
 kp, ki, kd = .00036, 0, 0    # PID constants
 
 # Global variables for PID control
