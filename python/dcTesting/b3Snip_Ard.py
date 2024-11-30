@@ -11,6 +11,7 @@ from serial_point import get_touch_point
 # ----------------------------------------------------------------------------------
 '''
 NOTES:
+    - Switch lines to use approproate touchscreen feedback input
     - Kinematics A,B,C == 0,1,2
 '''
 # ----------------------------------------------------------------------------------
