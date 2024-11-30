@@ -52,7 +52,7 @@ stepper3 = AccelStepper(AccelStepper.DRIVER, 23, 24)
 # Configure stepper motor speeds and accelerations
 for stepper in [stepper1, stepper2, stepper3]:
     stepper.set_max_speed(180000)  # Adjust as needed
-    stepper.set_acceleration(100000)  # Adjust as needed
+    stepper.set_acceleration(150000)  # Adjust as needed
 
 # Create a MultiStepper instance
 multi_stepper = MultiStepper()
