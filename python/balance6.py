@@ -121,7 +121,7 @@ def pid_control(setpoint_x, setpoint_y):
 def balance_ball():
     move_to(4.25, 0, 0)
     print("Setting up motor offsets...")
-    stepper3.move_to(800)
+    multi_stepper.move_to([400, 0, 400])
     time.sleep(5)
     debug_log("Starting balance loop...")
     try:
