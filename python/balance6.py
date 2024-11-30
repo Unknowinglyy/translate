@@ -4,7 +4,6 @@ from multistepper import MultiStepper
 import RPi.GPIO as GPIO
 from kine2 import Kinematics  # Import the Kinematics class
 from touchScreenTranslatedCoordOutput import *
-from ts2 import *
 import math
 
 # Define GPIO pins for the stepper motor
@@ -13,9 +12,9 @@ ENA = 17
 # Constants and Parameters
 CENTER_X, CENTER_Y = 500, 500  # Touchscreen center offsets
 angOrig = 206                    # Original angle
-angToStep = 1100 / 360           # Steps per degree
-ks = 20                          # Speed amplifying constant
-kp, ki, kd = .00036, 0, 0.005    # PID constants
+angToStep = 800 / 360           # Steps per degree
+ks = 30                         # Speed amplifying constant
+kp, ki, kd = .00034, 0, 0.0007    # PID constants
 
 # Global variables for PID control
 error = [0, 0]  # Error for X and Y axes
@@ -50,18 +49,16 @@ stepper1 = AccelStepper(AccelStepper.DRIVER, 13, 19)
 stepper2 = AccelStepper(AccelStepper.DRIVER, 5, 6) 
 stepper3 = AccelStepper(AccelStepper.DRIVER, 23, 24) 
 
-# Configure stepper motor speeds and accelerations 
-for stepper in [stepper1, stepper2, stepper3]: 
-    stepper.set_max_speed(8000)  # Adjust as needed 
-    stepper.set_acceleration(8000)  # Adjust as needed 
+# Configure stepper motor speeds and accelerations
+for stepper in [stepper1, stepper2, stepper3]:
+    stepper.set_max_speed(180000)  # Adjust as needed
+    stepper.set_acceleration(150000)  # Adjust as needed
 
 # Create a MultiStepper instance
 multi_stepper = MultiStepper()
 multi_stepper.add_stepper(stepper1)
 multi_stepper.add_stepper(stepper2)
 multi_stepper.add_stepper(stepper3)
-
-prev_point = {"x": 0, "y": 0}  # Previous point for filtering
 
 # Helper Functions
 def debug_log(msg):
@@ -84,16 +81,16 @@ def move_to(hz, nx, ny):
         time.sleep(0.005)  # Allow motors to run concurrently
 
 def pid_control(setpoint_x, setpoint_y):
-    global detected, error, error_prev, integr, deriv, out, pos, prev_point
+    global detected, error, error_prev, integr, deriv, out, pos
 
     # Get touchscreen data (original coordinates)
-    orig_point = read_touch_coordinates_with_timeout()
+    orig_point = read_coordinates()
     if orig_point is not None:
         # Transform to translated coordinates
         point = transform_coordinates(orig_point.x, orig_point.y)
         # point = orig_point
         debug_log(f"Point: ({point.x}, {point.y})")
-        prev_point["x"], prev_point["y"] = point.x, point.y # Store the point in history
+
         if point.x != 0 and point.y != 0:
             detected = True
             for i in range(2):  # For X and Y axes
@@ -110,7 +107,7 @@ def pid_control(setpoint_x, setpoint_y):
             detected = False
             debug_log("Ball not detected on first check.")
             time.sleep(0.01)  # 10 ms delay
-            orig_point = read_touch_coordinates_with_timeout()  # Check again
+            orig_point = read_coordinates()  # Check again
             if orig_point is None or (orig_point.x == 0 and orig_point.y == 0):
                 detected = False
                 debug_log("Ball not detected on second check.")
@@ -123,6 +120,8 @@ def pid_control(setpoint_x, setpoint_y):
 # Main Loop
 def balance_ball():
     move_to(4.25, 0, 0)
+    stepper3.step1(5)
+    time.sleep(5)
     debug_log("Starting balance loop...")
     try:
         while True:
