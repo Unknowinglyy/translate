@@ -124,7 +124,7 @@ def setup():
         positions = []
         for i in range(3):
             user_input = input(f"Enter position for motor {['A', 'B', 'C'][i]} (or 'q' to quit): ")
-            if user_input.lower() == 'q':
+            if user_input == '111':
                 print("Exiting setup...")
                 return  # Exit the setup function
             try:
