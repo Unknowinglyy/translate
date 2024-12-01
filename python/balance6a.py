@@ -12,7 +12,7 @@ ENA = 17
 
 # Constants and Parameters
 CENTER_X, CENTER_Y = 500, 500  # Touchscreen center offsets
-angOrig = 206                    # Original angle
+angOrig = 206.662752199                    # Original angle
 angToStep = 1100 / 360           # Steps per degree
 ks = 30                         # Speed amplifying constant
 kp, ki, kd = .00034, 0.000002, 0.0007    # PID constants
@@ -179,12 +179,10 @@ def setup():
 
 # Main Loop
 def balance_ball():
-    prep_time = 5
-
     move_to(4.25, 0, 0)
-    setup()
-    time.sleep(prep_time)
-    debug_log(f"Starting balance loop in {prep_time} seconds...")
+    
+    
+    
     try:
         while True:
             pid_control(0, 0)  # Maintain the ball at the center (0, 0)
@@ -195,5 +193,14 @@ def balance_ball():
         GPIO.cleanup()  # Clean up GPIO or any other resources
 
 if __name__ == "__main__":
+    prep_time = 5
     debug_log("Initializing...")
+
+    # Setup the motors
+    setup()
+    print(f"Starting balance loop in {prep_time} seconds...")
+    time.sleep(prep_time)
+
+    # Start the balance loop
+    print("Starting balance loop...")
     balance_ball()
