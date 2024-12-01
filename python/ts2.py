@@ -31,7 +31,7 @@ def read_touch_coordinates(device_path='/dev/input/event6'):
     return Point(0, 0)
 
 def read_coordinates(timeout=0.1):
-    result = [None]
+    result = [Point(0, 0)]
 
     def target():
         result[0] = read_touch_coordinates()
