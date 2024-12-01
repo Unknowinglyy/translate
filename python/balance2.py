@@ -51,7 +51,7 @@ stepper3 = AccelStepper(AccelStepper.DRIVER, 23, 24)
 
 # Configure stepper motor speeds and accelerations
 for stepper in [stepper1, stepper2, stepper3]:
-    stepper.set_max_speed(180000)  # Adjust as needed
+    stepper.set_max_speed(1000)  # Adjust as needed
     stepper.set_acceleration(150000)  # Adjust as needed
 
 # Create a MultiStepper instance
@@ -65,7 +65,11 @@ def debug_log(msg):
     print(f"[{time.time():.2f}] {msg}")
 
 def move_to(hz, nx, ny):
-    global pos
+    """
+    Moves the platform to the desired position while setting appropriate speed and acceleration.
+    """
+    global pos, speed
+
     debug_log(f"move_to called with hz={hz}, nx={nx}, ny={ny}")
 
     target_positions = []
@@ -74,6 +78,15 @@ def move_to(hz, nx, ny):
         pos[i] = round((angOrig - target_angle) * angToStep)  # Calculate position in steps
         target_positions.append(pos[i])
         debug_log(f"Motor {chr(65 + i)}: Target angle={target_angle:.2f}, Steps={pos[i]}")
+
+        # Calculate speed based on position difference
+        distance = abs(pos[i] - stepper.current_position())
+        speed[i] = distance * ks  # Adjust `ks` as needed
+        speed[i] = max(min(speed[i], 1000), 0)  # Constrain speed to a reasonable range
+
+        # Set speed and acceleration
+        stepper.set_max_speed(speed[i])
+        stepper.set_acceleration(speed[i] * 30)
 
     # Move all motors concurrently to the calculated positions
     multi_stepper.move_to(target_positions)
