@@ -45,21 +45,21 @@ working:
     B: 5 6
     C: 23 24
 ''' 
-stepper1 = AccelStepper(AccelStepper.DRIVER, 13, 19)   # aka "Motor A"
-stepper2 = AccelStepper(AccelStepper.DRIVER, 5, 6)    # aka "Motor B"
-stepper3 = AccelStepper(AccelStepper.DRIVER, 23, 24)     # aka "Motor C"
+stepperA = AccelStepper(AccelStepper.DRIVER, 13, 19)   # aka "Motor A"
+stepperB = AccelStepper(AccelStepper.DRIVER, 5, 6)    # aka "Motor B"
+stepperC = AccelStepper(AccelStepper.DRIVER, 23, 24)     # aka "Motor C"
 
 
 # Configure stepper motor speeds and accelerations
-for stepper in [stepper1, stepper2, stepper3]:
+for stepper in [stepperA, stepperB, stepperC]:
     stepper.set_max_speed(1000)  # Adjust as needed
     stepper.set_acceleration(150000)  # Adjust as needed
 
 # Create a MultiStepper instance
 multi_stepper = MultiStepper()
-multi_stepper.add_stepper(stepper1)
-multi_stepper.add_stepper(stepper2)
-multi_stepper.add_stepper(stepper3)
+multi_stepper.add_stepper(stepperA)
+multi_stepper.add_stepper(stepperB)
+multi_stepper.add_stepper(stepperC)
 
 # Helper Functions
 def debug_log(msg):
@@ -70,7 +70,7 @@ def move_to(hz, nx, ny):
     debug_log(f"move_to called with hz={hz}, nx={nx}, ny={ny}")
 
     target_positions = []
-    for i, stepper in enumerate([stepper1, stepper2, stepper3]):
+    for i, stepper in enumerate([stepperA, stepperB, stepperC]):
         target_angle = kinematics.compute_angle(i, hz, nx, ny)
         pos[i] = round((angOrig - target_angle) * angToStep)  # Calculate position in steps
         target_positions.append(pos[i])
@@ -137,6 +137,9 @@ def setup():
         if len(positions) == 3:
             # Move the motors to the specified positions
             multi_stepper.move_to(positions)
+            stepperA.current_position = positions[0]
+            stepperB.current_position = positions[1]
+            stepperC.current_position = positions[2]
             multi_stepper.run_speed_to_position()
             
             # Optional: Add a small delay to avoid overwhelming the system
