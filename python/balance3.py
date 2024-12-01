@@ -180,6 +180,8 @@ def PID(setpointX, setpointY):
 
                 out[i] = constrain(out[i], -0.25, 0.25)
 
+                debug_log(f"PID output {['X', 'Y'][i]}: error={error[i]}, integr={integr[i]}, deriv={deriv[i]}, out={out[i]}")
+
             for i in range(3):
                 # print(f"speed[{i}] {speed[i]}")
                 speedPrev[i] = speed[i]
@@ -191,8 +193,6 @@ def PID(setpointX, setpointY):
                 speed[i] = constrain(speed[i], speedPrev[i] - 200, speedPrev[i] + 200)
 
                 speed[i] = constrain(speed[i], 0, 1000)
-
-            debug_log(f"PID output {['X', 'Y'][i]}: error={error[i]}, integr={integr[i]}, deriv={deriv[i]}, out={out[i]}")
         else:
             detected = False
             debug_log("Ball not detected on first check.")
