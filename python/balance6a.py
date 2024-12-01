@@ -149,7 +149,7 @@ def pid_control(setpoint_x, setpoint_y):
 def setup():
     while True:
         try:
-            quit_ = input("Begin offset setup? (y/n): ")
+            quit_ = input("^C to quit setup")
             if quit_.lower() == 'n':
                 break    
 
