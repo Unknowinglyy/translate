@@ -51,7 +51,7 @@ stepper3 = AccelStepper(AccelStepper.DRIVER, 23, 24)
 
 # Configure stepper motor speeds and accelerations
 for stepper in [stepper1, stepper2, stepper3]:
-    stepper.set_max_speed(10000)  # Adjust as needed
+    stepper.set_max_speed(1000)  # Adjust as needed
     stepper.set_acceleration(150000)  # Adjust as needed
 
 # Create a MultiStepper instance
@@ -82,7 +82,7 @@ def move_to(hz, nx, ny):
         # Calculate speed based on position difference
         distance = abs(pos[i] - stepper.current_position())
         speed[i] = distance * ks  # Adjust `ks` as needed
-        speed[i] = max(min(speed[i], 10000), 0)  # Constrain speed to a reasonable range
+        speed[i] = max(min(speed[i], 1000), 0)  # Constrain speed to a reasonable range
 
         # Set speed and acceleration
         stepper.set_max_speed(speed[i])
@@ -121,12 +121,8 @@ def pid_control(setpoint_x, setpoint_y):
                 # calculates stepper motor speeds
                 current_position = stepper.current_position()
                 speed[i] = abs(current_position - pos[i]) * ks  # Compute speed based on error
-                speed[i] = max(min(speed[i], speed_prev[i] + 2000), speed_prev[i] - 2000)  # Smooth speed changes
-                speed[i] = max(min(speed[i], 10000), 0)  # Constrain speed to 0-1000 range
-                
-                # Apply speed and acceleration
-                stepper.set_max_speed(speed[i])
-                stepper.set_acceleration(speed[i] * 50000)  # Proportional to speed
+                speed[i] = max(min(speed[i], speed_prev[i] + 200), speed_prev[i] - 200)  # Smooth speed changes
+                speed[i] = max(min(speed[i], 1000), 0)  # Constrain speed to 0-1000 range
         else:
             detected = False
             debug_log("Ball not detected on first check.")
