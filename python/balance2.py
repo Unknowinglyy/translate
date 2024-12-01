@@ -126,7 +126,7 @@ def pid_control(setpoint_x, setpoint_y):
                 
                 # Apply speed and acceleration
                 stepper.set_max_speed(speed[i])
-                stepper.set_acceleration(speed[i] * 100)  # Proportional to speed
+                stepper.set_acceleration(speed[i] * 500)  # Proportional to speed
         else:
             detected = False
             debug_log("Ball not detected on first check.")
