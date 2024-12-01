@@ -18,7 +18,7 @@ stepperC = AccelStepper(AccelStepper.DRIVER, 5, 6)  # (driver type, STEP, DIR) D
 steppers = MultiStepper()
 
 # Stepper motor variables
-positions = [400, 400, 400]  # Target positions for each stepper motor
+forward_positions = [400, 400, 400]  # Target positions for each stepper motor
 backward_positions = [0, 0, 0]
 
 # Setup function
