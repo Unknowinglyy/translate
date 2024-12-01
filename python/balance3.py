@@ -59,7 +59,7 @@ angOrig = 206.662752199
 #speed of the stepper motor and the speed amplifying constant
 speed = [1.0, 1.0, 1.0]
 speedPrev = [0.0, 0.0, 0.0]
-ks = float(20)
+ks = float(80)
 
 #touch screen variables
 
