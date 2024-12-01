@@ -4,16 +4,18 @@ import RPi.GPIO as GPIO
 from accelstepper import AccelStepper, constrain
 from multistepper import MultiStepper
 from touchScreenBasicCoordOutput import read_touch_coordinates, Point
-from touchScreenTranslatedCoordOutput import transform_coordinates
+from touchScreenTranslatedCoordOutput import *
 from kine3 import Machine
-from serial_point import get_touch_point
-import serial
 
 A = Machine.A
 B = Machine.B
 C = Machine.C
 
 start_time = time.perf_counter()
+
+# Helper Functions
+def debug_log(msg):
+    print(f"[{time.time():.2f}] {msg}")
 
 def delay(milliseconds):
     """
@@ -34,11 +36,11 @@ machine = Machine(2, 3.125, 1.75, 3.669291339)
 print("Done with kinematics")
 
 
-#motor A = motor 2 (pins 20 & 21)
+#motor A = motor 2 (pins 13 & 19)
 #motor B = motor 3 (pins 5 & 6)
 #motor c = motor 1 (pins 23 & 24)
 
-stepperA = AccelStepper(1, 20, 21)
+stepperA = AccelStepper(1, 13, 19)
 stepperB = AccelStepper(1, 5, 6)
 stepperC = AccelStepper(1, 23, 24)
 
@@ -77,26 +79,21 @@ kd = 7E-3
 
 #PID constants
 #PID terms for X and Y directions
-error = [0, 0]
-errorPrev = [0, 0]
-integr = [0, 0]
-deriv = [0, 0]
-out = [0, 0]
+error = [0.0, 0.0]
+errorPrev = [0.0, 0.0]
+integr = [0.0, 0.0]
+deriv = [0.0, 0.0]
+out = [0.0, 0.0]
 
 #variable to capture inital times
-timeI = 0
+timeI = 0.0
 
 #other variables
-angToStep = 3200 / 360
+angToStep = 1100 / 360
 
 detected = False
 
 print("Done with variables")
-
-ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
-
-#wait for arduino to initailize
-time.sleep(2)
 
 def setup():
     steppers.add_stepper(stepperA)
@@ -121,14 +118,12 @@ def loop():
     PID(0,0)   
 
 def moveTo(hz, nx, ny):
-    global detected
-    print("Moving to: " + str(hz) + " " + str(nx) + " " + str(ny))
+    global detected, pos, speed, machine, angOrig, stepperA, stepperB, stepperC, steppers, angToStep
+    debug_log(f"move_to called with hz={hz}, nx={nx}, ny={ny}")
     if(detected):
         for i in range(3):
             pos[i] = round((angOrig - machine.theta(i, hz, nx, ny)) * angToStep)
             print(f"Motor {i} target position: {pos[i]}")
-
-        print("setting max speed to " + str(speed[A]) + " " + str(speed[B]) + " " + str(speed[C]))
         stepperA.set_max_speed(speed[A])
         stepperB.set_max_speed(speed[B])
         stepperC.set_max_speed(speed[C])
@@ -160,55 +155,59 @@ def moveTo(hz, nx, ny):
         steppers.run()
 
 def PID(setpointX, setpointY):
-    global detected, ser
+    global detected, error, errorPrev, integr, deriv, out, speed, speedPrev, timeI, pos, kp, kd, ki, ks, xoffset, yoffset, machine, stepperA, stepperB, stepperC
     print("===================================")
     print("starting PID")
-    x, y, z = get_touch_point(ser)
-    print(f"Touch point - X: {x}, Y: {y}, Z: {z}")
-    if(x != 0):
-        detected = True
+    orig_point = read_coordinates()
+    if orig_point is not None:
+        point = transform_coordinates(orig_point.x, orig_point.y)
+        debug_log(f"Point: ({point.x}, {point.y})")
+        if(point.x != 0 and point.y != 0):
+            detected = True
 
-        for i in range(2):
-            errorPrev[i] = error[i]
+            for i in range(2):
+                errorPrev[i] = error[i]
 
-            error[i] = (i == 0) * (xoffset - x - setpointX) + (i == 1) * (yoffset - y - setpointY)
-            # print(f"Error: {error[i]}")
-            integr[i] += error[i] + errorPrev[i]
+                error[i] = (i == 0) * (xoffset - point.x - setpointX) + (i == 1) * (yoffset - point.y - setpointY)
+                # print(f"Error: {error[i]}")
+                integr[i] += error[i] + errorPrev[i]
 
-            deriv[i] = error[i] - errorPrev[i]
+                deriv[i] = error[i] - errorPrev[i]
 
-            deriv[i] = 0 if (math.isnan(deriv[i]) or math.isinf(deriv[i])) else deriv[i]
+                deriv[i] = 0 if (math.isnan(deriv[i]) or math.isinf(deriv[i])) else deriv[i]
 
-            out[i] = kp * error[i] + ki * integr[i] + kd * deriv[i]
+                out[i] = kp * error[i] + ki * integr[i] + kd * deriv[i]
 
-            out[i] = constrain(out[i], -0.25, 0.25)
+                out[i] = constrain(out[i], -0.25, 0.25)
 
-        for i in range(3):
-            # print(f"speed[{i}] {speed[i]}")
-            speedPrev[i] = speed[i]
+            for i in range(3):
+                # print(f"speed[{i}] {speed[i]}")
+                speedPrev[i] = speed[i]
 
-            speed[i] = (i == A) * stepperA.current_position() + (i == B) * stepperB.current_position() + (i == C) * stepperC.current_position()
-        
-            speed[i] = abs(speed[i] - pos[i]) * ks
+                speed[i] = (i == A) * stepperA.current_position() + (i == B) * stepperB.current_position() + (i == C) * stepperC.current_position()
+            
+                speed[i] = abs(speed[i] - pos[i]) * ks
 
-            speed[i] = constrain(speed[i], speedPrev[i] - 200, speedPrev[i] + 200)
+                speed[i] = constrain(speed[i], speedPrev[i] - 200, speedPrev[i] + 200)
 
-            speed[i] = constrain(speed[i], 0, 1000)
+                speed[i] = constrain(speed[i], 0, 1000)
 
-        print("X OUT: " + str(out[0]) + " Y OUT: " + str(out[1]) + " Speed A: " + str(speed[Machine.A]))
-    else:
-        #delay by 10 ms to double check that there is no ball
-        delay(10)
-        x, y, z = get_touch_point(ser)
-        print(f"Touch point - X: {x}, Y: {y}, Z: {z}")
-        if(x == 0):
+            debug_log(f"PID output {['X', 'Y'][i]}: error={error[i]}, integr={integr[i]}, deriv={deriv[i]}, out={out[i]}")
+        else:
             detected = False
-            print("No ball detected")
-
-    # continues moving platform and waits until 20 milliseconds have elapsed
-    timeI = millis() # Convert to milliseconds
-    while (millis() - timeI < 20):
-        moveTo(4.25, -out[0], -out[1])  # moves the platform
+            debug_log("Ball not detected on first check.")
+            #delay for 10 ms
+            delay(10)
+            #check for ball again
+            orig_point = read_coordinates()
+            if orig_point is None or (orig_point.x == 0 and orig_point.y == 0):
+                detected = False
+                debug_log("Ball not detected on second check.")
+    else:
+        detected = False
+        debug_log("Touchscreen data is None.")
+    
+    moveTo(4.25, -out[0], -out[1])
 
 if __name__ == "__main__":
     try:
@@ -218,6 +217,7 @@ if __name__ == "__main__":
 
     except KeyboardInterrupt:
         print("Keyboard interrupt")
+
     finally:
         print("cleaning up GPIO")
         GPIO.cleanup()
