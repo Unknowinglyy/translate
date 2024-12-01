@@ -36,14 +36,16 @@ GPIO.output(ENA, GPIO.LOW)
 
 # Initialize stepper motors
 '''
-hardware wiring:
-    motor 1: 23 24      
-    motor 2: 20 21      13 19
-    motor 3: 5 6
-working: 
-    A: 20 21            13 19
-    B: 5 6
-    C: 23 24
+MOTORS:
+    Notation 1:
+        - Stepper1: 23,24
+        - Stepper2: 13,19
+        - Stepper3: 5,6
+        
+    Notation 2:
+        - StepperA: 13,19
+        - StepperB: 5,6
+        - StepperC: 23,24
 ''' 
 stepperA = AccelStepper(AccelStepper.DRIVER, 13, 19)   # aka "Motor A"
 stepperB = AccelStepper(AccelStepper.DRIVER, 5, 6)    # aka "Motor B"
