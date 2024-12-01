@@ -124,7 +124,7 @@ def balance_ball():
     # print("Setting up motor offsets...")
     # multi_stepper.move_to([0, 40, 65])
     # multi_stepper.run_speed_to_position()
-    time.sleep(5)
+    time.sleep(10)
     debug_log("Starting balance loop...")
     try:
         while True:
