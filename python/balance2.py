@@ -12,9 +12,9 @@ ENA = 17
 # Constants and Parameters
 CENTER_X, CENTER_Y = 500, 500  # Touchscreen center offsets
 angOrig = 206                    # Original angle
-angToStep = 1100 / 360           # Steps per degree
-ks = 20                         # Speed amplifying constant
-kp, ki, kd = 0.00034, 0.0, 7E-3  # PID constants
+angToStep = 1000 / 360           # Steps per degree
+ks = 30                         # Speed amplifying constant
+kp, ki, kd = .0004, 0.00001, 0.001    # PID constants
 
 # Global variables for PID control
 error = [0, 0]  # Error for X and Y axes
@@ -51,7 +51,7 @@ stepper3 = AccelStepper(AccelStepper.DRIVER, 23, 24)
 
 # Configure stepper motor speeds and accelerations
 for stepper in [stepper1, stepper2, stepper3]:
-    stepper.set_max_speed(1000)  # Adjust as needed
+    stepper.set_max_speed(10000)  # Adjust as needed
     stepper.set_acceleration(150000)  # Adjust as needed
 
 # Create a MultiStepper instance
@@ -116,17 +116,10 @@ def pid_control(setpoint_x, setpoint_y):
                 out[i] = kp * error[i] + ki * integr[i] + kd * deriv[i]
                 out[i] = max(min(out[i], 0.25), -0.25)  # Constrain output
                 debug_log(f"PID output {['X', 'Y'][i]}: error={error[i]}, integr={integr[i]}, deriv={deriv[i]}, out={out[i]}")
-            for i, stepper in enumerate([stepper1, stepper2, stepper3]):
-                speed_prev[i] = speed[i]
-                # calculates stepper motor speeds
-                current_position = stepper.current_position()
-                speed[i] = abs(current_position - pos[i]) * ks  # Compute speed based on error
-                speed[i] = max(min(speed[i], speed_prev[i] + 200), speed_prev[i] - 200)  # Smooth speed changes
-                speed[i] = max(min(speed[i], 1000), 0)  # Constrain speed to 0-1000 range
         else:
             detected = False
             debug_log("Ball not detected on first check.")
-            time.sleep(0.001)  # 10 ms delay
+            time.sleep(0.01)  # 10 ms delay
             orig_point = read_coordinates()  # Check again
             if orig_point is None or (orig_point.x == 0 and orig_point.y == 0):
                 detected = False
