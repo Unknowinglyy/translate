@@ -62,19 +62,21 @@ multi_stepper = MultiStepper()
 multi_stepper.add_stepper(stepperA)
 multi_stepper.add_stepper(stepperB)
 multi_stepper.add_stepper(stepperC)
-
+# --------------------------------------------------------------------------------------------------------------
 # Helper Functions
 def debug_log(msg):
     print(f"[{time.time():.2f}] {msg}")
-
+# --------------------------------------------------------------------------------------------------------------
 def move_to(hz, nx, ny):
     global pos
     debug_log(f"move_to called with hz={hz}, nx={nx}, ny={ny}")
 
     target_positions = []
     for i, stepper in enumerate([stepperA, stepperB, stepperC]):
+
         target_angle = kinematics.compute_angle(i, hz, nx, ny)
         pos[i] = round((angOrig - target_angle) * angToStep)  # Calculate position in steps
+
         target_positions.append(pos[i])
         debug_log(f"Motor {chr(65 + i)}: Target angle={target_angle:.2f}, Steps={pos[i]}")
 
@@ -151,7 +153,7 @@ def setup():
         stepperB.current_position = 0
         stepperC.current_position = 0
         # print(f"Current positions: A={stepperA.current_position}, B={stepperB.current_position}, C={stepperC.current_position}")
-
+# --------------------------------------------------------------------------------------------------------------
 # Main Loop
 def balance_ball():
     prep_time = 5
