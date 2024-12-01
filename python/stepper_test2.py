@@ -26,9 +26,9 @@ GPIO.output(ENA, GPIO.LOW)
 time.sleep(1)
 
 # Configure maximum speed for steppers
-stepper1.set_max_speed(1000)
-stepper2.set_max_speed(1000)
-stepper3.set_max_speed(1000)
+stepper1.set_max_speed(400)
+stepper2.set_max_speed(400)
+stepper3.set_max_speed(400)
 print("Set all the speeds")
 
 # Add steppers to MultiStepper
