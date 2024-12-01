@@ -38,20 +38,27 @@ def setup():
     GPIO.output(ENA, GPIO.LOW)  # Enable the stepper drivers
     time.sleep(1)  # Small delay to allow the user to reset the platform
 
-def move_to_target(positions):
-    steppers.move_to(positions)  # Calculate required speeds for all motors
-    while steppers.run():  # Blocks until all steppers reach their target positions
-        time.sleep(0.01)
+# Move motor to position using runSpeedToPosition
+def move_to_position(stepper, position):
+    stepper.move_to(position)  # Set target position
+    while not stepper.run_speed_to_position():  # Move to the target position at constant speed
+        time.sleep(0.01)  # Small delay to ensure smooth movement
 
 # Main loop
 def loop():
     while True:
         print("Moving to forward positions...")
-        move_to_target(forward_positions)  # Move to the forward positions
+        move_to_position(stepperA, forward_positions[0])
+        move_to_position(stepperB, forward_positions[1])
+        move_to_position(stepperC, forward_positions[2])
+
         time.sleep(1)  # Pause for 1 second
-        
+
         print("Moving to backward positions...")
-        move_to_target(backward_positions)  # Move back to the starting positions
+        move_to_position(stepperA, backward_positions[0])
+        move_to_position(stepperB, backward_positions[1])
+        move_to_position(stepperC, backward_positions[2])
+
         time.sleep(1)  # Pause for 1 second
 
 # Run the setup and loop
