@@ -122,7 +122,7 @@ def pid_control(setpoint_x, setpoint_y):
                 current_position = stepper.current_position()
                 speed[i] = abs(current_position - pos[i]) * ks  # Compute speed based on error
                 speed[i] = max(min(speed[i], speed_prev[i] + 200), speed_prev[i] - 200)  # Smooth speed changes
-                speed[i] = max(min(speed[i], 1000), 0)  # Constrain speed to 0-1000 range
+                speed[i] = max(min(speed[i], 100000), 0)  # Constrain speed to 0-1000 range
                 
                 # Apply speed and acceleration
                 stepper.set_max_speed(speed[i])
