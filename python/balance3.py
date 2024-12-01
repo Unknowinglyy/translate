@@ -7,10 +7,6 @@ from touchScreenBasicCoordOutput import read_touch_coordinates, Point
 from touchScreenTranslatedCoordOutput import *
 from kine3 import Machine
 
-A = Machine.A
-B = Machine.B
-C = Machine.C
-
 start_time = time.perf_counter()
 
 # Helper Functions
@@ -33,7 +29,11 @@ def millis():
 
 machine = Machine(2, 3.125, 1.75, 3.669291339)
 
-print("Done with kinematics")
+A = Machine.A
+B = Machine.B
+C = Machine.C
+
+debug_log("Done with kinematics")
 
 
 #motor A = motor 2 (pins 13 & 19)
@@ -45,7 +45,7 @@ stepperB = AccelStepper(1, 5, 6)
 stepperC = AccelStepper(1, 23, 24)
 
 steppers = MultiStepper()
-print("Done with steppers")
+debug_log("Done with steppers")
 
 #stores the target positions for each stepper motor
 pos = [0, 0, 0]
@@ -57,7 +57,7 @@ ENA = 17
 angOrig = 206.662752199
 
 #speed of the stepper motor and the speed amplifying constant
-speed = [1.0, 1.0, 1.0]
+speed = [0.0, 0.0, 0.0]
 speedPrev = [0.0, 0.0, 0.0]
 ks = float(80)
 
@@ -81,19 +81,21 @@ kd = 7E-3
 #PID terms for X and Y directions
 error = [0.0, 0.0]
 errorPrev = [0.0, 0.0]
+
 integr = [0.0, 0.0]
 deriv = [0.0, 0.0]
+
 out = [0.0, 0.0]
 
 #variable to capture inital times
 timeI = 0.0
 
 #other variables
-angToStep = 1100 / 360
+angToStep = 1000 / 360
 
 detected = False
 
-print("Done with variables")
+debug_log("Done with variables")
 
 def setup():
     steppers.add_stepper(stepperA)
@@ -114,6 +116,8 @@ def setup():
 
     steppers.run_speed_to_position()
 
+    debug_log("Done with setup")
+
 def loop():
     PID(0,0)   
 
@@ -123,7 +127,7 @@ def moveTo(hz, nx, ny):
     if(detected):
         for i in range(3):
             pos[i] = round((angOrig - machine.theta(i, hz, nx, ny)) * angToStep)
-            print(f"Motor {i} target position: {pos[i]}")
+            debug_log(f"Motor {i} target position: {pos[i]}")
         stepperA.set_max_speed(speed[A])
         stepperB.set_max_speed(speed[B])
         stepperC.set_max_speed(speed[C])
@@ -136,16 +140,16 @@ def moveTo(hz, nx, ny):
         stepperB.move_to(pos[B])
         stepperC.move_to(pos[C])
 
-        # print(f"Stepper1 max_speed {speed[Kinematics.A]}, acceleration {speed[kinematics.A]}, move_to {pos[Kinematics.A]}")
+        debug_log(f"Stepper1 max_speed {speed[Machine.A]}, acceleration {speed[Machine.A]}, move_to {pos[Machine.A]}")
 
         stepperA.run()
         stepperB.run()
         stepperC.run()
     else:
-        print("Ball not detected, moving to original position")
+        debug_log("Ball not detected, moving to original position")
         for i in range(3):
             pos[i] = round((angOrig - machine.theta(i, hz, 0,0)) * angToStep)
-            print(f"Motor {i} target position: {pos[i]}")
+            debug_log(f"Motor {i} target position: {pos[i]}")
 
         stepperA.set_max_speed(800)
         stepperB.set_max_speed(800)
@@ -156,8 +160,8 @@ def moveTo(hz, nx, ny):
 
 def PID(setpointX, setpointY):
     global detected, error, errorPrev, integr, deriv, out, speed, speedPrev, timeI, pos, kp, kd, ki, ks, xoffset, yoffset, machine, stepperA, stepperB, stepperC
-    print("===================================")
-    print("starting PID")
+    print("\n===================================\n")
+    debug_log("starting PID")
     orig_point = read_coordinates()
     if orig_point is not None:
         point = transform_coordinates(orig_point.x, orig_point.y)
@@ -169,7 +173,7 @@ def PID(setpointX, setpointY):
                 errorPrev[i] = error[i]
 
                 error[i] = (i == 0) * (xoffset - point.x - setpointX) + (i == 1) * (yoffset - point.y - setpointY)
-                # print(f"Error: {error[i]}")
+
                 integr[i] += error[i] + errorPrev[i]
 
                 deriv[i] = error[i] - errorPrev[i]
@@ -183,16 +187,20 @@ def PID(setpointX, setpointY):
                 debug_log(f"PID output {['X', 'Y'][i]}: error={error[i]}, integr={integr[i]}, deriv={deriv[i]}, out={out[i]}")
 
             for i in range(3):
-                # print(f"speed[{i}] {speed[i]}")
                 speedPrev[i] = speed[i]
 
-                speed[i] = (i == A) * stepperA.current_position() + (i == B) * stepperB.current_position() + (i == C) * stepperC.current_position()
+                if i == A:
+                    speed[i] = stepperA.current_position()
+                elif i == B:
+                    speed[i] = stepperB.current_position()
+                elif i == C:
+                    speed[i] = stepperC.current_position()
             
                 speed[i] = abs(speed[i] - pos[i]) * ks
 
-                speed[i] = constrain(speed[i], speedPrev[i] - 200, speedPrev[i] + 200)
+                speed[i] = constrain(speed[i], speedPrev[i] - 1000, speedPrev[i] + 1000)
 
-                speed[i] = constrain(speed[i], 0, 1000)
+                speed[i] = constrain(speed[i], 0, 100000)
             debug_log(f"X output: {out[0]}, Y output: {out[1]}, Speed A: {speed[A]}")
         else:
             debug_log("Ball not detected on first check.")
@@ -206,9 +214,9 @@ def PID(setpointX, setpointY):
     else:
         detected = False
         debug_log("Touchscreen data is None.")
-    timeI = millis()
-    while (millis() - timeI < 20):
-        moveTo(4.25, -out[0], -out[1])
+
+    moveTo(4.25, -out[0], -out[1])
+    debug_log("Moving to position")
 
 if __name__ == "__main__":
     try:
