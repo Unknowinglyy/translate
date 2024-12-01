@@ -5,6 +5,7 @@ import RPi.GPIO as GPIO
 from kine2 import Kinematics  # Import the Kinematics class
 from touchScreenTranslatedCoordOutput import *
 import math
+
 # --------------------------------------------------------------------------------------------------------------
 # Define GPIO pins for the stepper motor
 ENA = 17
@@ -51,7 +52,6 @@ stepperA = AccelStepper(AccelStepper.DRIVER, 13, 19)   # aka "Motor A"
 stepperB = AccelStepper(AccelStepper.DRIVER, 5, 6)    # aka "Motor B"
 stepperC = AccelStepper(AccelStepper.DRIVER, 23, 24)     # aka "Motor C"
 
-
 # Configure stepper motor speeds and accelerations
 for stepper in [stepperA, stepperB, stepperC]:
     stepper.set_max_speed(1000)  # Adjust as needed
@@ -62,10 +62,12 @@ multi_stepper = MultiStepper()
 multi_stepper.add_stepper(stepperA)
 multi_stepper.add_stepper(stepperB)
 multi_stepper.add_stepper(stepperC)
+
 # --------------------------------------------------------------------------------------------------------------
 # Helper Functions
 def debug_log(msg):
     print(f"[{time.time():.2f}] {msg}")
+
 # --------------------------------------------------------------------------------------------------------------
 def move_to(hz, nx, ny):
     """
@@ -76,7 +78,7 @@ def move_to(hz, nx, ny):
     debug_log(f"move_to called with hz={hz}, nx={nx}, ny={ny}")
 
     target_positions = []
-    for i, stepper in enumerate([stepper1, stepper2, stepper3]):
+    for i, stepper in enumerate([stepperA, stepperB, stepperC]):
         target_angle = kinematics.compute_angle(i, hz, nx, ny)
         pos[i] = round((angOrig - target_angle) * angToStep)  # Calculate position in steps
         target_positions.append(pos[i])
@@ -97,7 +99,7 @@ def move_to(hz, nx, ny):
         time.sleep(0.005)  # Allow motors to run concurrently
 
 def pid_control(setpoint_x, setpoint_y):
-    global detected, error, error_prev, integr, deriv, out, pos
+    global detected, error, error_prev, integr, deriv, out, pos, speed, speed_prev
 
     # Get touchscreen data (original coordinates)
     orig_point = read_coordinates()
@@ -119,6 +121,17 @@ def pid_control(setpoint_x, setpoint_y):
                 out[i] = kp * error[i] + ki * integr[i] + kd * deriv[i]
                 out[i] = max(min(out[i], 0.25), -0.25)  # Constrain output
                 debug_log(f"PID output {['X', 'Y'][i]}: error={error[i]}, integr={integr[i]}, deriv={deriv[i]}, out={out[i]}")
+
+            # Calculate stepper motor speeds
+            for i, stepper in enumerate([stepperA, stepperB, stepperC]):
+                speed_prev[i] = speed[i]
+                speed[i] = abs(stepper.current_position() - pos[i]) * ks
+                speed[i] = max(min(speed[i], speed_prev[i] + 200), speed_prev[i] - 200)  # Filter speed changes
+                speed[i] = max(min(speed[i], 1000), 0)  # Constrain speed
+                stepper.set_max_speed(speed[i])
+                stepper.set_acceleration(speed[i] * 30)
+                debug_log(f"Motor {chr(65 + i)}: Speed={speed[i]}, Acceleration={speed[i] * 30}")
+
         else:
             detected = False
             debug_log("Ball not detected on first check.")
@@ -139,32 +152,33 @@ def setup():
         if quit_.lower() == 'n':
             break    
 
-
         # Ask the user for 3 numbers
         positions = []
         for i in range(3):
-            if i == 0:
-                pos = float(input(f"Enter position for motor A: "))
-            elif i == 1:
-                pos = float(input(f"Enter position for motor B: "))
-            else:
-                pos = float(input(f"Enter position for motor C: "))
-            positions.append(pos)
+            user_input = input(f"Enter position for motor {['A', 'B', 'C'][i]} (or 'q' to quit): ")
+            if user_input.lower() == 'q':
+                print("Exiting setup...")
+                return  # Exit the setup function
+            try:
+                pos = float(user_input)
+                positions.append(pos)
+            except ValueError:
+                print("Invalid input. Please enter a valid number or 'q' to quit.")
+                break  # Break the inner loop to re-prompt for the current motor
 
-        
-        # Move the motors to the specified positions
-        multi_stepper.move_to(positions)
-        multi_stepper.run_speed_to_position()
+        if len(positions) == 3:
+            # Move the motors to the specified positions
+            multi_stepper.move_to(positions)
+            multi_stepper.run_speed_to_position()
 
-        # Small Delay
-        time.sleep(0.1) 
+            # Small Delay
+            time.sleep(0.1)
 
-        # Set the current offsets as the "zero" position
-        stepperA.current_position = 0
-        stepperB.current_position = 0
-        stepperC.current_position = 0
-        # print(f"Current positions: A={stepperA.current_position}, B={stepperB.current_position}, C={stepperC.current_position}")
-# --------------------------------------------------------------------------------------------------------------------------------------
+            stepperA.current_position = 0
+            stepperB.current_position = 0
+            stepperC.current_position = 0
+            print(f"Current positions: A={stepperA.current_position}, B={stepperB.current_position}, C={stepperC.current_position}")
+
 # Main Loop
 def balance_ball():
     prep_time = 5
