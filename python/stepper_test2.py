@@ -1,63 +1,63 @@
-import RPi.GPIO as GPIO
 from accelstepper import AccelStepper
 from multistepper import MultiStepper
-import time
+import RPi.GPIO as GPIO
+import time 
 
-# Initialize GPIO
+# Setup GPIO
 GPIO.setmode(GPIO.BCM)
 
-# Define enable pin
-ENA = 17  # GPIO pin for enable
+# Parameters = driver type, step pin, direction pin
+stepper1 = AccelStepper(AccelStepper.DRIVER, 23, 24)
+stepper2 = AccelStepper(AccelStepper.DRIVER, 13, 19)
+stepper3 = AccelStepper(AccelStepper.DRIVER, 5, 6)
 
-# Initialize stepper motors
-stepperA = AccelStepper(AccelStepper.DRIVER, 13, 19)  # (driver type, STEP, DIR) Driver A
-stepperB = AccelStepper(AccelStepper.DRIVER, 23, 24)  # (driver type, STEP, DIR) Driver B
-stepperC = AccelStepper(AccelStepper.DRIVER, 5, 6)  # (driver type, STEP, DIR) Driver C
-
-# Initialize MultiStepper
 steppers = MultiStepper()
 
-# Stepper motor variables
-forward_positions = [400, 400, 400]  # Target positions for each stepper motor
-backward_positions = [0, 0, 0]
+# Target positions for each motor
+pos_up = [400, 400, 400]  # Move up
+pos_down = [0, 0, 0]      # Move back down
 
-# Setup function
-def setup():
-    # Set initial maximum speed for the steppers (steps/sec)
-    stepperA.set_max_speed(1200)
-    stepperB.set_max_speed(400)
-    stepperC.set_max_speed(800)
-    
-    # Add the steppers to the MultiStepper instance
-    steppers.add_stepper(stepperA)
-    steppers.add_stepper(stepperB)
-    steppers.add_stepper(stepperC)
-    
-    # Configure enable pin
-    GPIO.setup(ENA, GPIO.OUT)
-    GPIO.output(ENA, GPIO.LOW)  # Enable the stepper drivers
-    time.sleep(1)  # Small delay to allow the user to reset the platform
+# Enable pin for drivers
+ENA = 17
+GPIO.setup(ENA, GPIO.OUT)
+GPIO.output(ENA, GPIO.LOW)
 
-def move_to_target(positions):
-    steppers.move_to(positions)  # Calculate required speeds for all motors
-    while steppers.run():  # Blocks until all steppers reach their target positions
-        time.sleep(0.01)
+# Small delay to allow system to settle
+time.sleep(1)
 
-# Main loop
-def loop():
-    while True:
-        print("Moving to forward positions...")
-        move_to_target(forward_positions)  # Move to the forward positions
-        time.sleep(1)  # Pause for 1 second
-        
-        print("Moving to backward positions...")
-        move_to_target(backward_positions)  # Move back to the starting positions
-        time.sleep(1)  # Pause for 1 second
+# Configure maximum speed for steppers
+stepper1.set_max_speed(400)
+stepper2.set_max_speed(400)
+stepper3.set_max_speed(400)
+print("Set all the speeds")
 
-# Run the setup and loop
-if __name__ == "__main__":
-    try:
-        setup()
-        loop()
-    except KeyboardInterrupt:
-        GPIO.cleanup()  # Clean up GPIO resources
+# Add steppers to MultiStepper
+steppers.add_stepper(stepper1)
+steppers.add_stepper(stepper2)
+steppers.add_stepper(stepper3)
+print("Added all the steppers")
+
+try:
+    # Move to target positions (up)
+    steppers.move_to(pos_up)
+    print("Moving to target positions (up)...")
+    while steppers.run():
+        time.sleep(0.01)  # Wait until the movement completes
+    print("Reached target positions (up)")
+
+    # Pause before moving back down
+    time.sleep(1)
+
+    # Move back to original positions (down)
+    steppers.move_to(pos_down)
+    print("Moving back to original positions (down)...")
+    while steppers.run():
+        time.sleep(0.01)  # Wait until the movement completes
+    print("Reached original positions (down)")
+
+except KeyboardInterrupt:
+    print("Keyboard interrupt")
+
+finally:
+    print("Cleaning up GPIO")
+    GPIO.cleanup()
