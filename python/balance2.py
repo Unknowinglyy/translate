@@ -139,11 +139,11 @@ def pid_control(setpoint_x, setpoint_y):
         detected = False
         debug_log("Touchscreen data is None.")
 
-    move_to(4.25, -out[0], -out[1])
+    move_to(5, -out[0], -out[1])
 
 # Main Loop
 def balance_ball():
-    move_to(4.25, 0, 0)
+    move_to(5, 0, 0)
     debug_log("Starting balance loop...")
     try:
         while True:
