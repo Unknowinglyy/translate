@@ -42,7 +42,7 @@ stepperC = AccelStepper(AccelStepper.DRIVER, 23, 24)     # aka "Motor C"
 
 # Configure stepper motor speeds and accelerations
 for stepper in [stepperA, stepperB, stepperC]:
-    stepper.set_max_speed(1000)  # Adjust as needed
+    stepper.set_max_speed(100000)  # Adjust as needed
     stepper.set_acceleration(150000)  # Adjust as needed
 
 # Create a MultiStepper instance
@@ -169,7 +169,7 @@ def setup():
 # Main Loop
 def balance_ball():
     move_to(4.25, 0, 0)
-    
+
     try:
         while True:
             pid_control(0, 0)  # Maintain the ball at the center (0, 0)
