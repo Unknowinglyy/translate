@@ -149,9 +149,7 @@ def pid_control(setpoint_x, setpoint_y):
 def setup():
     while True:
         try:
-            quit_ = input("^C to quit setup")
-            if quit_.lower() == 'n':
-                break    
+            print("Beginning Setup. ^C to quit setup")    
 
             # Ask the user for 3 numbers
             positions = []
