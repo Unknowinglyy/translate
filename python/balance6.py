@@ -123,7 +123,7 @@ def setup():
         # Ask the user for 3 numbers
         positions = []
         for i in range(3):
-            user_input = input(f"Enter position for motor {['A', 'B', 'C'][i]} (or 'q' to quit): ")
+            user_input = float(input(f"Enter position for motor {['A', 'B', 'C'][i]} (or 'q' to quit): "))
             if user_input.lower() == 'q':
                 print("Exiting setup...")
                 return  # Exit the setup function
