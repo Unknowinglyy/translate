@@ -193,8 +193,8 @@ def PID(setpointX, setpointY):
                 speed[i] = constrain(speed[i], speedPrev[i] - 200, speedPrev[i] + 200)
 
                 speed[i] = constrain(speed[i], 0, 1000)
+            debug_log(f"X output: {out[0]}, Y output: {out[1]}, Speed A: {speed[A]}")
         else:
-            detected = False
             debug_log("Ball not detected on first check.")
             #delay for 10 ms
             delay(10)
@@ -207,7 +207,7 @@ def PID(setpointX, setpointY):
         detected = False
         debug_log("Touchscreen data is None.")
     timeI = millis()
-    while (millis() - timeI) < 20:
+    while (millis() - timeI < 20):
         moveTo(4.25, -out[0], -out[1])
 
 if __name__ == "__main__":
