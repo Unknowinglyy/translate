@@ -11,10 +11,10 @@ ENA = 17
 
 # Constants and Parameters
 CENTER_X, CENTER_Y = 500, 500  # Touchscreen center offsets
-angOrig = 230                    # Original angle
-angToStep = 1000 / 360           # Steps per degree
+angOrig = 206                    # Original angle
+angToStep = 1100 / 360           # Steps per degree
 ks = 30                         # Speed amplifying constant
-kp, ki, kd = .0004, 0.00001, 0.0007    # PID constants
+kp, ki, kd = .0004, 0, 0.0007    # PID constants
 
 # Global variables for PID control
 error = [0, 0]  # Error for X and Y axes
@@ -82,7 +82,7 @@ def move_to(hz, nx, ny):
         # Calculate speed based on position difference
         distance = abs(pos[i] - stepper.current_position())
         speed[i] = distance * ks  # Adjust `ks` as needed
-        speed[i] = max(min(speed[i], 1000), 0)  # Constrain speed to a reasonable range
+        speed[i] = max(min(speed[i], 10000), 0)  # Constrain speed to a reasonable range
 
         # Set speed and acceleration
         stepper.set_max_speed(speed[i])
@@ -114,15 +114,15 @@ def pid_control(setpoint_x, setpoint_y):
                 deriv[i] = error[i] - error_prev[i]
                 deriv[i] = 0 if math.isnan(deriv[i]) or math.isinf(deriv[i]) else deriv[i]
                 out[i] = kp * error[i] + ki * integr[i] + kd * deriv[i]
-                out[i] = max(min(out[i], 0.1), -0.1)  # Constrain output
+                out[i] = max(min(out[i], 0.25), -0.25)  # Constrain output
                 debug_log(f"PID output {['X', 'Y'][i]}: error={error[i]}, integr={integr[i]}, deriv={deriv[i]}, out={out[i]}")
             for i, stepper in enumerate([stepper1, stepper2, stepper3]):
                 speed_prev[i] = speed[i]
                 # calculates stepper motor speeds
                 current_position = stepper.current_position()
                 speed[i] = abs(current_position - pos[i]) * ks  # Compute speed based on error
-                speed[i] = max(min(speed[i], speed_prev[i] + 200), speed_prev[i] - 200)  # Smooth speed changes
-                speed[i] = max(min(speed[i], 1000), 0)  # Constrain speed to 0-1000 range
+                speed[i] = max(min(speed[i], speed_prev[i] + 2000), speed_prev[i] - 2000)  # Smooth speed changes
+                speed[i] = max(min(speed[i], 10000), 0)  # Constrain speed to 0-1000 range
                 
                 # Apply speed and acceleration
                 stepper.set_max_speed(speed[i])
@@ -130,7 +130,7 @@ def pid_control(setpoint_x, setpoint_y):
         else:
             detected = False
             debug_log("Ball not detected on first check.")
-            time.sleep(0.01)  # 10 ms delay
+            time.sleep(0.001)  # 10 ms delay
             orig_point = read_coordinates()  # Check again
             if orig_point is None or (orig_point.x == 0 and orig_point.y == 0):
                 detected = False
@@ -139,11 +139,11 @@ def pid_control(setpoint_x, setpoint_y):
         detected = False
         debug_log("Touchscreen data is None.")
 
-    move_to(5.25, -out[0], -out[1])
+    move_to(4.25, -out[0], -out[1])
 
 # Main Loop
 def balance_ball():
-    move_to(5.25, 0, 0)
+    move_to(4.25, 0, 0)
     debug_log("Starting balance loop...")
     try:
         while True:
