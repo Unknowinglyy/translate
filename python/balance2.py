@@ -114,7 +114,7 @@ def pid_control(setpoint_x, setpoint_y):
                 deriv[i] = error[i] - error_prev[i]
                 deriv[i] = 0 if math.isnan(deriv[i]) or math.isinf(deriv[i]) else deriv[i]
                 out[i] = kp * error[i] + ki * integr[i] + kd * deriv[i]
-                out[i] = max(min(out[i], 0.25), -0.25)  # Constrain output
+                out[i] = max(min(out[i], 0.15), -0.15)  # Constrain output
                 debug_log(f"PID output {['X', 'Y'][i]}: error={error[i]}, integr={integr[i]}, deriv={deriv[i]}, out={out[i]}")
             for i, stepper in enumerate([stepper1, stepper2, stepper3]):
                 speed_prev[i] = speed[i]
