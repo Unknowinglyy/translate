@@ -6,7 +6,7 @@ class Point:
         self.y = y
         self.z = z
 
-def read_touch_coordinates(device_path='/dev/input/event4'):
+def read_touch_coordinates(device_path='/dev/input/event6'):
     device = evdev.InputDevice(device_path)
 
     # print(f"Device: {device.name}")

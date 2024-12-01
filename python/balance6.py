@@ -45,21 +45,21 @@ working:
     B: 5 6
     C: 23 24
 ''' 
-stepper1 = AccelStepper(AccelStepper.DRIVER, 13, 19)   # aka "Motor A"
-stepper2 = AccelStepper(AccelStepper.DRIVER, 5, 6)    # aka "Motor B"
-stepper3 = AccelStepper(AccelStepper.DRIVER, 23, 24)     # aka "Motor C"
+stepperA = AccelStepper(AccelStepper.DRIVER, 13, 19)   # aka "Motor A"
+stepperB = AccelStepper(AccelStepper.DRIVER, 5, 6)    # aka "Motor B"
+stepperC = AccelStepper(AccelStepper.DRIVER, 23, 24)     # aka "Motor C"
 
 
 # Configure stepper motor speeds and accelerations
-for stepper in [stepper1, stepper2, stepper3]:
+for stepper in [stepperA, stepperB, stepperC]:
     stepper.set_max_speed(1000)  # Adjust as needed
     stepper.set_acceleration(150000)  # Adjust as needed
 
 # Create a MultiStepper instance
 multi_stepper = MultiStepper()
-multi_stepper.add_stepper(stepper1)
-multi_stepper.add_stepper(stepper2)
-multi_stepper.add_stepper(stepper3)
+multi_stepper.add_stepper(stepperA)
+multi_stepper.add_stepper(stepperB)
+multi_stepper.add_stepper(stepperC)
 
 # Helper Functions
 def debug_log(msg):
@@ -70,7 +70,7 @@ def move_to(hz, nx, ny):
     debug_log(f"move_to called with hz={hz}, nx={nx}, ny={ny}")
 
     target_positions = []
-    for i, stepper in enumerate([stepper1, stepper2, stepper3]):
+    for i, stepper in enumerate([stepperA, stepperB, stepperC]):
         target_angle = kinematics.compute_angle(i, hz, nx, ny)
         pos[i] = round((angOrig - target_angle) * angToStep)  # Calculate position in steps
         target_positions.append(pos[i])
@@ -118,14 +118,43 @@ def pid_control(setpoint_x, setpoint_y):
 
     move_to(4.25, -out[0], -out[1])
 
+def setup():
+    while True:
+        # Ask the user for 3 numbers
+        positions = []
+        for i in range(3):
+            user_input = input(f"Enter position for motor {['A', 'B', 'C'][i]} (or 'q' to quit): ")
+            if user_input == '111':
+                print("Exiting setup...")
+                return  # Exit the setup function
+            try:
+                pos = float(user_input)
+                positions.append(pos)
+            except ValueError:
+                print("Invalid input. Please enter a valid number or 'q' to quit.")
+                break  # Break the inner loop to re-prompt for the current motor
+
+        if len(positions) == 3:
+            # Move the motors to the specified positions
+            multi_stepper.move_to(positions)
+            multi_stepper.run_speed_to_position()
+
+            # Small Delay
+            time.sleep(0.1)
+
+            stepperA.current_position = 0
+            stepperB.current_position = 0
+            stepperC.current_position = 0
+            print(f"Current positions: A={stepperA.current_position}, B={stepperB.current_position}, C={stepperC.current_position}")
+
 # Main Loop
 def balance_ball():
+    prep_time = 5
+
     move_to(4.25, 0, 0)
-    print("Setting up motor offsets...")
-    multi_stepper.move_to([0, 40, 65])
-    multi_stepper.run_speed_to_position()
-    time.sleep(5)
-    debug_log("Starting balance loop...")
+    setup()
+    time.sleep(prep_time)
+    debug_log(f"Starting balance loop in {prep_time} seconds...")
     try:
         while True:
             pid_control(0, 0)  # Maintain the ball at the center (0, 0)
