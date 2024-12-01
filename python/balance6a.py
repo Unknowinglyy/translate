@@ -176,6 +176,8 @@ def setup():
             # print(f"Current positions: A={stepperA.current_position}, B={stepperB.current_position}, C={stepperC.current_position}")
         except KeyboardInterrupt:
             print("Exiting setup...")
+            break
+            
 
 # Main Loop
 def balance_ball():
