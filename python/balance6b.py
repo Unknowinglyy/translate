@@ -184,5 +184,11 @@ def balance_ball():
         GPIO.cleanup()  # Clean up GPIO or any other resources
 
 if __name__ == "__main__":
-    debug_log("Initializing...")
-    balance_ball()
+    try:
+        debug_log("Initializing...")
+        balance_ball()
+    except KeyboardInterrupt:
+        debug_log("Keyboard interrupt")
+    finally:
+        debug_log("Cleaning up GPIO")
+        GPIO.cleanup()
