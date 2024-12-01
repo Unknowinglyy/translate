@@ -135,36 +135,33 @@ def pid_control(setpoint_x, setpoint_y):
 
 def setup():
     while True:
-        quit_ = input("Begin offset setup? (y/n): ")
-        if quit_.lower() == 'n':
-            break    
+        try:
+            print("Beginning Setup. ^C to quit setup")    
 
-        # Ask the user for 3 numbers
-        positions = []
-        for i in range(3):
-            user_input = input(f"Enter position for motor {['A', 'B', 'C'][i]} (or 'q' to quit): ")
-            if user_input.lower() == 'q':
-                print("Exiting setup...")
-                return  # Exit the setup function
-            try:
-                pos = float(user_input)
+            # Ask the user for 3 numbers
+            positions = []
+            for i in range(3):
+                if i == 0:
+                    pos = float(input(f"Enter position for motor A: "))
+                elif i == 1:
+                    pos = float(input(f"Enter position for motor B: "))
+                else:
+                    pos = float(input(f"Enter position for motor C: "))
                 positions.append(pos)
-            except ValueError:
-                print("Invalid input. Please enter a valid number or 'q' to quit.")
-                break  # Break the inner loop to re-prompt for the current motor
-
-        if len(positions) == 3:
+            
             # Move the motors to the specified positions
             multi_stepper.move_to(positions)
             multi_stepper.run_speed_to_position()
-
             # Small Delay
-            time.sleep(0.1)
-
+            time.sleep(0.1) 
+            # Set the current offsets as the "zero" position
             stepperA.current_position = 0
             stepperB.current_position = 0
             stepperC.current_position = 0
-            print(f"Current positions: A={stepperA.current_position}, B={stepperB.current_position}, C={stepperC.current_position}")
+            # print(f"Current positions: A={stepperA.current_position}, B={stepperB.current_position}, C={stepperC.current_position}")
+        except KeyboardInterrupt:
+            print("Exiting setup...")
+            break
 
 # Main Loop
 def balance_ball():
