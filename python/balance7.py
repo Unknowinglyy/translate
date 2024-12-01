@@ -6,7 +6,7 @@ from kine2 import Kinematics  # Import the Kinematics class
 from touchScreenTranslatedCoordOutput import *
 import math
 '''
-    Initalize motor positions to [0, 120, 100] [0, 135, 80]](motor2, motor1, motor3) (A,B,C) to have flat surface
+    Initalize motor positions to [0,40,40] [0, 120, 100] [0, 135, 80] (motor2, motor1, motor3) (A,B,C) to have flat surface
     angToStep = 1100/360
     angOrig = 206
 '''
