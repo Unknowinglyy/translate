@@ -118,14 +118,38 @@ def pid_control(setpoint_x, setpoint_y):
 
     move_to(4.25, -out[0], -out[1])
 
+def setup():
+    while True:
+        # Ask the user for 3 numbers
+        positions = []
+        for i in range(3):
+            user_input = input(f"Enter position for motor {['A', 'B', 'C'][i]} (or 'q' to quit): ")
+            if user_input.lower() == 'q':
+                print("Exiting setup...")
+                return  # Exit the setup function
+            try:
+                pos = float(user_input)
+                positions.append(pos)
+            except ValueError:
+                print("Invalid input. Please enter a valid number or 'q' to quit.")
+                break  # Break the inner loop to re-prompt for the current motor
+
+        if len(positions) == 3:
+            # Move the motors to the specified positions
+            multi_stepper.move_to(positions)
+            multi_stepper.run_speed_to_position()
+            
+            # Optional: Add a small delay to avoid overwhelming the system
+            time.sleep(0.1)
+
 # Main Loop
 def balance_ball():
+    prep_time = 5
+
     move_to(4.25, 0, 0)
-    # print("Setting up motor offsets...")
-    # multi_stepper.move_to([0, 40, 65])
-    # multi_stepper.run_speed_to_position()
-    time.sleep(10)
-    debug_log("Starting balance loop...")
+    setup()
+    time.sleep(prep_time)
+    debug_log(f"Starting balance loop in {prep_time} seconds...")
     try:
         while True:
             pid_control(0, 0)  # Maintain the ball at the center (0, 0)
