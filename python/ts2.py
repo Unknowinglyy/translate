@@ -10,7 +10,7 @@ class Point:
         self.y = y
         self.z = z
 
-def read_touch_coordinates(device_path='/dev/input/event4'):
+def read_touch_coordinates(device_path='/dev/input/event6'):
     global prev_point
     device = evdev.InputDevice(device_path)
 
@@ -30,7 +30,7 @@ def read_touch_coordinates(device_path='/dev/input/event4'):
             return Point(x, y)
     return Point(0, 0)
 
-def read_touch_coordinates_with_timeout(timeout=0.1):
+def read_coordinates(timeout=0.1):
     result = [None]
 
     def target():

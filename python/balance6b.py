@@ -3,6 +3,7 @@ from accelstepper import AccelStepper
 from multistepper import MultiStepper
 import RPi.GPIO as GPIO
 from kine2 import Kinematics  # Import the Kinematics class
+from ts2 import *
 from touchScreenTranslatedCoordOutput import *
 import math
 
@@ -15,7 +16,7 @@ CENTER_X, CENTER_Y = 500, 500  # Touchscreen center offsets
 angOrig = 206.662752199                    # Original angle
 angToStep = 1100 / 360           # Steps per degree
 ks = 30                         # Speed amplifying constant
-kp, ki, kd = .00034, 0.000002, 0.0007    # PID constants
+kp, ki, kd = .00038, 0.000002, 0.0007    # PID constants
 
 # Global variables for PID control
 error = [0, 0]  # Error for X and Y axes
@@ -42,7 +43,7 @@ stepperC = AccelStepper(AccelStepper.DRIVER, 23, 24)     # aka "Motor C"
 
 # Configure stepper motor speeds and accelerations
 for stepper in [stepperA, stepperB, stepperC]:
-    stepper.set_max_speed(1000)  # Adjust as needed
+    stepper.set_max_speed(100000)  # Adjust as needed
     stepper.set_acceleration(150000)  # Adjust as needed
 
 # Create a MultiStepper instance
@@ -135,41 +136,38 @@ def pid_control(setpoint_x, setpoint_y):
 
 def setup():
     while True:
-        quit_ = input("Begin offset setup? (y/n): ")
-        if quit_.lower() == 'n':
-            break    
+        try:
+            print("Beginning Setup. ^C to quit setup")    
 
-        # Ask the user for 3 numbers
-        positions = []
-        for i in range(3):
-            user_input = input(f"Enter position for motor {['A', 'B', 'C'][i]} (or 'q' to quit): ")
-            if user_input.lower() == 'q':
-                print("Exiting setup...")
-                return  # Exit the setup function
-            try:
-                pos = float(user_input)
+            # Ask the user for 3 numbers
+            positions = []
+            for i in range(3):
+                if i == 0:
+                    pos = float(input(f"Enter position for motor A: "))
+                elif i == 1:
+                    pos = float(input(f"Enter position for motor B: "))
+                else:
+                    pos = float(input(f"Enter position for motor C: "))
                 positions.append(pos)
-            except ValueError:
-                print("Invalid input. Please enter a valid number or 'q' to quit.")
-                break  # Break the inner loop to re-prompt for the current motor
-
-        if len(positions) == 3:
+            
             # Move the motors to the specified positions
             multi_stepper.move_to(positions)
             multi_stepper.run_speed_to_position()
-
             # Small Delay
-            time.sleep(0.1)
-
+            time.sleep(0.1) 
+            # Set the current offsets as the "zero" position
             stepperA.current_position = 0
             stepperB.current_position = 0
             stepperC.current_position = 0
-            print(f"Current positions: A={stepperA.current_position}, B={stepperB.current_position}, C={stepperC.current_position}")
+            # print(f"Current positions: A={stepperA.current_position}, B={stepperB.current_position}, C={stepperC.current_position}")
+        except KeyboardInterrupt:
+            print("Exiting setup...")
+            break
 
 # Main Loop
 def balance_ball():
     move_to(4.25, 0, 0)
-    
+
     try:
         while True:
             pid_control(0, 0)  # Maintain the ball at the center (0, 0)
