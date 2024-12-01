@@ -123,7 +123,7 @@ def setup():
         # Ask the user for 3 numbers
         positions = []
         for i in range(3):
-            user_input = float(input(f"Enter position for motor {['A', 'B', 'C'][i]} (or 'q' to quit): "))
+            user_input = input(f"Enter position for motor {['A', 'B', 'C'][i]} (or 'q' to quit): ")
             if user_input.lower() == 'q':
                 print("Exiting setup...")
                 return  # Exit the setup function
@@ -137,14 +137,15 @@ def setup():
         if len(positions) == 3:
             # Move the motors to the specified positions
             multi_stepper.move_to(positions)
+            multi_stepper.run_speed_to_position()
+
+            # Small Delay
+            time.sleep(0.1)
+
             stepperA.current_position = 0
             stepperB.current_position = 0
             stepperC.current_position = 0
             print(f"Current positions: A={stepperA.current_position}, B={stepperB.current_position}, C={stepperC.current_position}")
-            multi_stepper.run_speed_to_position()
-            
-            # Optional: Add a small delay to avoid overwhelming the system
-            time.sleep(0.1)
 
 # Main Loop
 def balance_ball():
