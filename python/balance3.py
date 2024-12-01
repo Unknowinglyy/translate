@@ -206,8 +206,9 @@ def PID(setpointX, setpointY):
     else:
         detected = False
         debug_log("Touchscreen data is None.")
-    
-    moveTo(4.25, -out[0], -out[1])
+    timeI = millis()
+    while (millis() - timeI) < 20:
+        moveTo(4.25, -out[0], -out[1])
 
 if __name__ == "__main__":
     try:
