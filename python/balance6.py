@@ -137,9 +137,10 @@ def setup():
         if len(positions) == 3:
             # Move the motors to the specified positions
             multi_stepper.move_to(positions)
-            stepperA.current_position = positions[0]
-            stepperB.current_position = positions[1]
-            stepperC.current_position = positions[2]
+            stepperA.current_position = 0
+            stepperB.current_position = 0
+            stepperC.current_position = 0
+            print(f"Current positions: A={stepperA.current_position}, B={stepperB.current_position}, C={stepperC.current_position}")
             multi_stepper.run_speed_to_position()
             
             # Optional: Add a small delay to avoid overwhelming the system
