@@ -7,11 +7,11 @@ import time
 GPIO.setmode(GPIO.BCM)
 
 # Define enable pin
-ENA = 0  # GPIO pin for enable
+ENA = 17  # GPIO pin for enable
 
 # Initialize stepper motors
-stepperA = AccelStepper(AccelStepper.DRIVER, 1, 2)  # (driver type, STEP, DIR) Driver A
-stepperB = AccelStepper(AccelStepper.DRIVER, 3, 4)  # (driver type, STEP, DIR) Driver B
+stepperA = AccelStepper(AccelStepper.DRIVER, 13, 19)  # (driver type, STEP, DIR) Driver A
+stepperB = AccelStepper(AccelStepper.DRIVER, 23, 24)  # (driver type, STEP, DIR) Driver B
 stepperC = AccelStepper(AccelStepper.DRIVER, 5, 6)  # (driver type, STEP, DIR) Driver C
 
 # Initialize MultiStepper
