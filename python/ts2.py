@@ -46,5 +46,5 @@ def read_coordinates(timeout=0.1):
         return result[0]
 
 if __name__ == "__main__":
-    point = read_touch_coordinates_with_timeout()
+    point = read_coordinates()
     print(f"X: {point.x}, Y: {point.y}")
