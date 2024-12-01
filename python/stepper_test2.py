@@ -24,8 +24,8 @@ backward_positions = [0, 0, 0]
 # Setup function
 def setup():
     # Set initial maximum speed for the steppers (steps/sec)
-    stepperA.set_max_speed(800)
-    stepperB.set_max_speed(800)
+    stepperA.set_max_speed(1200)
+    stepperB.set_max_speed(400)
     stepperC.set_max_speed(800)
     
     # Add the steppers to the MultiStepper instance
