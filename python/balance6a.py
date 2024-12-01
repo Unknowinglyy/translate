@@ -181,8 +181,6 @@ def setup():
 def balance_ball():
     move_to(4.25, 0, 0)
     
-    
-    
     try:
         while True:
             pid_control(0, 0)  # Maintain the ball at the center (0, 0)
@@ -193,14 +191,18 @@ def balance_ball():
         GPIO.cleanup()  # Clean up GPIO or any other resources
 
 if __name__ == "__main__":
-    prep_time = 5
-    debug_log("Initializing...")
+    try:
+        prep_time = 5
+        debug_log("Initializing...")
 
-    # Setup the motors
-    setup()
-    print(f"Starting balance loop in {prep_time} seconds...")
-    time.sleep(prep_time)
+        # Setup the motors
+        setup()
+        print(f"Starting balance loop in {prep_time} seconds...")
+        time.sleep(prep_time)
 
-    # Start the balance loop
-    print("Starting balance loop...")
-    balance_ball()
+        # Start the balance loop
+        print("Starting balance loop...")
+        balance_ball()
+    except KeyboardInterrupt:
+        debug_log("Keyboard interrupt")
+        GPIO.cleanup()
